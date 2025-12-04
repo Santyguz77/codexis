@@ -1,0 +1,102 @@
+=======================================================
+MIGRAR DE LOCALSTORAGE A BACKEND CON API
+Sistema de Suscripciones CODEXIS
+=======================================================
+
+Una vez que tengas el servidor corriendo en tu VPS con Cloudflare Tunnel,
+sigue estos pasos para conectar tu PWA con el backend:
+
+=======================================================
+📝 PASO 1: OBTENER LA URL DE CLOUDFLARE
+=======================================================
+
+Después de ejecutar el tunnel en tu VPS, copia la URL que te da.
+Ejemplo: https://abc-xyz-123.trycloudflare.com
+
+=======================================================
+🔧 PASO 2: MODIFICAR index.html
+=======================================================
+
+En el archivo index.html, busca esta línea (alrededor de la línea 1050):
+
+    // CONFIGURACIÓN DEL BACKEND - Cambiar cuando tengas el servidor listo
+    const API_URL = '';  // Dejar vacío para usar LocalStorage
+
+Y cámbiala por tu URL de Cloudflare:
+
+    // CONFIGURACIÓN DEL BACKEND - URL del servidor
+    const API_URL = 'https://TU-URL-CLOUDFLARE.trycloudflare.com';
+
+=======================================================
+💾 PASO 3: MIGRAR DATOS EXISTENTES
+=======================================================
+
+Si ya tienes datos en LocalStorage y quieres migrarlos al servidor:
+
+1. Abre la consola del navegador (F12)
+
+2. Ejecuta este código:
+
+```javascript
+async function migrateToBackend() {
+    const API_URL = 'https://TU-URL-CLOUDFLARE.trycloudflare.com';
+    
+    const subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '[]');
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const payments = JSON.parse(localStorage.getItem('payments') || '[]');
+    
+    const response = await fetch(`${API_URL}/api/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscriptions, invoices, payments })
+    });
+    
+    const result = await response.json();
+    console.log('✅ Migración completada:', result);
+}
+
+migrateToBackend();
+```
+
+=======================================================
+✅ PASO 4: VERIFICAR QUE FUNCIONA
+=======================================================
+
+1. Recarga la página (F5)
+
+2. Los datos ahora se sincronizarán automáticamente con el servidor
+
+3. Puedes verificar en la consola del navegador que aparezcan mensajes
+   como "✅ Datos sincronizados con el servidor"
+
+4. Abre la app en otro dispositivo o navegador y deberías ver los mismos datos
+
+=======================================================
+🔄 MODO HÍBRIDO (LocalStorage + Backend)
+=======================================================
+
+El código está diseñado para funcionar en modo híbrido:
+
+- Si API_URL está vacío: Solo usa LocalStorage (modo offline)
+- Si API_URL tiene valor: Usa el backend pero mantiene copia en LocalStorage
+  para funcionar offline y sincroniza cuando hay conexión
+
+=======================================================
+📱 VENTAJAS DEL BACKEND
+=======================================================
+
+✅ Sincronización entre dispositivos
+✅ Backup automático en la nube
+✅ Múltiples usuarios pueden acceder
+✅ Los datos persisten aunque borres el caché del navegador
+✅ Puedes acceder desde cualquier lugar
+
+=======================================================
+⚠️ IMPORTANTE
+=======================================================
+
+- La URL de Cloudflare Tunnel gratuita cambia cada vez que reinicias el tunnel
+- Para una URL permanente, necesitas configurar Cloudflare Tunnel con tu propio dominio
+- Considera agregar autenticación para proteger los datos sensibles
+
+=======================================================

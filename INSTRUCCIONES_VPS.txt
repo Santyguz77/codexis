@@ -1,0 +1,169 @@
+=======================================================
+INSTRUCCIONES PARA CONFIGURAR EL SERVIDOR EN VPS
+Sistema de Suscripciones CODEXIS
+=======================================================
+
+📋 REQUISITOS PREVIOS:
+   - VPS con Ubuntu/Debian/Kali Linux
+   - Node.js instalado (v18 o superior)
+   - PM2 instalado globalmente
+   - Cloudflare Tunnel instalado
+
+=======================================================
+🚀 INSTALACIÓN INICIAL EN EL VPS
+=======================================================
+
+1️⃣ CONECTARSE AL VPS:
+   ssh root@TU_IP_VPS
+
+2️⃣ CREAR DIRECTORIO DEL PROYECTO:
+   mkdir -p ~/codexis_api
+   cd ~/codexis_api
+
+3️⃣ COPIAR ARCHIVOS DESDE TU PC AL VPS:
+   (Ejecuta esto en PowerShell de tu PC Windows)
+   
+   scp C:\Users\User\Desktop\Codexis\server.js root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\package.json root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\index.html root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\manifest.json root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\sw.js root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\logo.png root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\image.png root@TU_IP_VPS:/root/codexis_api/
+   scp C:\Users\User\Desktop\Codexis\favicon-32x32.png root@TU_IP_VPS:/root/codexis_api/
+
+4️⃣ EN EL VPS, INSTALAR DEPENDENCIAS:
+   cd ~/codexis_api
+   npm install
+
+5️⃣ PROBAR QUE EL SERVIDOR FUNCIONE:
+   node server.js
+   
+   Deberías ver: "✅ API de CODEXIS corriendo en puerto 3003"
+   Presiona Ctrl+C para detener
+
+6️⃣ INICIAR CON PM2 (para que corra permanentemente):
+   pm2 start server.js --name codexis-api
+   pm2 save
+   pm2 startup
+
+7️⃣ VERIFICAR QUE ESTÉ CORRIENDO:
+   pm2 list
+   pm2 logs codexis-api
+
+=======================================================
+🌐 CONFIGURAR CLOUDFLARE TUNNEL
+=======================================================
+
+8️⃣ CREAR TÚNEL DE CLOUDFLARE:
+   cloudflared tunnel --url http://localhost:3003
+
+   Copia la URL que te da (algo como: https://xyz-abc-123.trycloudflare.com)
+
+9️⃣ PARA TÚNEL PERMANENTE CON PM2:
+   pm2 start cloudflared --name cloudflare-tunnel-codexis -- tunnel --url http://localhost:3003
+   pm2 save
+
+🔟 VERIFICAR QUE EL TÚNEL FUNCIONE:
+   Abre en navegador: https://TU-URL-CLOUDFLARE.trycloudflare.com
+   Debería mostrar: "💼 Servidor de CODEXIS - Sistema de Suscripciones funcionando correctamente"
+
+=======================================================
+🔧 COMANDOS ÚTILES DE MANTENIMIENTO
+=======================================================
+
+VER LOGS DEL SERVIDOR:
+   pm2 logs codexis-api
+
+REINICIAR EL SERVIDOR:
+   pm2 restart codexis-api
+
+DETENER EL SERVIDOR:
+   pm2 stop codexis-api
+
+VERIFICAR ESTADO:
+   pm2 status
+
+VER QUÉ PROCESO USA EL PUERTO 3003:
+   fuser 3003/tcp
+
+MATAR PROCESO QUE USA EL PUERTO:
+   fuser -k 3003/tcp
+
+ACTUALIZAR ARCHIVOS DEL SERVIDOR:
+   (Desde tu PC, ejecuta el comando scp nuevamente)
+   scp C:\Users\User\Desktop\Codexis\server.js root@TU_IP_VPS:/root/codexis_api/
+   
+   (En el VPS, reinicia PM2)
+   pm2 restart codexis-api
+
+=======================================================
+📱 CONECTAR LA PWA CON EL BACKEND
+=======================================================
+
+Una vez que tengas el túnel de Cloudflare funcionando, necesitas:
+
+1. Copiar la URL de Cloudflare (ej: https://xyz-abc-123.trycloudflare.com)
+
+2. Modificar tu index.html para usar el backend en lugar de LocalStorage
+
+3. Cambiar la clase Database para que haga peticiones HTTP al servidor
+
+=======================================================
+✅ VERIFICACIÓN FINAL
+=======================================================
+
+Prueba los endpoints en tu navegador o con curl:
+
+1. Verificar que el servidor responde:
+   https://TU-URL-CLOUDFLARE.trycloudflare.com/
+
+2. Obtener suscripciones:
+   https://TU-URL-CLOUDFLARE.trycloudflare.com/api/subscriptions
+
+3. Obtener facturas:
+   https://TU-URL-CLOUDFLARE.trycloudflare.com/api/invoices
+
+4. Obtener pagos:
+   https://TU-URL-CLOUDFLARE.trycloudflare.com/api/payments
+
+=======================================================
+🆘 SOLUCIÓN DE PROBLEMAS
+=======================================================
+
+PROBLEMA: Puerto 3003 ocupado
+SOLUCIÓN: fuser -k 3003/tcp
+
+PROBLEMA: PM2 no guarda al reiniciar
+SOLUCIÓN: pm2 startup && pm2 save
+
+PROBLEMA: Cloudflare Tunnel se cae
+SOLUCIÓN: pm2 restart cloudflare-tunnel-codexis
+
+PROBLEMA: Base de datos corrupta
+SOLUCIÓN: rm ~/codexis_api/codexis_subscriptions.db && pm2 restart codexis-api
+
+=======================================================
+📞 ENDPOINTS DISPONIBLES
+=======================================================
+
+GET    /                           - Verificar que el servidor funciona
+GET    /api/subscriptions          - Obtener todas las suscripciones
+POST   /api/subscriptions          - Guardar lista completa de suscripciones
+PUT    /api/subscriptions/:id      - Actualizar/crear una suscripción
+DELETE /api/subscriptions/:id      - Eliminar una suscripción
+
+GET    /api/invoices               - Obtener todas las facturas
+POST   /api/invoices               - Guardar lista completa de facturas
+PUT    /api/invoices/:id           - Actualizar/crear una factura
+DELETE /api/invoices/:id           - Eliminar una factura
+
+GET    /api/payments               - Obtener todos los pagos
+POST   /api/payments               - Guardar lista completa de pagos
+PUT    /api/payments/:id           - Actualizar/crear un pago
+DELETE /api/payments/:id           - Eliminar un pago
+
+GET    /api/sync                   - Obtener todos los datos
+POST   /api/sync                   - Sincronizar todos los datos
+
+=======================================================

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Iconos - Codexis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-preview {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        .icon-box {
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        button {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 15px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #333;
+        }
+        .instructions {
+            background: #fffbea;
+            padding: 20px;
+            border-left: 4px solid #ffc107;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generador de Iconos - CODEXIS</h1>
+        
+        <div class="icon-preview">
+            <div class="icon-box">
+                <h3>192x192</h3>
+                <canvas id="canvas192" width="192" height="192"></canvas>
+                <button onclick="downloadIcon('canvas192', 'icon-192.png')">Descargar 192x192</button>
+            </div>
+            
+            <div class="icon-box">
+                <h3>512x512</h3>
+                <canvas id="canvas512" width="512" height="512"></canvas>
+                <button onclick="downloadIcon('canvas512', 'icon-512.png')">Descargar 512x512</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Instrucciones:</h3>
+            <ol>
+                <li>Haz clic en cada botón para descargar los iconos</li>
+                <li>Guarda los archivos en la carpeta de tu proyecto (Codexis)</li>
+                <li>Los nombres deben ser exactamente: <code>icon-192.png</code> y <code>icon-512.png</code></li>
+                <li>¡Listo! Tu PWA ya tiene iconos personalizados</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            
+            // Fondo negro
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Configuración de texto
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Letra C estilizada
+            const fontSize = size * 0.5;
+            ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+            ctx.fillText('C', size / 2, size / 2.2);
+            
+            // Texto "CODEXIS" abajo
+            const smallFont = size * 0.12;
+            ctx.font = `bold ${smallFont}px Arial, sans-serif`;
+            ctx.fillText('CODEXIS', size / 2, size * 0.78);
+            
+            // Línea decorativa
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = size * 0.015;
+            ctx.beginPath();
+            ctx.moveTo(size * 0.25, size * 0.65);
+            ctx.lineTo(size * 0.75, size * 0.65);
+            ctx.stroke();
+        }
+
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Dibujar iconos al cargar
+        window.onload = function() {
+            drawIcon(document.getElementById('canvas192'));
+            drawIcon(document.getElementById('canvas512'));
+        };
+    </script>
+</body>
+</html>
