@@ -3,1932 +3,1149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#000000">
-    <title>Codexis - Gestión de Suscripciones</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="favicon-32x32.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script type="text/javascript" src="https://checkout.wompi.co/widget.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #000000;
-            --secondary: #ffffff;
-            --accent: #1a1a1a;
-            --danger: #ff4757;
-            --warning: #ffa502;
-            --success: #2ed573;
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --gradient-dark: linear-gradient(135deg, #1e1e1e 0%, #000000 100%);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-            background-attachment: fixed;
-            color: var(--secondary);
-            min-height: 100vh;
-        }
-
-        .header {
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid transparent;
-            border-image: var(--gradient-3);
-            border-image-slice: 1;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .header-logo {
-            height: 80px;
-            margin-bottom: 1rem;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))
-                    drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
-                    drop-shadow(0 0 60px rgba(255, 255, 255, 0.2));
-            animation: logoGlow 2s ease-in-out infinite alternate, float 3s ease-in-out infinite;
-            transition: all 0.3s ease;
-        }
-
-        .header-logo:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.9))
-                    drop-shadow(0 0 50px rgba(255, 255, 255, 0.6))
-                    drop-shadow(0 0 80px rgba(255, 255, 255, 0.4));
-        }
-
-        @keyframes logoGlow {
-            from {
-                filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))
-                        drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
-                        drop-shadow(0 0 60px rgba(255, 255, 255, 0.2));
-            }
-            to {
-                filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.9))
-                        drop-shadow(0 0 50px rgba(255, 255, 255, 0.6))
-                        drop-shadow(0 0 80px rgba(255, 255, 255, 0.4));
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .header p {
-            font-size: 1rem;
-            color: #aaa;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding: 0.5rem;
-            background: rgba(26, 26, 26, 0.5);
-            border-radius: 15px;
-            overflow-x: auto;
-            backdrop-filter: blur(5px);
-        }
-
-        .tab {
-            background: transparent;
-            color: var(--secondary);
-            border: none;
-            padding: 1rem 2rem;
-            cursor: pointer;
-            font-size: 1rem;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            position: relative;
-            font-weight: 500;
-        }
-
-        .tab::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 10px;
-            padding: 2px;
-            background: var(--gradient-3);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .tab:hover {
-            background: rgba(79, 172, 254, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .tab:hover::before {
-            opacity: 1;
-        }
-
-        .tab.active {
-            background: var(--gradient-3);
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-        }
-
-        .tab.active::before {
-            opacity: 0;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .btn {
-            background: var(--gradient-3);
-            color: white;
-            border: none;
-            padding: 0.875rem 2rem;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(79, 172, 254, 0.5);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%);
-            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 6px 25px rgba(255, 71, 87, 0.5);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #2ed573 0%, #7bed9f 100%);
-            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 6px 25px rgba(46, 213, 115, 0.5);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid rgba(79, 172, 254, 0.3);
-            background: rgba(26, 26, 26, 0.6);
-            color: var(--secondary);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: rgba(79, 172, 254, 1);
-            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
-            background: rgba(26, 26, 26, 0.9);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .card {
-            background: rgba(26, 26, 26, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(79, 172, 254, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(79, 172, 254, 0.2);
-            border-color: rgba(79, 172, 254, 0.3);
-        }
-
-        .card:hover::before {
-            left: 100%;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #555;
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-
-        .card-subtitle {
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-top: 0.3rem;
-        }
-
-        .card-body {
-            line-height: 1.6;
-        }
-
-        .card-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-label {
-            color: #aaa;
-            font-size: 0.85rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .info-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.5rem 1.2rem;
-            border-radius: 25px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .status-active {
-            background: linear-gradient(135deg, #2ed573 0%, #7bed9f 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.4);
-        }
-
-        .status-warning {
-            background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 165, 2, 0.4);
-        }
-
-        .status-expired {
-            background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            overflow-y: auto;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .modal-content {
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(79, 172, 254, 0.3);
-            border-radius: 20px;
-            padding: 2.5rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #555;
-        }
-
-        .modal-header h2 {
-            font-size: 1.5rem;
-        }
-
-        .close-modal {
-            float: right;
-            font-size: 2rem;
-            line-height: 1;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: var(--secondary);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--gradient-dark);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(79, 172, 254, 0.1) 60deg, transparent 120deg);
-            animation: rotate 4s linear infinite;
-        }
-
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
-        }
-
-        .stat-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 40px rgba(79, 172, 254, 0.3);
-        }
-
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 900;
-            margin: 0.5rem 0;
-            background: var(--gradient-3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat-label {
-            color: #bbb;
-            font-size: 0.95rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .invoice-preview {
-            background: var(--secondary);
-            color: var(--primary);
-            padding: 2rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-        }
-
-        .invoice-table th,
-        .invoice-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .invoice-table th {
-            background: var(--primary);
-            color: var(--secondary);
-        }
-
-        .invoice-total {
-            text-align: right;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-top: 1rem;
-        }
-
-        .reminder-list {
-            list-style: none;
-        }
-
-        .reminder-item {
-            background: var(--accent);
-            border-left: 4px solid var(--warning);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-        }
-
-        .reminder-item.urgent {
-            border-left-color: var(--danger);
-        }
-
-        .reminder-date {
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-top: 0.5rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #888;
-        }
-
-        .empty-state h3 {
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.4rem;
-            }
-
-            .card-info {
-                grid-template-columns: 1fr;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-bar select,
-        .filter-bar input {
-            padding: 0.75rem;
-            border: 2px solid var(--accent);
-            background: var(--accent);
-            color: var(--secondary);
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .auth-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .auth-overlay.active {
-            display: flex;
-        }
-
-        .auth-box {
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(79, 172, 254, 0.3);
-            border-radius: 20px;
-            padding: 3rem;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .auth-box h2 {
-            margin-bottom: 1.5rem;
-            background: var(--gradient-3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .auth-box input {
-            width: 100%;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 2px solid rgba(79, 172, 254, 0.3);
-            background: rgba(26, 26, 26, 0.6);
-            color: var(--secondary);
-            border-radius: 10px;
-            font-size: 1rem;
-        }
-
-        .auth-box input:focus {
-            outline: none;
-            border-color: rgba(79, 172, 254, 1);
-            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
-        }
-
-        .lock-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-    </style>
+    <meta name="description" content="Sistema profesional de gestión de suscripciones, facturas y pagos">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="CODEXIS">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <title>CODEXIS - Gestión de Suscripciones</title>
 </head>
 <body>
-    <!-- Auth Overlay -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-box">
-            <div class="lock-icon">🔒</div>
-            <h2>Acceso a Configuración</h2>
-            <p style="color: #aaa; margin-bottom: 2rem;">Ingresa tu contraseña para acceder</p>
-            <input type="password" id="authPassword" placeholder="Contraseña" autocomplete="off">
-            <button class="btn" onclick="authenticate()" style="width: 100%;">Desbloquear</button>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            <span>CODEXIS</span>
         </div>
-    </div>
+        
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-page="suscripciones">
+                <i class="fas fa-briefcase"></i>
+                <span>Suscripciones</span>
+            </a>
+            <a href="#" class="nav-item" data-page="facturas">
+                <i class="fas fa-file-invoice"></i>
+                <span>Facturas</span>
+            </a>
+            <a href="#" class="nav-item" data-page="pagos">
+                <i class="fas fa-credit-card"></i>
+                <span>Pagos</span>
+            </a>
+            <a href="#" class="nav-item" data-page="mensajes">
+                <i class="fas fa-comments"></i>
+                <span>Mensajes</span>
+                <span class="badge">0</span>
+            </a>
+            <a href="#" class="nav-item" data-page="clientes">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="#" class="nav-item" data-page="configuracion">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </a>
+        </nav>
+    </aside>
 
-    <div class="header">
-        <img src="logo.png" alt="Codexis Logo" class="header-logo">
-        <p>Gestión de Suscripciones de Software</p>
-    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar suscripciones, clientes, facturas...">
+            </div>
+            <div class="user-actions">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge-dot"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </header>
 
-    <div class="container">
-        <div class="tabs">
-            <button class="tab active" data-tab="dashboard">Dashboard</button>
-            <button class="tab" data-tab="subscriptions">Suscripciones</button>
-            <button class="tab" data-tab="invoices">Facturas</button>
-            <button class="tab" data-tab="reminders">Recordatorios</button>
-            <button class="tab" data-tab="payments">Pagos</button>
-        </div>
+        <!-- Dashboard Page -->
+        <section id="dashboard" class="page active">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <button class="btn-primary" onclick="showModal('nuevaSuscripcion')">
+                    <i class="fas fa-plus"></i> Nueva Suscripción
+                </button>
+            </div>
 
-        <!-- Dashboard -->
-        <div class="tab-content active" id="dashboard">
+            <!-- Stats Cards -->
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Suscripciones Activas</div>
-                    <div class="stat-value" id="activeCount">0</div>
+                <div class="stat-card blue">
+                    <div class="stat-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-activas">0</h3>
+                        <p>Suscripciones Activas</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Próximos a Vencer</div>
-                    <div class="stat-value" id="expiringCount">0</div>
+                <div class="stat-card green">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-aldia">0</h3>
+                        <p>Pagos al Día</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Ingresos del Mes</div>
-                    <div class="stat-value" id="monthlyRevenue">$0</div>
+                <div class="stat-card red">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-pendientes">0</h3>
+                        <p>Pagos Pendientes</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Clientes</div>
-                    <div class="stat-value" id="clientCount">0</div>
+                <div class="stat-card purple">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-ingresos">$ 0</h3>
+                        <p>Ingresos del Mes</p>
+                    </div>
                 </div>
             </div>
 
+            <!-- Próximos Vencimientos -->
             <div class="card">
                 <div class="card-header">
-                    <h2>Alertas de Vencimiento</h2>
+                    <h2>Próximos Vencimientos</h2>
+                    <a href="#" class="link">Ver todas</a>
                 </div>
-                <div id="dashboardAlerts">
-                    <div class="empty-state">
-                        <h3>No hay alertas pendientes</h3>
-                        <p>Todas las suscripciones están al día</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Subscriptions -->
-        <div class="tab-content" id="subscriptions">
-            <button class="btn" id="addSubscriptionBtn">+ Nueva Suscripción</button>
-            
-            <div class="filter-bar" style="margin-top: 1.5rem;">
-                <input type="text" id="searchSub" placeholder="Buscar cliente o programa...">
-                <select id="filterStatus">
-                    <option value="">Todos los estados</option>
-                    <option value="active">Activo</option>
-                    <option value="warning">Por vencer</option>
-                    <option value="expired">Vencido</option>
-                </select>
-            </div>
-
-            <div id="subscriptionsList">
-                <div class="empty-state">
-                    <h3>No hay suscripciones registradas</h3>
-                    <p>Comienza agregando una nueva suscripción</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Invoices -->
-        <div class="tab-content" id="invoices">
-            <div class="filter-bar">
-                <input type="month" id="filterMonth">
-                <button class="btn" id="generateInvoiceBtn">Generar Factura</button>
-            </div>
-
-            <div id="invoicesList">
-                <div class="empty-state">
-                    <h3>No hay facturas generadas</h3>
-                    <p>Genera facturas desde las suscripciones activas</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reminders -->
-        <div class="tab-content" id="reminders">
-            <ul class="reminder-list" id="remindersList">
-                <div class="empty-state">
-                    <h3>No hay recordatorios pendientes</h3>
-                    <p>Los recordatorios se generan automáticamente</p>
-                </div>
-            </ul>
-        </div>
-
-        <!-- Payments -->
-        <div class="tab-content" id="payments">
-            <div class="stats-grid" style="margin-bottom: 2rem;">
-                <div class="stat-card">
-                    <div class="stat-label">Pagos Recibidos</div>
-                    <div class="stat-value" id="paymentsReceived">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Recaudado</div>
-                    <div class="stat-value" id="totalCollected">$0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Pendientes de Pago</div>
-                    <div class="stat-value" id="pendingPayments">0</div>
-                </div>
-            </div>
-
-            <div id="paymentsList">
-                <div class="empty-state">
-                    <h3>No hay pagos registrados</h3>
-                    <p>Los pagos aparecerán aquí cuando los clientes paguen</p>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
-
-    <!-- Modal for Add/Edit Subscription -->
-    <div class="modal" id="subscriptionModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close-modal">&times;</button>
-                <h2 id="modalTitle">Nueva Suscripción</h2>
-            </div>
-            <form id="subscriptionForm">
-                <input type="hidden" id="subId">
-                
-                <div class="form-group">
-                    <label for="clientName">Cliente *</label>
-                    <input type="text" id="clientName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="clientEmail">Email *</label>
-                    <input type="email" id="clientEmail" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="clientPhone">Teléfono</label>
-                    <input type="tel" id="clientPhone">
-                </div>
-
-                <div class="form-group">
-                    <label for="programName">Programa/Software *</label>
-                    <input type="text" id="programName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="programDescription">Descripción</label>
-                    <textarea id="programDescription"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="monthlyFee">Cuota Mensual ($) *</label>
-                    <input type="number" id="monthlyFee" step="0.01" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="startDate">Fecha de Inicio *</label>
-                    <input type="date" id="startDate" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="cutoffDay">Día de Corte (1-31) *</label>
-                    <input type="number" id="cutoffDay" min="1" max="31" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="reminderDays">Recordatorio (días antes) *</label>
-                    <input type="number" id="reminderDays" value="5" min="1" required>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn">Guardar</button>
-                    <button type="button" class="btn btn-danger" id="cancelBtn">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal for Generate Invoice -->
-    <div class="modal" id="invoiceModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close-modal">&times;</button>
-                <h2>Generar Factura</h2>
-            </div>
-            <form id="invoiceForm">
-                <div class="form-group">
-                    <label for="invoiceSubscription">Seleccionar Suscripción *</label>
-                    <select id="invoiceSubscription" required>
-                        <option value="">-- Seleccione --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="invoiceDate">Fecha de Factura *</label>
-                    <input type="date" id="invoiceDate" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="invoicePeriod">Período *</label>
-                    <input type="text" id="invoicePeriod" placeholder="Ej: Enero 2024" required>
-                </div>
-
-                <div id="invoicePreviewContainer"></div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn" id="previewInvoiceBtn">Vista Previa</button>
-                    <button type="submit" class="btn btn-success">Generar</button>
-                    <button type="button" class="btn btn-danger" id="cancelInvoiceBtn">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker registrado', reg))
-                .catch(err => console.log('Error al registrar Service Worker', err));
-        }
-
-        // Simple encryption/decryption (for basic protection)
-        class Crypto {
-            static encrypt(text, password) {
-                // Simple XOR encryption with password
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    result += String.fromCharCode(text.charCodeAt(i) ^ password.charCodeAt(i % password.length));
-                }
-                return btoa(result); // Base64 encode
-            }
-
-            static decrypt(encrypted, password) {
-                try {
-                    const text = atob(encrypted); // Base64 decode
-                    let result = '';
-                    for (let i = 0; i < text.length; i++) {
-                        result += String.fromCharCode(text.charCodeAt(i) ^ password.charCodeAt(i % password.length));
-                    }
-                    return result;
-                } catch {
-                    return null;
-                }
-            }
-
-            static hash(text) {
-                // Simple hash function
-                let hash = 0;
-                for (let i = 0; i < text.length; i++) {
-                    const char = text.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash;
-                }
-                return hash.toString();
-            }
-        }
-
-        // Authentication Manager
-        class AuthManager {
-            constructor() {
-                const defaultPassword = 'Colombia77.';
-                this.passwordHash = localStorage.getItem('appPasswordHash');
-                
-                // Set default password if not exists
-                if (!this.passwordHash) {
-                    this.passwordHash = Crypto.hash(defaultPassword);
-                    localStorage.setItem('appPasswordHash', this.passwordHash);
-                }
-                
-                this.isAuthenticated = false;
-                this.currentPassword = null;
-            }
-
-            hasPassword() {
-                return this.passwordHash !== null;
-            }
-
-            setPassword(password) {
-                this.passwordHash = Crypto.hash(password);
-                localStorage.setItem('appPasswordHash', this.passwordHash);
-                this.isAuthenticated = true;
-                this.currentPassword = password;
-            }
-
-            verifyPassword(password) {
-                const hash = Crypto.hash(password);
-                if (hash === this.passwordHash) {
-                    this.isAuthenticated = true;
-                    this.currentPassword = password;
-                    return true;
-                }
-                return false;
-            }
-
-            logout() {
-                this.isAuthenticated = false;
-                this.currentPassword = null;
-            }
-        }
-
-        const authManager = new AuthManager();
-
-        // Authentication functions
-        window.authenticate = function() {
-            const password = document.getElementById('authPassword').value;
-            
-            if (!password) {
-                alert('Por favor ingresa una contraseña');
-                return;
-            }
-
-            if (authManager.verifyPassword(password)) {
-                document.getElementById('authOverlay').classList.remove('active');
-                document.getElementById('authPassword').value = '';
-            } else {
-                alert('❌ Contraseña incorrecta');
-                document.getElementById('authPassword').value = '';
-            }
-        };
-
-        // Enter key on password
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('authPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    authenticate();
-                }
-            });
-        });
-
-        // Wompi Configuration - Llave fija en código
-        class WompiConfig {
-            constructor() {
-                // CONFIGURACIÓN FIJA - Para cambiar la llave, modifica esta línea:
-                this.publicKey = 'pub_test_RAqnhtzXL2RelRoyT4fOzeo10sW4r2TC';
-                // Secreto de integridad de tu cuenta Wompi
-                this.integritySecret = 'test_integrity_iZ6LG18NV43VYaU9em514MU0oIvwECno';
-                this.testMode = true;
-            }
-
-            async generateIntegrity(reference, amountInCents, currency) {
-                const cadena = `${reference}${amountInCents}${currency}${this.integritySecret}`;
-                const msgUint8 = new TextEncoder().encode(cadena);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-                return hashHex;
-            }
-
-            isConfigured() {
-                return this.publicKey && this.publicKey.length > 0;
-            }
-        }
-
-        const wompiConfig = new WompiConfig();
-
-        // CONFIGURACIÓN DEL BACKEND
-        // Dejar vacío para usar solo LocalStorage (modo offline)
-        // Colocar la URL de tu servidor para sincronizar con backend
-        const API_URL = 'https://earnings-list-tennessee-workflow.trycloudflare.com';  // Backend en VPS con Cloudflare
-
-        // Database Management (Híbrido: LocalStorage + Backend)
-        class Database {
-            constructor() {
-                this.subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '[]');
-                this.invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-                this.payments = JSON.parse(localStorage.getItem('payments') || '[]');
-                
-                // Sincronizar con backend al iniciar (si está configurado)
-                if (API_URL) {
-                    this.syncFromBackend();
-                }
-            }
-
-            // Sincronizar desde el backend al cargar
-            async syncFromBackend() {
-                try {
-                    const response = await fetch(`${API_URL}/api/sync`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.subscriptions = data.subscriptions || [];
-                        this.invoices = data.invoices || [];
-                        this.payments = data.payments || [];
-                        
-                        // Guardar en LocalStorage como backup
-                        this.saveSubscriptions();
-                        this.saveInvoices();
-                        this.savePayments();
-                        
-                        console.log('✅ Datos sincronizados desde el servidor');
-                    }
-                } catch (error) {
-                    console.warn('⚠️ No se pudo conectar al servidor, usando datos locales', error);
-                }
-            }
-
-            // Sincronizar hacia el backend después de cada cambio
-            async syncToBackend() {
-                if (!API_URL) return;
-                
-                try {
-                    const response = await fetch(`${API_URL}/api/sync`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            subscriptions: this.subscriptions,
-                            invoices: this.invoices,
-                            payments: this.payments
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        console.log('✅ Datos sincronizados con el servidor');
-                    }
-                } catch (error) {
-                    console.warn('⚠️ Error al sincronizar con servidor, datos guardados localmente', error);
-                }
-            }
-
-            saveSubscriptions() {
-                localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-                this.syncToBackend();
-            }
-
-            saveInvoices() {
-                localStorage.setItem('invoices', JSON.stringify(this.invoices));
-                this.syncToBackend();
-            }
-
-            savePayments() {
-                localStorage.setItem('payments', JSON.stringify(this.payments));
-                this.syncToBackend();
-            }
-
-            addPayment(payment) {
-                payment.id = Date.now().toString();
-                payment.date = new Date().toISOString();
-                this.payments.push(payment);
-                this.savePayments();
-                return payment;
-            }
-
-            addSubscription(sub) {
-                sub.id = Date.now().toString();
-                this.subscriptions.push(sub);
-                this.saveSubscriptions();
-                return sub;
-            }
-
-            updateSubscription(id, data) {
-                const index = this.subscriptions.findIndex(s => s.id === id);
-                if (index !== -1) {
-                    this.subscriptions[index] = { ...this.subscriptions[index], ...data };
-                    this.saveSubscriptions();
-                }
-            }
-
-            deleteSubscription(id) {
-                this.subscriptions = this.subscriptions.filter(s => s.id !== id);
-                this.saveSubscriptions();
-            }
-
-            addInvoice(invoice) {
-                invoice.id = Date.now().toString();
-                invoice.number = `INV-${Date.now()}`;
-                this.invoices.push(invoice);
-                this.saveInvoices();
-                return invoice;
-            }
-        }
-
-        const db = new Database();
-
-        // Tab Navigation
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-
-                if (tab.dataset.tab === 'dashboard') updateDashboard();
-                if (tab.dataset.tab === 'subscriptions') renderSubscriptions();
-                if (tab.dataset.tab === 'invoices') renderInvoices();
-                if (tab.dataset.tab === 'reminders') renderReminders();
-                if (tab.dataset.tab === 'payments') renderPayments();
-            });
-        });
-
-        // Modal Management
-        const subscriptionModal = document.getElementById('subscriptionModal');
-        const invoiceModal = document.getElementById('invoiceModal');
-
-        document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', () => {
-                subscriptionModal.classList.remove('active');
-                invoiceModal.classList.remove('active');
-            });
-        });
-
-        document.getElementById('addSubscriptionBtn').addEventListener('click', () => {
-            document.getElementById('modalTitle').textContent = 'Nueva Suscripción';
-            document.getElementById('subscriptionForm').reset();
-            document.getElementById('subId').value = '';
-            document.getElementById('startDate').valueAsDate = new Date();
-            subscriptionModal.classList.add('active');
-        });
-
-        document.getElementById('cancelBtn').addEventListener('click', () => {
-            subscriptionModal.classList.remove('active');
-        });
-
-        document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
-            const select = document.getElementById('invoiceSubscription');
-            select.innerHTML = '<option value="">-- Seleccione --</option>';
-            
-            db.subscriptions.forEach(sub => {
-                const option = document.createElement('option');
-                option.value = sub.id;
-                option.textContent = `${sub.clientName} - ${sub.programName}`;
-                select.appendChild(option);
-            });
-
-            document.getElementById('invoiceDate').valueAsDate = new Date();
-            const now = new Date();
-            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            document.getElementById('invoicePeriod').value = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
-            
-            invoiceModal.classList.add('active');
-        });
-
-        document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
-            invoiceModal.classList.remove('active');
-        });
-
-        // Subscription Form
-        document.getElementById('subscriptionForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const data = {
-                clientName: document.getElementById('clientName').value,
-                clientEmail: document.getElementById('clientEmail').value,
-                clientPhone: document.getElementById('clientPhone').value,
-                programName: document.getElementById('programName').value,
-                programDescription: document.getElementById('programDescription').value,
-                monthlyFee: parseFloat(document.getElementById('monthlyFee').value),
-                startDate: document.getElementById('startDate').value,
-                cutoffDay: parseInt(document.getElementById('cutoffDay').value),
-                reminderDays: parseInt(document.getElementById('reminderDays').value)
-            };
-
-            const id = document.getElementById('subId').value;
-            if (id) {
-                db.updateSubscription(id, data);
-            } else {
-                db.addSubscription(data);
-            }
-
-            subscriptionModal.classList.remove('active');
-            renderSubscriptions();
-            updateDashboard();
-        });
-
-        // Invoice Preview
-        document.getElementById('previewInvoiceBtn').addEventListener('click', () => {
-            const subId = document.getElementById('invoiceSubscription').value;
-            if (!subId) {
-                alert('Seleccione una suscripción');
-                return;
-            }
-
-            const sub = db.subscriptions.find(s => s.id === subId);
-            const date = document.getElementById('invoiceDate').value;
-            const period = document.getElementById('invoicePeriod').value;
-
-            const preview = `
-                <div class="invoice-preview">
-                    <div class="invoice-header">
-                        <div>
-                            <h2>CODEXIS</h2>
-                            <p>Desarrollo de Software</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <h3>FACTURA</h3>
-                            <p>Fecha: ${new Date(date).toLocaleDateString('es-ES')}</p>
-                            <p>Período: ${period}</p>
-                        </div>
-                    </div>
-                    <div>
-                        <h3>Cliente:</h3>
-                        <p>${sub.clientName}</p>
-                        <p>${sub.clientEmail}</p>
-                        ${sub.clientPhone ? `<p>${sub.clientPhone}</p>` : ''}
-                    </div>
-                    <table class="invoice-table">
+                <div class="table-container">
+                    <table id="tabla-vencimientos">
                         <thead>
                             <tr>
-                                <th>Concepto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Total</th>
+                                <th>Cliente</th>
+                                <th>Programa</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Corte</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Días Restantes</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>${sub.programName}<br><small>${sub.programDescription || ''}</small></td>
-                                <td>1</td>
-                                <td>$${sub.monthlyFee.toFixed(2)}</td>
-                                <td>$${sub.monthlyFee.toFixed(2)}</td>
-                            </tr>
+                            <!-- Datos dinámicos -->
                         </tbody>
                     </table>
-                    <div class="invoice-total">
-                        Total: $${sub.monthlyFee.toFixed(2)}
+                </div>
+            </div>
+        </section>
+
+        <!-- Suscripciones Page -->
+        <section id="suscripciones" class="page">
+            <div class="page-header">
+                <h1>Gestión de Suscripciones</h1>
+                <button class="btn-primary" onclick="showModal('nuevaSuscripcion')">
+                    <i class="fas fa-plus"></i> Nueva Suscripción
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="table-container">
+                    <table id="tabla-suscripciones">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Programa</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Corte</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facturas Page -->
+        <section id="facturas" class="page">
+            <div class="page-header">
+                <h1>Facturas</h1>
+                <button class="btn-primary" onclick="generarFactura()">
+                    <i class="fas fa-file-invoice"></i> Generar Factura
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="table-container">
+                    <table id="tabla-facturas">
+                        <thead>
+                            <tr>
+                                <th>N° Factura</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pagos Page -->
+        <section id="pagos" class="page">
+            <div class="page-header">
+                <h1>Historial de Pagos</h1>
+            </div>
+            
+            <div class="card">
+                <div class="table-container">
+                    <table id="tabla-pagos">
+                        <thead>
+                            <tr>
+                                <th>ID Transacción</th>
+                                <th>Cliente</th>
+                                <th>Monto</th>
+                                <th>Método</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mensajes Page -->
+        <section id="mensajes" class="page">
+            <div class="page-header">
+                <h1>Centro de Mensajes y Soporte</h1>
+            </div>
+            
+            <div class="mensajes-container">
+                <div class="mensajes-list">
+                    <div class="mensajes-header">
+                        <h3>Conversaciones</h3>
+                        <button class="btn-secondary" onclick="showModal('nuevoMensaje')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="lista-conversaciones">
+                        <!-- Lista de conversaciones -->
+                    </div>
+                </div>
+                <div class="mensajes-chat">
+                    <div class="chat-header">
+                        <h3>Selecciona una conversación</h3>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Mensajes -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="mensaje-input" placeholder="Escribe un mensaje...">
+                        <button class="btn-primary" onclick="enviarMensaje()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clientes Page -->
+        <section id="clientes" class="page">
+            <div class="page-header">
+                <h1>Gestión de Clientes</h1>
+                <button class="btn-primary" onclick="showModal('nuevoCliente')">
+                    <i class="fas fa-plus"></i> Nuevo Cliente
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="table-container">
+                    <table id="tabla-clientes">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Suscripciones</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuración Page -->
+        <section id="configuracion" class="page">
+            <div class="page-header">
+                <h1>Configuración</h1>
+            </div>
+            
+            <div class="settings-grid">
+                <div class="card">
+                    <h3>Configuración de Wompi</h3>
+                    <form id="form-wompi">
+                        <div class="form-group">
+                            <label>Public Key</label>
+                            <input type="text" id="wompi-public-key" placeholder="pub_test_...">
+                        </div>
+                        <div class="form-group">
+                            <label>Private Key</label>
+                            <input type="password" id="wompi-private-key" placeholder="prv_test_...">
+                        </div>
+                        <button type="submit" class="btn-primary">Guardar</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>Programas Disponibles</h3>
+                    <div id="lista-programas">
+                        <!-- Lista de programas -->
+                    </div>
+                    <button class="btn-secondary" onclick="showModal('nuevoPrograma')">
+                        <i class="fas fa-plus"></i> Agregar Programa
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Nueva Suscripción -->
+    <div id="modal-nuevaSuscripcion" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nueva Suscripción</h2>
+                <button class="close-btn" onclick="closeModal('nuevaSuscripcion')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="form-nueva-suscripcion" onsubmit="guardarSuscripcion(event)">
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <select id="suscripcion-cliente" required>
+                        <option value="">Seleccionar cliente...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Programa</label>
+                    <select id="suscripcion-programa" required>
+                        <option value="">Seleccionar programa...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Inicio</label>
+                    <input type="date" id="suscripcion-fecha-inicio" required>
+                </div>
+                <div class="form-group">
+                    <label>Monto</label>
+                    <input type="number" id="suscripcion-monto" placeholder="$ 0" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('nuevaSuscripcion')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Cliente -->
+    <div id="modal-nuevoCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuevo Cliente</h2>
+                <button class="close-btn" onclick="closeModal('nuevoCliente')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="form-nuevo-cliente" onsubmit="guardarCliente(event)">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="cliente-nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="cliente-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" id="cliente-telefono" required>
+                </div>
+                <div class="form-group">
+                    <label>Dirección</label>
+                    <input type="text" id="cliente-direccion">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('nuevoCliente')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Pago Wompi -->
+    <div id="modal-pago" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Procesar Pago</h2>
+                <button class="close-btn" onclick="closeModal('pago')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="pago-info">
+                <h3>Detalles del Pago</h3>
+                <div class="pago-detalle">
+                    <span>Cliente:</span>
+                    <span id="pago-cliente"></span>
+                </div>
+                <div class="pago-detalle">
+                    <span>Concepto:</span>
+                    <span id="pago-concepto"></span>
+                </div>
+                <div class="pago-detalle total">
+                    <span>Total:</span>
+                    <span id="pago-monto"></span>
+                </div>
+            </div>
+            <div id="wompi-payment-widget"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('pago')">Cancelar</button>
+                <button type="button" class="btn-primary" onclick="procesarPagoWompi()">Pagar con Wompi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wompi Widget -->
+    <script src="https://checkout.wompi.co/widget.js"></script>
+    
+    <!-- PWA Installation Script -->
+    <script></script>
+    <script>
+        // ========== CONFIGURACIÓN API ==========
+        // URL del túnel de Cloudflare
+        const API_URL = localStorage.getItem('API_URL') || 'https://impressed-arrival-steel-telecharger.trycloudflare.com';
+        let authToken = localStorage.getItem('authToken') || null;
+
+        // ========== REGISTRO DEL SERVICE WORKER ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.error('❌ Error al registrar Service Worker:', err);
+                    });
+            });
+        }
+
+        // ========== INSTALACIÓN DE PWA ==========
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botón de instalación (opcional)
+            const installBtn = document.createElement('button');
+            installBtn.className = 'btn-primary';
+            installBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999;';
+            installBtn.innerHTML = '<i class="fas fa-download"></i> Instalar App';
+            installBtn.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`Resultado de instalación: ${outcome}`);
+                    deferredPrompt = null;
+                    installBtn.remove();
+                }
+            };
+            document.body.appendChild(installBtn);
+        });
+
+        // ========== DATOS Y ESTADO ==========
+        let suscripciones = [];
+        let clientes = [];
+        let facturas = [];
+        let pagos = [];
+        let mensajes = [];
+        let programas = [];
+        
+        let currentPage = 'dashboard';
+        let wompiConfig = {
+            publicKey: 'pub_test_G6gQRPaqYwcmq0xrEv6pBgYBWOx7hTBW',
+            currency: 'COP'
+        };
+
+        // ========== UTILIDADES API ==========
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+
+                if (response.status === 401) {
+                    // Token inválido, redirigir a login
+                    localStorage.removeItem('authToken');
+                    alert('Sesión expirada. Por favor inicie sesión nuevamente.');
+                    return null;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('Error en API:', error);
+                
+                // Si falla la API, usar datos locales como respaldo
+                if (options.fallbackData) {
+                    return options.fallbackData;
+                }
+                
+                throw error;
+            }
+        }
+
+        // ========== SINCRONIZACIÓN DE DATOS ==========
+        async function syncWithServer() {
+            try {
+                if (!authToken) {
+                    console.log('No hay token de autenticación, usando datos locales');
+                    return;
+                }
+
+                // Cargar datos del servidor
+                const [subsData, clientsData, facturasData, pagosData, programasData] = await Promise.all([
+                    fetchAPI('/api/suscripciones').catch(() => []),
+                    fetchAPI('/api/clientes').catch(() => []),
+                    fetchAPI('/api/facturas').catch(() => []),
+                    fetchAPI('/api/pagos').catch(() => []),
+                    fetchAPI('/api/programas').catch(() => [])
+                ]);
+
+                if (subsData) suscripciones = subsData;
+                if (clientsData) clientes = clientsData;
+                if (facturasData) facturas = facturasData;
+                if (pagosData) pagos = pagosData;
+                if (programasData) programas = programasData;
+
+                // Guardar en localStorage como respaldo
+                guardarDatosLocales();
+                
+                console.log('✅ Datos sincronizados con el servidor');
+            } catch (error) {
+                console.error('Error al sincronizar:', error);
+                // Cargar datos locales como respaldo
+                cargarDatosLocales();
+            }
+        }
+
+        function guardarDatosLocales() {
+            localStorage.setItem('suscripciones', JSON.stringify(suscripciones));
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            localStorage.setItem('facturas', JSON.stringify(facturas));
+            localStorage.setItem('pagos', JSON.stringify(pagos));
+            localStorage.setItem('programas', JSON.stringify(programas));
+        }
+
+        function cargarDatosLocales() {
+            if (localStorage.getItem('suscripciones')) {
+                suscripciones = JSON.parse(localStorage.getItem('suscripciones'));
+            }
+            if (localStorage.getItem('clientes')) {
+                clientes = JSON.parse(localStorage.getItem('clientes'));
+            }
+            if (localStorage.getItem('facturas')) {
+                facturas = JSON.parse(localStorage.getItem('facturas'));
+            }
+            if (localStorage.getItem('pagos')) {
+                pagos = JSON.parse(localStorage.getItem('pagos'));
+            }
+            if (localStorage.getItem('programas')) {
+                programas = JSON.parse(localStorage.getItem('programas'));
+            }
+        }
+
+        // ========== INICIALIZACIÓN ==========
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Primero cargar datos locales
+            cargarDatosLocales();
+            
+            // Luego sincronizar con servidor
+            await syncWithServer();
+            
+            configurarNavegacion();
+            actualizarDashboard();
+            cargarProgramas();
+        });
+
+        function cargarDatosIniciales() {
+            // Cargar datos de localStorage si existen
+            if (localStorage.getItem('suscripciones')) {
+                suscripciones = JSON.parse(localStorage.getItem('suscripciones'));
+            } else {
+                // Datos de ejemplo
+                const hoy = new Date();
+                suscripciones = [
+                    {
+                        id: 1,
+                        clienteNombre: 'Comercializadora XYZ',
+                        programa: 'Sistema de Facturación',
+                        fechaInicio: new Date(2025, 10, 13).toISOString(),
+                        fechaCorte: new Date(2025, 11, 12).toISOString(),
+                        monto: 250000,
+                        estado: 'pendiente'
+                    },
+                    {
+                        id: 2,
+                        clienteNombre: 'Empresa ABC S.A.S',
+                        programa: 'Software ERP Premium',
+                        fechaInicio: new Date(2025, 10, 29).toISOString(),
+                        fechaCorte: new Date(2025, 11, 29).toISOString(),
+                        monto: 500000,
+                        estado: 'pagado'
+                    },
+                    {
+                        id: 3,
+                        clienteNombre: 'Servicios Integrales LTDA',
+                        programa: 'CRM Empresarial',
+                        fechaInicio: new Date(2025, 11, 3).toISOString(),
+                        fechaCorte: new Date(2026, 0, 2).toISOString(),
+                        monto: 350000,
+                        estado: 'pagado'
+                    }
+                ];
+            }
+            
+            if (localStorage.getItem('clientes')) {
+                clientes = JSON.parse(localStorage.getItem('clientes'));
+            } else {
+                clientes = [
+                    { id: 1, nombre: 'Comercializadora XYZ', email: 'contacto@xyz.com', telefono: '3001234567', estado: 'activo' },
+                    { id: 2, nombre: 'Empresa ABC S.A.S', email: 'info@abc.com', telefono: '3007654321', estado: 'activo' },
+                    { id: 3, nombre: 'Servicios Integrales LTDA', email: 'ventas@servicios.com', telefono: '3009876543', estado: 'activo' }
+                ];
+            }
+
+            guardarDatos();
+        }
+
+        function guardarDatos() {
+            localStorage.setItem('suscripciones', JSON.stringify(suscripciones));
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            localStorage.setItem('facturas', JSON.stringify(facturas));
+            localStorage.setItem('pagos', JSON.stringify(pagos));
+        }
+
+        // ========== NAVEGACIÓN ==========
+        function configurarNavegacion() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    cambiarPagina(page);
+                });
+            });
+        }
+
+        function cambiarPagina(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(page).classList.add('active');
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            
+            currentPage = page;
+            
+            // Cargar datos de la página
+            switch(page) {
+                case 'dashboard':
+                    actualizarDashboard();
+                    break;
+                case 'suscripciones':
+                    cargarSuscripciones();
+                    break;
+                case 'facturas':
+                    cargarFacturas();
+                    break;
+                case 'pagos':
+                    cargarPagos();
+                    break;
+                case 'clientes':
+                    cargarClientes();
+                    break;
+                case 'mensajes':
+                    cargarMensajes();
+                    break;
+            }
+        }
+
+        // ========== DASHBOARD ==========
+        function actualizarDashboard() {
+            const activas = suscripciones.length;
+            const pagados = suscripciones.filter(s => s.estado === 'pagado').length;
+            const pendientes = suscripciones.filter(s => s.estado === 'pendiente').length;
+            const ingresos = suscripciones.reduce((sum, s) => s.estado === 'pagado' ? sum + s.monto : sum, 0);
+            
+            document.getElementById('stat-activas').textContent = activas;
+            document.getElementById('stat-aldia').textContent = pagados;
+            document.getElementById('stat-pendientes').textContent = pendientes;
+            document.getElementById('stat-ingresos').textContent = '$ ' + ingresos.toLocaleString('es-CO');
+            
+            cargarProximosVencimientos();
+        }
+
+        function cargarProximosVencimientos() {
+            const tbody = document.querySelector('#tabla-vencimientos tbody');
+            tbody.innerHTML = '';
+            
+            const hoy = new Date();
+            const proximos = suscripciones
+                .map(s => ({
+                    ...s,
+                    diasRestantes: Math.ceil((new Date(s.fechaCorte) - hoy) / (1000 * 60 * 60 * 24))
+                }))
+                .sort((a, b) => a.diasRestantes - b.diasRestantes);
+            
+            proximos.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.clienteNombre}</td>
+                    <td>${s.programa}</td>
+                    <td>${formatDate(s.fechaInicio)}</td>
+                    <td>${formatDate(s.fechaCorte)}</td>
+                    <td>$ ${s.monto.toLocaleString('es-CO')}</td>
+                    <td><span class="badge-status ${s.estado}">${s.estado === 'pagado' ? 'Pagado' : 'Pendiente'}</span></td>
+                    <td>${s.diasRestantes} días</td>
+                    <td>
+                        <button class="action-btn" onclick="verDetalle(${s.id})" title="Ver"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="editarSuscripcion(${s.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="enviarMensajeCliente(${s.id})" title="Mensaje"><i class="fas fa-comment"></i></button>
+                        <button class="action-btn" onclick="iniciarPago(${s.id})" title="Pagar"><i class="fas fa-dollar-sign"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== SUSCRIPCIONES ==========
+        function cargarSuscripciones() {
+            const tbody = document.querySelector('#tabla-suscripciones tbody');
+            tbody.innerHTML = '';
+            
+            suscripciones.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${s.id}</td>
+                    <td>${s.clienteNombre}</td>
+                    <td>${s.programa}</td>
+                    <td>${formatDate(s.fechaInicio)}</td>
+                    <td>${formatDate(s.fechaCorte)}</td>
+                    <td>$ ${s.monto.toLocaleString('es-CO')}</td>
+                    <td><span class="badge-status ${s.estado}">${s.estado === 'pagado' ? 'Pagado' : 'Pendiente'}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="editarSuscripcion(${s.id})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="eliminarSuscripcion(${s.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            cargarClientesSelect();
+            cargarProgramasSelect();
+        }
+
+        async function guardarSuscripcion(event) {
+            event.preventDefault();
+            
+            const clienteId = document.getElementById('suscripcion-cliente').value;
+            const programaId = document.getElementById('suscripcion-programa').value;
+            const fechaInicio = document.getElementById('suscripcion-fecha-inicio').value;
+            const monto = parseFloat(document.getElementById('suscripcion-monto').value);
+            
+            const cliente = clientes.find(c => c.id == clienteId);
+            const programa = programas.find(p => p.id == programaId);
+            
+            const fechaCorte = new Date(fechaInicio);
+            fechaCorte.setMonth(fechaCorte.getMonth() + 1);
+            
+            const nuevaSuscripcion = {
+                clienteNombre: cliente.nombre,
+                clienteId: parseInt(clienteId),
+                programa: programa.nombre,
+                fechaInicio: new Date(fechaInicio).toISOString(),
+                fechaCorte: fechaCorte.toISOString(),
+                monto: monto,
+                estado: 'pendiente'
+            };
+            
+            try {
+                // Intentar guardar en el servidor
+                const response = await fetchAPI('/api/suscripciones', {
+                    method: 'POST',
+                    body: JSON.stringify(nuevaSuscripcion)
+                });
+                
+                if (response) {
+                    suscripciones.push(response);
+                } else {
+                    // Si falla, guardar localmente
+                    nuevaSuscripcion.id = suscripciones.length + 1;
+                    suscripciones.push(nuevaSuscripcion);
+                }
+            } catch (error) {
+                // Guardar localmente si hay error
+                nuevaSuscripcion.id = suscripciones.length + 1;
+                suscripciones.push(nuevaSuscripcion);
+            }
+            
+            guardarDatosLocales();
+            closeModal('nuevaSuscripcion');
+            cargarSuscripciones();
+            actualizarDashboard();
+            
+            alert('Suscripción creada exitosamente');
+        }
+
+        // ========== CLIENTES ==========
+        function cargarClientes() {
+            const tbody = document.querySelector('#tabla-clientes tbody');
+            tbody.innerHTML = '';
+            
+            clientes.forEach(c => {
+                const suscrip = suscripciones.filter(s => s.clienteNombre === c.nombre).length;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${c.id}</td>
+                    <td>${c.nombre}</td>
+                    <td>${c.email}</td>
+                    <td>${c.telefono}</td>
+                    <td>${suscrip}</td>
+                    <td><span class="badge-status pagado">${c.estado}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="editarCliente(${c.id})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="eliminarCliente(${c.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function guardarCliente(event) {
+            event.preventDefault();
+            
+            const nuevoCliente = {
+                nombre: document.getElementById('cliente-nombre').value,
+                email: document.getElementById('cliente-email').value,
+                telefono: document.getElementById('cliente-telefono').value,
+                direccion: document.getElementById('cliente-direccion').value,
+                estado: 'activo'
+            };
+            
+            try {
+                // Intentar guardar en el servidor
+                const response = await fetchAPI('/api/clientes', {
+                    method: 'POST',
+                    body: JSON.stringify(nuevoCliente)
+                });
+                
+                if (response) {
+                    clientes.push(response);
+                } else {
+                    nuevoCliente.id = clientes.length + 1;
+                    clientes.push(nuevoCliente);
+                }
+            } catch (error) {
+                nuevoCliente.id = clientes.length + 1;
+                clientes.push(nuevoCliente);
+            }
+            
+            guardarDatosLocales();
+            closeModal('nuevoCliente');
+            cargarClientes();
+            
+            alert('Cliente agregado exitosamente');
+        }
+
+        function cargarClientesSelect() {
+            const select = document.getElementById('suscripcion-cliente');
+            select.innerHTML = '<option value="">Seleccionar cliente...</option>';
+            clientes.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+            });
+        }
+
+        // ========== FACTURAS ==========
+        function cargarFacturas() {
+            const tbody = document.querySelector('#tabla-facturas tbody');
+            tbody.innerHTML = '';
+            
+            // Generar facturas automáticamente de suscripciones pagadas
+            const facturasAuto = suscripciones.filter(s => s.estado === 'pagado').map((s, i) => ({
+                numero: `F-${String(i + 1).padStart(5, '0')}`,
+                cliente: s.clienteNombre,
+                fecha: s.fechaInicio,
+                monto: s.monto,
+                estado: 'pagada'
+            }));
+            
+            facturasAuto.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${f.numero}</td>
+                    <td>${f.cliente}</td>
+                    <td>${formatDate(f.fecha)}</td>
+                    <td>$ ${f.monto.toLocaleString('es-CO')}</td>
+                    <td><span class="badge-status pagado">${f.estado}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="descargarFactura('${f.numero}')"><i class="fas fa-download"></i></button>
+                        <button class="action-btn" onclick="enviarFactura('${f.numero}')"><i class="fas fa-paper-plane"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function descargarFactura(numero) {
+            alert(`Descargando factura ${numero}...`);
+            // Aquí puedes implementar la generación de PDF
+        }
+
+        function enviarFactura(numero) {
+            alert(`Enviando factura ${numero} por email...`);
+        }
+
+        // ========== PAGOS WOMPI ==========
+        function iniciarPago(suscripcionId) {
+            const suscripcion = suscripciones.find(s => s.id === suscripcionId);
+            
+            document.getElementById('pago-cliente').textContent = suscripcion.clienteNombre;
+            document.getElementById('pago-concepto').textContent = suscripcion.programa;
+            document.getElementById('pago-monto').textContent = '$ ' + suscripcion.monto.toLocaleString('es-CO');
+            
+            document.getElementById('modal-pago').dataset.suscripcionId = suscripcionId;
+            showModal('pago');
+        }
+
+        function procesarPagoWompi() {
+            const suscripcionId = parseInt(document.getElementById('modal-pago').dataset.suscripcionId);
+            const suscripcion = suscripciones.find(s => s.id === suscripcionId);
+            
+            // Configurar checkout de Wompi
+            var checkout = new WidgetCheckout({
+                currency: 'COP',
+                amountInCents: suscripcion.monto * 100,
+                reference: `SUB-${suscripcionId}-${Date.now()}`,
+                publicKey: wompiConfig.publicKey,
+                redirectUrl: window.location.href
+            });
+            
+            checkout.open(function (result) {
+                var transaction = result.transaction;
+                
+                if (transaction.status === 'APPROVED') {
+                    // Actualizar estado de suscripción
+                    suscripcion.estado = 'pagado';
+                    
+                    // Registrar pago
+                    pagos.push({
+                        id: pagos.length + 1,
+                        transactionId: transaction.id,
+                        cliente: suscripcion.clienteNombre,
+                        monto: suscripcion.monto,
+                        metodo: 'Wompi',
+                        fecha: new Date().toISOString(),
+                        estado: 'aprobado'
+                    });
+                    
+                    guardarDatos();
+                    closeModal('pago');
+                    actualizarDashboard();
+                    
+                    alert('¡Pago procesado exitosamente!');
+                } else {
+                    alert('El pago no pudo ser procesado');
+                }
+            });
+        }
+
+        function cargarPagos() {
+            const tbody = document.querySelector('#tabla-pagos tbody');
+            tbody.innerHTML = '';
+            
+            pagos.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.transactionId}</td>
+                    <td>${p.cliente}</td>
+                    <td>$ ${p.monto.toLocaleString('es-CO')}</td>
+                    <td>${p.metodo}</td>
+                    <td>${formatDate(p.fecha)}</td>
+                    <td><span class="badge-status pagado">${p.estado}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== MENSAJES ==========
+        function cargarMensajes() {
+            // Implementación básica de mensajes
+            const lista = document.getElementById('lista-conversaciones');
+            lista.innerHTML = `
+                <div class="conversacion-item">
+                    <div class="avatar">CX</div>
+                    <div class="conversacion-info">
+                        <h4>Comercializadora XYZ</h4>
+                        <p>Consulta sobre renovación...</p>
                     </div>
                 </div>
             `;
-
-            document.getElementById('invoicePreviewContainer').innerHTML = preview;
-        });
-
-        // Invoice Form
-        document.getElementById('invoiceForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const subId = document.getElementById('invoiceSubscription').value;
-            const sub = db.subscriptions.find(s => s.id === subId);
-
-            const invoice = {
-                subscriptionId: subId,
-                clientName: sub.clientName,
-                clientEmail: sub.clientEmail,
-                programName: sub.programName,
-                amount: sub.monthlyFee,
-                date: document.getElementById('invoiceDate').value,
-                period: document.getElementById('invoicePeriod').value
-            };
-
-            db.addInvoice(invoice);
-            invoiceModal.classList.remove('active');
-            renderInvoices();
-            alert('Factura generada exitosamente');
-        });
-
-        // Render Functions
-        function getSubscriptionStatus(sub) {
-            const today = new Date();
-            const cutoffDate = new Date(today.getFullYear(), today.getMonth(), sub.cutoffDay);
-            const daysUntilCutoff = Math.ceil((cutoffDate - today) / (1000 * 60 * 60 * 24));
-
-            if (daysUntilCutoff < 0) return { status: 'expired', label: 'Vencido' };
-            if (daysUntilCutoff <= sub.reminderDays) return { status: 'warning', label: 'Por Vencer' };
-            return { status: 'active', label: 'Activo' };
         }
 
-        function renderSubscriptions() {
-            const container = document.getElementById('subscriptionsList');
-            const search = document.getElementById('searchSub').value.toLowerCase();
-            const filterStatus = document.getElementById('filterStatus').value;
-
-            let filtered = db.subscriptions;
-
-            if (search) {
-                filtered = filtered.filter(s => 
-                    s.clientName.toLowerCase().includes(search) ||
-                    s.programName.toLowerCase().includes(search)
-                );
+        function enviarMensaje() {
+            const input = document.getElementById('mensaje-input');
+            if (input.value.trim()) {
+                alert('Mensaje enviado: ' + input.value);
+                input.value = '';
             }
-
-            if (filterStatus) {
-                filtered = filtered.filter(s => getSubscriptionStatus(s).status === filterStatus);
-            }
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No se encontraron suscripciones</h3></div>';
-                return;
-            }
-
-            container.innerHTML = filtered.map(sub => {
-                const status = getSubscriptionStatus(sub);
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">${sub.clientName}</div>
-                                <div class="card-subtitle">${sub.clientEmail}</div>
-                            </div>
-                            <span class="status-badge status-${status.status}">${status.label}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-info">
-                                <div class="info-item">
-                                    <span class="info-label">Programa</span>
-                                    <span class="info-value">${sub.programName}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Cuota Mensual</span>
-                                    <span class="info-value">$${sub.monthlyFee.toFixed(2)}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Día de Corte</span>
-                                    <span class="info-value">${sub.cutoffDay}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Fecha de Inicio</span>
-                                    <span class="info-value">${new Date(sub.startDate).toLocaleDateString('es-ES')}</span>
-                                </div>
-                            </div>
-                            ${sub.programDescription ? `<p style="margin-top: 1rem; color: #ccc;">${sub.programDescription}</p>` : ''}
-                            <div class="card-actions">
-                                <button class="btn" onclick="editSubscription('${sub.id}')">Editar</button>
-                                <button class="btn btn-danger" onclick="deleteSubscription('${sub.id}')">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
-        function renderInvoices() {
-            const container = document.getElementById('invoicesList');
-            const filterMonth = document.getElementById('filterMonth').value;
-
-            let filtered = db.invoices;
-
-            if (filterMonth) {
-                filtered = filtered.filter(inv => inv.date.startsWith(filterMonth));
-            }
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No se encontraron facturas</h3></div>';
-                return;
-            }
-
-            container.innerHTML = filtered.map(inv => `
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">${inv.number}</div>
-                            <div class="card-subtitle">${inv.clientName}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="info-value" style="color: #4CAF50;">$${inv.amount.toFixed(2)}</div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-info">
-                            <div class="info-item">
-                                <span class="info-label">Programa</span>
-                                <span class="info-value">${inv.programName}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Período</span>
-                                <span class="info-value">${inv.period}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Fecha</span>
-                                <span class="info-value">${new Date(inv.date).toLocaleDateString('es-ES')}</span>
-                            </div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn btn-success" onclick="processPayment('${inv.id}')">💳 Cobrar con Wompi</button>
-                            <button class="btn" onclick="downloadInvoice('${inv.id}')">⬇️ Descargar PDF</button>
-                            <button class="btn" onclick="sendInvoiceEmail('${inv.id}')">✉️ Enviar Email</button>
-                            <button class="btn" onclick="sendInvoiceWhatsApp('${inv.id}')">📱 Enviar WhatsApp</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderReminders() {
-            const container = document.getElementById('remindersList');
-            const reminders = [];
-
-            db.subscriptions.forEach(sub => {
-                const today = new Date();
-                const cutoffDate = new Date(today.getFullYear(), today.getMonth(), sub.cutoffDay);
-                const daysUntilCutoff = Math.ceil((cutoffDate - today) / (1000 * 60 * 60 * 24));
-
-                if (daysUntilCutoff >= 0 && daysUntilCutoff <= sub.reminderDays) {
-                    reminders.push({
-                        sub,
-                        days: daysUntilCutoff,
-                        urgent: daysUntilCutoff <= 2
-                    });
-                }
-            });
-
-            if (reminders.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No hay recordatorios pendientes</h3></div>';
-                return;
-            }
-
-            container.innerHTML = reminders.map(r => `
-                <li class="reminder-item ${r.urgent ? 'urgent' : ''}">
-                    <strong>${r.sub.clientName} - ${r.sub.programName}</strong>
-                    <p>Vencimiento en ${r.days} día${r.days !== 1 ? 's' : ''}</p>
-                    <p>Monto: $${r.sub.monthlyFee.toFixed(2)}</p>
-                    <div class="reminder-date">Día de corte: ${r.sub.cutoffDay}</div>
-                </li>
-            `).join('');
-        }
-
-        function updateDashboard() {
-            const today = new Date();
-            let activeCount = 0;
-            let expiringCount = 0;
-            let monthlyRevenue = 0;
-
-            db.subscriptions.forEach(sub => {
-                const status = getSubscriptionStatus(sub);
-                if (status.status === 'active') activeCount++;
-                if (status.status === 'warning') expiringCount++;
-                monthlyRevenue += sub.monthlyFee;
-            });
-
-            document.getElementById('activeCount').textContent = activeCount;
-            document.getElementById('expiringCount').textContent = expiringCount;
-            document.getElementById('monthlyRevenue').textContent = `$${monthlyRevenue.toFixed(2)}`;
-            document.getElementById('clientCount').textContent = db.subscriptions.length;
-
-            // Dashboard alerts
-            const alertsContainer = document.getElementById('dashboardAlerts');
-            const expiring = db.subscriptions.filter(s => getSubscriptionStatus(s).status === 'warning');
-
-            if (expiring.length === 0) {
-                alertsContainer.innerHTML = '<div class="empty-state"><h3>No hay alertas pendientes</h3></div>';
-            } else {
-                alertsContainer.innerHTML = expiring.map(sub => {
-                    const status = getSubscriptionStatus(sub);
-                    const today = new Date();
-                    const cutoffDate = new Date(today.getFullYear(), today.getMonth(), sub.cutoffDay);
-                    const days = Math.ceil((cutoffDate - today) / (1000 * 60 * 60 * 24));
-                    
-                    return `
-                        <div class="reminder-item urgent">
-                            <strong>${sub.clientName} - ${sub.programName}</strong>
-                            <p>Vence en ${days} día${days !== 1 ? 's' : ''}</p>
-                            <p>Monto: $${sub.monthlyFee.toFixed(2)}</p>
+        // ========== PROGRAMAS ==========
+        function cargarProgramas() {
+            const lista = document.getElementById('lista-programas');
+            if (lista) {
+                lista.innerHTML = '';
+                programas.forEach(p => {
+                    lista.innerHTML += `
+                        <div class="programa-item">
+                            <span>${p.nombre}</span>
+                            <span>$ ${p.precio.toLocaleString('es-CO')}</span>
                         </div>
                     `;
-                }).join('');
+                });
             }
         }
 
-        // Global Functions
-        window.editSubscription = (id) => {
-            const sub = db.subscriptions.find(s => s.id === id);
-            if (!sub) return;
+        function cargarProgramasSelect() {
+            const select = document.getElementById('suscripcion-programa');
+            select.innerHTML = '<option value="">Seleccionar programa...</option>';
+            programas.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.nombre} - $${p.precio.toLocaleString('es-CO')}</option>`;
+            });
+        }
 
-            document.getElementById('modalTitle').textContent = 'Editar Suscripción';
-            document.getElementById('subId').value = sub.id;
-            document.getElementById('clientName').value = sub.clientName;
-            document.getElementById('clientEmail').value = sub.clientEmail;
-            document.getElementById('clientPhone').value = sub.clientPhone || '';
-            document.getElementById('programName').value = sub.programName;
-            document.getElementById('programDescription').value = sub.programDescription || '';
-            document.getElementById('monthlyFee').value = sub.monthlyFee;
-            document.getElementById('startDate').value = sub.startDate;
-            document.getElementById('cutoffDay').value = sub.cutoffDay;
-            document.getElementById('reminderDays').value = sub.reminderDays;
+        // ========== MODALES ==========
+        function showModal(modalId) {
+            document.getElementById('modal-' + modalId).classList.add('show');
+        }
 
-            subscriptionModal.classList.add('active');
-        };
+        function closeModal(modalId) {
+            document.getElementById('modal-' + modalId).classList.remove('show');
+        }
 
-        window.deleteSubscription = (id) => {
+        // Cerrar modal al hacer click fuera
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // ========== UTILIDADES ==========
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function verDetalle(id) {
+            alert('Ver detalle de suscripción #' + id);
+        }
+
+        function editarSuscripcion(id) {
+            alert('Editar suscripción #' + id);
+        }
+
+        function eliminarSuscripcion(id) {
             if (confirm('¿Está seguro de eliminar esta suscripción?')) {
-                db.deleteSubscription(id);
-                renderSubscriptions();
-                updateDashboard();
+                suscripciones = suscripciones.filter(s => s.id !== id);
+                guardarDatos();
+                cargarSuscripciones();
+                actualizarDashboard();
             }
-        };
-
-        window.downloadInvoice = (id) => {
-            const invoice = db.invoices.find(inv => inv.id === id);
-            if (!invoice) return;
-
-            const sub = db.subscriptions.find(s => s.id === invoice.subscriptionId);
-            
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Configuración de colores
-            const primaryColor = [0, 0, 0];
-            const accentColor = [79, 172, 254];
-            const textColor = [50, 50, 50];
-            
-            // Header con gradiente simulado
-            doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 40, 'F');
-            
-            // Logo y título
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(28);
-            doc.setFont(undefined, 'bold');
-            doc.text('CODEXIS', 105, 20, { align: 'center' });
-            
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'normal');
-            doc.text('Desarrollo de Software', 105, 28, { align: 'center' });
-            
-            // Línea decorativa
-            doc.setDrawColor(...accentColor);
-            doc.setLineWidth(2);
-            doc.line(20, 35, 190, 35);
-            
-            // Información de la factura
-            doc.setTextColor(...textColor);
-            doc.setFontSize(20);
-            doc.setFont(undefined, 'bold');
-            doc.text('FACTURA', 20, 50);
-            
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'normal');
-            doc.text(`No. ${invoice.number}`, 20, 57);
-            doc.text(`Fecha: ${new Date(invoice.date).toLocaleDateString('es-ES', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            })}`, 20, 63);
-            doc.text(`Período: ${invoice.period}`, 20, 69);
-            
-            // Información del cliente
-            doc.setFontSize(12);
-            doc.setFont(undefined, 'bold');
-            doc.text('FACTURAR A:', 20, 85);
-            
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'normal');
-            doc.text(invoice.clientName, 20, 93);
-            doc.text(invoice.clientEmail, 20, 99);
-            if (sub && sub.clientPhone) {
-                doc.text(sub.clientPhone, 20, 105);
-            }
-            
-            // Tabla de conceptos
-            const startY = 120;
-            
-            // Header de tabla
-            doc.setFillColor(...accentColor);
-            doc.rect(20, startY, 170, 10, 'F');
-            
-            doc.setTextColor(255, 255, 255);
-            doc.setFont(undefined, 'bold');
-            doc.setFontSize(10);
-            doc.text('CONCEPTO', 25, startY + 7);
-            doc.text('CANT.', 120, startY + 7);
-            doc.text('PRECIO', 145, startY + 7);
-            doc.text('TOTAL', 170, startY + 7);
-            
-            // Fila de concepto
-            doc.setTextColor(...textColor);
-            doc.setFont(undefined, 'normal');
-            doc.text(invoice.programName, 25, startY + 17);
-            if (sub && sub.programDescription) {
-                doc.setFontSize(8);
-                doc.setTextColor(100, 100, 100);
-                const lines = doc.splitTextToSize(sub.programDescription, 85);
-                doc.text(lines, 25, startY + 22);
-                doc.setFontSize(10);
-                doc.setTextColor(...textColor);
-            }
-            
-            doc.text('1', 120, startY + 17);
-            doc.text(`$${invoice.amount.toFixed(2)}`, 145, startY + 17);
-            doc.text(`$${invoice.amount.toFixed(2)}`, 170, startY + 17);
-            
-            // Línea separadora
-            doc.setDrawColor(200, 200, 200);
-            doc.setLineWidth(0.5);
-            doc.line(20, startY + 25, 190, startY + 25);
-            
-            // Totales
-            const totalY = startY + 35;
-            doc.setFont(undefined, 'bold');
-            doc.setFontSize(12);
-            doc.text('SUBTOTAL:', 130, totalY);
-            doc.text(`$${invoice.amount.toFixed(2)}`, 170, totalY);
-            
-            doc.setFontSize(14);
-            doc.text('TOTAL:', 130, totalY + 10);
-            doc.setTextColor(...accentColor);
-            doc.text(`$${invoice.amount.toFixed(2)}`, 170, totalY + 10);
-            
-            // Footer
-            doc.setTextColor(100, 100, 100);
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'italic');
-            doc.text('Gracias por su preferencia', 105, 270, { align: 'center' });
-            
-            doc.setFontSize(8);
-            doc.text('CODEXIS - Desarrollo de Software', 105, 280, { align: 'center' });
-            doc.text('Este documento es una factura válida', 105, 285, { align: 'center' });
-            
-            // Descargar PDF
-            doc.save(`Factura-${invoice.number}-${invoice.clientName.replace(/\s+/g, '-')}.pdf`);
-        };
-
-        window.sendInvoiceEmail = (id) => {
-            const invoice = db.invoices.find(inv => inv.id === id);
-            if (!invoice) return;
-
-            // Generar el PDF primero
-            window.downloadInvoice(id);
-            
-            // Preparar email
-            const subject = `Factura ${invoice.number} - ${invoice.period}`;
-            const body = `Estimado/a ${invoice.clientName},\n\nAdjunto encontrará su factura correspondiente al período ${invoice.period}.\n\nPrograma: ${invoice.programName}\nMonto: $${invoice.amount.toFixed(2)}\n\nGracias por su preferencia.\n\nSaludos,\nEquipo CODEXIS`;
-            
-            // Abrir cliente de email
-            const mailtoLink = `mailto:${invoice.clientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.location.href = mailtoLink;
-            
-            alert('Se ha descargado el PDF y abierto su cliente de correo. Por favor adjunte el PDF manualmente.');
-        };
-
-        window.sendInvoiceWhatsApp = (id) => {
-            const invoice = db.invoices.find(inv => inv.id === id);
-            if (!invoice) return;
-
-            const sub = db.subscriptions.find(s => s.clientName === invoice.clientName && s.programName === invoice.programName);
-            if (!sub || !sub.clientPhone) {
-                alert('⚠️ No se encontró un número de teléfono para este cliente. Por favor agrega el teléfono en la suscripción.');
-                return;
-            }
-
-            // Limpiar número de teléfono (quitar espacios, guiones, paréntesis)
-            let phone = sub.clientPhone.replace(/[\s\-\(\)]/g, '');
-            
-            // Si el número no tiene código de país, agregar +57 (Colombia)
-            if (!phone.startsWith('+')) {
-                if (!phone.startsWith('57')) {
-                    phone = '57' + phone;
-                }
-            } else {
-                phone = phone.substring(1); // Quitar el + inicial
-            }
-
-            // Preparar mensaje de WhatsApp
-            const message = `Hola ${invoice.clientName.toUpperCase()}, te enviamos la factura de tu suscripción:\n\n` +
-                `📄 *Factura:* ${invoice.number}\n` +
-                `📅 *Período:* ${invoice.period}\n` +
-                `💼 *Programa:* ${invoice.programName}\n` +
-                `💰 *Monto:* $${invoice.amount.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP\n\n` +
-                `Para realizar el pago, puedes usar el siguiente enlace: ${window.location.origin}${window.location.pathname}\n\n` +
-                `Gracias por tu confianza.\n\n` +
-                `— *CODEXIS* - Desarrollo de Software`;
-
-            // Crear URL de WhatsApp
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
-            
-            // Abrir WhatsApp
-            window.open(whatsappUrl, '_blank');
-        };
-
-
-
-        window.processPayment = async (invoiceId) => {
-            const invoice = db.invoices.find(inv => inv.id === invoiceId);
-            if (!invoice) return;
-
-            // Verificar si ya fue pagada
-            const alreadyPaid = db.payments.find(p => p.invoiceId === invoiceId && p.status === 'APPROVED');
-            if (alreadyPaid) {
-                alert('✅ Esta factura ya fue pagada el ' + new Date(alreadyPaid.date).toLocaleDateString('es-ES'));
-                return;
-            }
-
-            const amountInCents = Math.round(invoice.amount * 100);
-            const currency = 'COP';
-            const reference = `INV-${invoice.number}-${Date.now()}`;
-
-            // Generar firma de integridad
-            const integrity = await wompiConfig.generateIntegrity(reference, amountInCents, currency);
-
-            // Crear formulario dinámico para abrir Wompi Checkout
-            const form = document.createElement('form');
-            form.action = 'https://checkout.wompi.co/p/';
-            form.method = 'GET';
-            form.target = '_blank';
-
-            // Parámetros obligatorios
-            const params = {
-                'public-key': wompiConfig.publicKey,
-                'currency': currency,
-                'amount-in-cents': amountInCents,
-                'reference': reference,
-                'signature:integrity': integrity,
-                'redirect-url': window.location.href
-            };
-
-            // Parámetros opcionales del cliente
-            if (invoice.clientEmail) {
-                params['customer-data:email'] = invoice.clientEmail;
-            }
-            if (invoice.clientName) {
-                params['customer-data:full-name'] = invoice.clientName;
-            }
-
-            // Crear inputs ocultos
-            for (const [key, value] of Object.entries(params)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
-
-            // Agregar al body, enviar y remover
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
-
-            // Mostrar mensaje informativo
-            setTimeout(() => {
-                if (confirm('Se abrió la ventana de pago de Wompi.\n\n¿El pago se completó exitosamente?')) {
-                    db.addPayment({
-                        invoiceId: invoiceId,
-                        invoiceNumber: invoice.number,
-                        clientName: invoice.clientName,
-                        amount: invoice.amount,
-                        status: 'APPROVED',
-                        transactionId: reference,
-                        paymentMethod: 'Wompi',
-                        reference: reference
-                    });
-
-                    alert('✅ ¡Pago registrado exitosamente!');
-                    renderPayments();
-                    updateDashboard();
-                    renderInvoices();
-                }
-            }, 2000);
-        };
-
-        function renderPayments() {
-            const container = document.getElementById('paymentsList');
-            
-            if (db.payments.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No hay pagos registrados</h3></div>';
-                return;
-            }
-
-            container.innerHTML = db.payments.sort((a, b) => new Date(b.date) - new Date(a.date)).map(payment => {
-                const statusColors = {
-                    'APPROVED': 'status-active',
-                    'DECLINED': 'status-expired',
-                    'PENDING': 'status-warning',
-                    'VOIDED': 'status-expired'
-                };
-                
-                const statusLabels = {
-                    'APPROVED': 'Aprobado',
-                    'DECLINED': 'Rechazado',
-                    'PENDING': 'Pendiente',
-                    'VOIDED': 'Cancelado'
-                };
-
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">${payment.clientName}</div>
-                                <div class="card-subtitle">${payment.invoiceNumber}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div class="info-value" style="color: #2ed573; margin-bottom: 0.5rem;">$${payment.amount.toFixed(2)}</div>
-                                <span class="status-badge ${statusColors[payment.status]}">${statusLabels[payment.status]}</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-info">
-                                <div class="info-item">
-                                    <span class="info-label">Fecha</span>
-                                    <span class="info-value">${new Date(payment.date).toLocaleString('es-ES')}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Método</span>
-                                    <span class="info-value">${payment.paymentMethod || 'N/A'}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">ID Transacción</span>
-                                    <span class="info-value" style="font-size: 0.85rem;">${payment.transactionId}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Referencia</span>
-                                    <span class="info-value" style="font-size: 0.85rem;">${payment.reference}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Actualizar estadísticas
-            const approved = db.payments.filter(p => p.status === 'APPROVED');
-            document.getElementById('paymentsReceived').textContent = approved.length;
-            document.getElementById('totalCollected').textContent = '$' + approved.reduce((sum, p) => sum + p.amount, 0).toFixed(2);
-            document.getElementById('pendingPayments').textContent = db.invoices.length - approved.length;
         }
 
-        // Search and Filter
-        document.getElementById('searchSub').addEventListener('input', renderSubscriptions);
-        document.getElementById('filterStatus').addEventListener('change', renderSubscriptions);
-        document.getElementById('filterMonth').addEventListener('change', renderInvoices);
+        function editarCliente(id) {
+            alert('Editar cliente #' + id);
+        }
 
-        // Initialize
-        updateDashboard();
+        function eliminarCliente(id) {
+            if (confirm('¿Está seguro de eliminar este cliente?')) {
+                clientes = clientes.filter(c => c.id !== id);
+                guardarDatos();
+                cargarClientes();
+            }
+        }
+
+        function enviarMensajeCliente(id) {
+            cambiarPagina('mensajes');
+        }
+
+        function generarFactura() {
+            alert('Generar nueva factura');
+        }
     </script>
 </body>
 </html>
