@@ -739,6 +739,69 @@ tbody tr:hover {
     }
 }
 
+/* ========== COTIZACIONES ========== */
+.cotizacion-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.item-cotizacion {
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: var(--card-bg);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.btn-icon {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-icon:hover {
+    background: #5a6268;
+}
+
+.totales-cotizacion {
+    background: var(--primary-black);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+/* ========== CAMPOS CONDICIONALES ========== */
+.campos-nuevos {
+    margin-top: 15px;
+    padding: 15px;
+    border-left: 4px solid var(--primary-color);
+    background: var(--hover-color);
+    border-radius: 4px;
+    display: none;
+}
+
+.campos-nuevos h4 {
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 600;
+}
+
 /* ========== SCROLLBAR ========== */
 ::-webkit-scrollbar {
     width: 8px;
