@@ -25,8 +25,59 @@
     <title>CODEXIS - Gestión de Suscripciones</title>
 </head>
 <body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="login-logo">
+                <div class="logo-symbol">&lt;&gt;</div>
+                <h1>CODEXIS</h1>
+                <p>Sistema de Gestión de Suscripciones</p>
+            </div>
+            <div class="login-tabs">
+                <button class="login-tab active" data-tab="login">Iniciar Sesión</button>
+                <button class="login-tab" data-tab="register">Registrarse</button>
+            </div>
+            <div id="login-form-container" class="login-form-section active">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Contraseña</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                </form>
+                <div id="login-error" class="error-message" style="display: none;"></div>
+            </div>
+            <div id="register-form-container" class="login-form-section">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Nombre</label>
+                        <input type="text" id="register-nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Contraseña</label>
+                        <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary btn-block">
+                        <i class="fas fa-user-plus"></i> Crear Cuenta
+                    </button>
+                </form>
+                <div id="register-error" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sidebar Navigation -->
-    <aside class="sidebar">
+    <aside class="sidebar" style="display: none;">
         <div class="logo">
             <i class="fas fa-code"></i>
             <span>CODEXIS</span>
@@ -70,7 +121,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" style="display: none;">
         <!-- Top Bar -->
         <header class="top-bar">
             <div class="search-box">
@@ -390,6 +441,16 @@
                         <i class="fas fa-plus"></i> Agregar Programa
                     </button>
                 </div>
+
+                <div class="card">
+                    <h3>Sesión</h3>
+                    <p style="margin-bottom: 15px; color: #666;">
+                        <i class="fas fa-user"></i> Sesión activa
+                    </p>
+                    <button class="btn-secondary" onclick="cerrarSesion()" style="background-color: #e74c3c;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </section>
     </main>
@@ -675,6 +736,130 @@
         // URL fija del backend (tu túnel de Cloudflare)
         const API_URL = 'https://impressed-arrival-steel-telecharger.trycloudflare.com';
         let authToken = localStorage.getItem('authToken') || null;
+
+        // ========== LOGIN/REGISTRO ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            // Si hay token, verificar y mostrar app
+            if (authToken) {
+                verificarToken();
+            }
+
+            // Tabs de login/registro
+            document.querySelectorAll('.login-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.login-form-section').forEach(s => s.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const targetTab = tab.dataset.tab;
+                    document.getElementById(`${targetTab}-form-container`).classList.add('active');
+                });
+            });
+
+            // Login form
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorDiv = document.getElementById('login-error');
+
+                try {
+                    const response = await fetch(`${API_URL}/api/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Error al iniciar sesión');
+                    }
+
+                    const data = await response.json();
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    
+                    mostrarApp();
+                    syncWithServer();
+                } catch (error) {
+                    console.error('Error en login:', error);
+                    errorDiv.textContent = error.message;
+                    errorDiv.style.display = 'block';
+                }
+            });
+
+            // Register form
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nombre = document.getElementById('register-nombre').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const errorDiv = document.getElementById('register-error');
+
+                try {
+                    const response = await fetch(`${API_URL}/api/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre, email, password })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Error al registrarse');
+                    }
+
+                    const data = await response.json();
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    
+                    mostrarApp();
+                    syncWithServer();
+                } catch (error) {
+                    console.error('Error en registro:', error);
+                    errorDiv.textContent = error.message;
+                    errorDiv.style.display = 'block';
+                }
+            });
+        });
+
+        async function verificarToken() {
+            try {
+                const response = await fetch(`${API_URL}/api/programas`, {
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    mostrarApp();
+                    syncWithServer();
+                } else {
+                    // Token inválido
+                    localStorage.removeItem('authToken');
+                    authToken = null;
+                }
+            } catch (error) {
+                console.error('Error verificando token:', error);
+                localStorage.removeItem('authToken');
+                authToken = null;
+            }
+        }
+
+        function mostrarApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.querySelector('.sidebar').style.display = 'block';
+            document.querySelector('.main-content').style.display = 'flex';
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('authToken');
+            authToken = null;
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.querySelector('.sidebar').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'none';
+            location.reload();
+        }
 
         // ========== REGISTRO DEL SERVICE WORKER ==========
         if ('serviceWorker' in navigator) {
