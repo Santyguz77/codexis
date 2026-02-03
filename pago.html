@@ -288,9 +288,26 @@
     // =============================================
     // CONFIGURACIÓN DEL NEGOCIO - EDITAR AQUÍ
     // =============================================
+    const DEFAULT_API_BASE = 'https://sign-boxed-developer-saved.trycloudflare.com';
+    const API_BASE = (() => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const apiParam = params.get('api');
+        if (apiParam) {
+          const normalized = apiParam.replace(/\/$/, '');
+          localStorage.setItem('subs_api_base', normalized);
+          return normalized;
+        }
+        const stored = localStorage.getItem('subs_api_base');
+        if (stored) return stored;
+      } catch {}
+      return DEFAULT_API_BASE;
+    })();
+
     const CONFIG = {
       // Wompi - Llave pública PRODUCCIÓN
-      wompiPublicKey: 'pub_prod_sI5MUpBNrHlTm98AjNE4nJbHxZR9Vy5E',
+      wompiPublicKey: '',
+      wompiBaseUrl: '',
       
       // Datos del negocio para la factura
       businessName: 'Mi Negocio',
@@ -309,21 +326,36 @@
     let paymentData = null;
     let transactionResult = null;
 
+    async function loadWompiConfig() {
+      try {
+        const response = await fetch(`${API_BASE}/api/wompi/config`);
+        if (!response.ok) throw new Error('Config no disponible');
+        const data = await response.json();
+        if (data.publicKey) CONFIG.wompiPublicKey = data.publicKey;
+        if (data.baseUrl) CONFIG.wompiBaseUrl = data.baseUrl;
+      } catch (e) {
+        console.warn('No se pudo cargar configuraciÃ³n de Wompi');
+      }
+    }
+
     // =============================================
     // INICIALIZACIÓN
     // =============================================
     document.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      
-      // Verificar si viene de un pago completado por redirect
-      const transactionId = params.get('id');
-      if (transactionId) {
-        checkTransactionStatus(transactionId);
-        return;
-      }
-      
-      // Cargar datos de pago
-      loadPaymentData();
+      (async () => {
+        const params = new URLSearchParams(window.location.search);
+
+        // Verificar si viene de un pago completado por redirect
+        const transactionId = params.get('id');
+        await loadWompiConfig();
+        if (transactionId) {
+          checkTransactionStatus(transactionId);
+          return;
+        }
+
+        // Cargar datos de pago
+        loadPaymentData();
+      })();
     });
 
     function loadPaymentData() {
@@ -371,6 +403,10 @@
     // WOMPI CHECKOUT
     // =============================================
     function openWompiCheckout() {
+      if (!CONFIG.wompiPublicKey) {
+        showError('No se pudo cargar configuraciÃ³n de Wompi');
+        return;
+      }
       const reference = paymentData.reference || `PAY_${Date.now()}`;
       
       // Construir URL de redirección con los datos originales
@@ -439,7 +475,7 @@
         }
 
         // Consultar estado de la transacción en Wompi
-        const response = await fetch(`https://sandbox.wompi.co/v1/transactions/${transactionId}`);
+        const response = await fetch(`${API_BASE}/api/wompi/transactions/${transactionId}`);
         const data = await response.json();
         
         if (data.data) {

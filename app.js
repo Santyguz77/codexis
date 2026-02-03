@@ -1,7 +1,22 @@
 // ========================================
 // CONFIGURACIÓN DE LA API
 // ========================================
-const API_URL = 'https://sign-boxed-developer-saved.trycloudflare.com/api';
+const DEFAULT_API_URL = 'https://sign-boxed-developer-saved.trycloudflare.com/api';
+const API_URL = (() => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const apiParam = params.get('api');
+    if (apiParam) {
+      const normalized = apiParam.replace(/\/$/, '');
+      const urlWithApi = normalized.endsWith('/api') ? normalized : `${normalized}/api`;
+      localStorage.setItem('subs_api_url', urlWithApi);
+      return urlWithApi;
+    }
+    const stored = localStorage.getItem('subs_api_url');
+    if (stored) return stored;
+  } catch {}
+  return DEFAULT_API_URL;
+})();
 const APP_TIMEZONE = 'America/Bogota';
 const USE_LOCAL_STORAGE = false; // Usar servidor
 
@@ -15,7 +30,7 @@ const AppState = {
   payments: [],
   reminders: [],
   config: {},
-  wompiConfig: { publicKey: '', environment: 'sandbox' },
+  wompiConfig: { publicKey: '', environment: 'test' },
   currentView: 'dashboard',
   isOnline: navigator.onLine,
   serverAvailable: false
@@ -231,11 +246,14 @@ const Utils = {
 // ========================================
 const Wompi = {
   async getConfig() {
-    // Forzar siempre la llave de test en frontend
-    return {
-      publicKey: 'pub_test_RAqnhtzXL2RelRoyT4fOzeo10sW4r2TC',
-      environment: 'test'
-    };
+    try {
+      const response = await fetch(`${API_URL}/wompi/config`);
+      if (!response.ok) throw new Error('Config no disponible');
+      return await response.json();
+    } catch (error) {
+      console.warn('No se pudo cargar config Wompi desde el servidor');
+      return { publicKey: '', environment: 'test' };
+    }
   },
 
   async createPaymentLink(data) {
@@ -1020,7 +1038,7 @@ const Views = {
               <div>
                 <label class="text-sm text-gray-500">Ambiente actual</label>
                 <p class="font-medium text-gray-800" id="wompi-environment">
-                  ${AppState.wompiConfig.environment === 'sandbox' ? '🧪 Sandbox (Pruebas)' : '🚀 Producción'}
+                  ${AppState.wompiConfig.environment === 'production' ? '🚀 Producción' : '🧪 Sandbox (Pruebas)'}
                 </p>
               </div>
               <div>
@@ -1569,7 +1587,8 @@ const App = {
 
     const encodedData = this.generatePaymentData(subscriptionId);
     const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
-    const paymentLink = `${baseUrl}pago.html?data=${encodedData}`;
+    const apiBase = API_URL.replace(/\/api$/, '');
+    const paymentLink = `${baseUrl}pago.html?data=${encodedData}&api=${encodeURIComponent(apiBase)}`;
 
     Modal.show(
       'Link de Pago Generado',
@@ -1637,7 +1656,8 @@ const App = {
 
     const encodedData = this.generatePaymentData(subscriptionId);
     const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
-    const paymentLink = `${baseUrl}pago.html?data=${encodedData}`;
+    const apiBase = API_URL.replace(/\/api$/, '');
+    const paymentLink = `${baseUrl}pago.html?data=${encodedData}&api=${encodeURIComponent(apiBase)}`;
 
     const message = `¡Hola ${client.name}! 👋
 
