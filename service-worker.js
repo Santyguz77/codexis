@@ -3,8 +3,10 @@ const urlsToCache = [
   './',
   'index.html',
   'app.js',
-  'styles.css',
-  'manifest.json'
+  'manifest.json',
+  'pago.html',
+  'icon-192.svg',
+  'icon-512.svg'
 ];
 
 // Instalación del service worker
@@ -12,11 +14,15 @@ self.addEventListener('install', event => {
   console.log('[SW] Instalando Service Worker Suscripciones...');
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
+      .then(async cache => {
         console.log('[SW] Guardando archivos en caché...');
-        return cache.addAll(urlsToCache).catch(err => {
-          console.error('[SW] Error al cachear archivos:', err);
-        });
+        const results = await Promise.allSettled(
+          urlsToCache.map(url => cache.add(url))
+        );
+        const failed = results.filter(r => r.status === 'rejected');
+        if (failed.length > 0) {
+          console.warn('[SW] Algunos archivos no se pudieron cachear:', failed.length);
+        }
       })
       .then(() => {
         console.log('[SW] Service Worker instalado');

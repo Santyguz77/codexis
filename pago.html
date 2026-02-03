@@ -404,6 +404,9 @@
     // =============================================
     async function openWompiCheckout() {
       if (!CONFIG.wompiPublicKey) {
+        await loadWompiConfig();
+      }
+      if (!CONFIG.wompiPublicKey) {
         showError('No se pudo cargar configuraciÃ³n de Wompi');
         return;
       }
