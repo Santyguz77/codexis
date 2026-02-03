@@ -284,6 +284,14 @@
 
   </div>
 
+  <!-- Debug (solo diagnÃ³stico) -->
+  <div class="max-w-md mx-auto mt-4">
+    <div id="debug-panel" class="glass rounded-2xl p-4 text-xs text-gray-700">
+      <p class="font-semibold mb-2">DiagnÃ³stico Wompi</p>
+      <div id="debug-info" class="space-y-1"></div>
+    </div>
+  </div>
+
   <script>
     // =============================================
     // CONFIGURACIÓN DEL NEGOCIO - EDITAR AQUÍ
@@ -325,6 +333,7 @@
     // =============================================
     let paymentData = null;
     let transactionResult = null;
+    let integritySignature = '';
 
     async function loadWompiConfig() {
       try {
@@ -397,6 +406,7 @@
       document.getElementById('detail-cycle').textContent = paymentData.period || 'Mensual';
       document.getElementById('detail-due').textContent = paymentData.dueDate ? formatDate(paymentData.dueDate) : '-';
       document.getElementById('detail-ref').textContent = paymentData.reference || '-';
+      renderDebugInfo();
     }
 
     // =============================================
@@ -412,7 +422,6 @@
       }
       const reference = paymentData.reference || `PAY_${Date.now()}`;
       const amountInCents = Math.round(paymentData.amount * 100);
-      let integritySignature = '';
 
       try {
         const signatureResponse = await fetch(`${API_BASE}/api/wompi/integrity-signature`, {
@@ -621,6 +630,7 @@
       document.getElementById('invoice-transaction-id').textContent = transaction.id;
       document.getElementById('invoice-method').textContent = getPaymentMethodName(transaction.payment_method_type);
       document.getElementById('invoice-ref').textContent = transaction.reference;
+      renderDebugInfo();
     }
 
     function getPaymentMethodName(type) {
@@ -657,6 +667,7 @@
       hideAllViews();
       document.getElementById('view-pending').classList.remove('hidden');
       document.getElementById('pending-ref').textContent = transaction.reference;
+      renderDebugInfo();
     }
 
     function showDeclined(transaction) {
@@ -671,6 +682,7 @@
       
       document.getElementById('declined-message').textContent = 
         messages[transaction?.status] || 'No pudimos procesar tu pago.';
+      renderDebugInfo();
     }
 
     function showSubscription() {
@@ -681,10 +693,22 @@
       hideAllViews();
       document.getElementById('view-error').classList.remove('hidden');
       document.getElementById('error-message').textContent = message;
+      renderDebugInfo();
     }
 
     function hideAllViews() {
       document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+    }
+
+    function renderDebugInfo() {
+      const debug = document.getElementById('debug-info');
+      if (!debug) return;
+      debug.innerHTML = `
+        <div><strong>API_BASE:</strong> ${API_BASE}</div>
+        <div><strong>publicKey:</strong> ${CONFIG.wompiPublicKey || '-'}</div>
+        <div><strong>reference:</strong> ${paymentData?.reference || '-'}</div>
+        <div><strong>signature:</strong> ${integritySignature || '-'}</div>
+      `;
     }
 
     // =============================================
