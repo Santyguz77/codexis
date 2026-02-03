@@ -402,12 +402,30 @@
     // =============================================
     // WOMPI CHECKOUT
     // =============================================
-    function openWompiCheckout() {
+    async function openWompiCheckout() {
       if (!CONFIG.wompiPublicKey) {
         showError('No se pudo cargar configuraciÃ³n de Wompi');
         return;
       }
       const reference = paymentData.reference || `PAY_${Date.now()}`;
+      const amountInCents = Math.round(paymentData.amount * 100);
+      let integritySignature = '';
+
+      try {
+        const signatureResponse = await fetch(`${API_BASE}/api/wompi/integrity-signature`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reference,
+            amount_in_cents: amountInCents,
+            currency: CONFIG.currency
+          })
+        });
+        const signatureData = await signatureResponse.json();
+        integritySignature = signatureData.signature || '';
+      } catch (e) {
+        console.error('Error obteniendo firma de integridad:', e);
+      }
       
       // Construir URL de redirección con los datos originales
       const currentUrl = new URL(window.location.href);
@@ -420,10 +438,11 @@
 
       const checkout = new WidgetCheckout({
         currency: CONFIG.currency,
-        amountInCents: Math.round(paymentData.amount * 100),
+        amountInCents,
         reference: reference,
         publicKey: CONFIG.wompiPublicKey,
         redirectUrl: redirectUrl,
+        signature: integritySignature ? { integrity: integritySignature } : undefined,
         customerData: {
           email: paymentData.clientEmail || 'cliente@ejemplo.com',
           fullName: paymentData.clientName || 'Cliente',
