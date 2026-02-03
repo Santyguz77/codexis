@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   
-  <!-- Wompi Widget (se carga dinÃ¡micamente despuÃ©s de tener config) -->
+  <!-- Wompi Widget (se carga dinÃ¡micamente al hacer click en pagar) -->
   
   <script>
     tailwind.config = {
@@ -366,20 +366,17 @@
     // INICIALIZACIÓN
     // =============================================
     document.addEventListener('DOMContentLoaded', () => {
-      (async () => {
-        const params = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(window.location.search);
 
-        // Verificar si viene de un pago completado por redirect
-        const transactionId = params.get('id');
-        await loadWompiConfig();
-        if (transactionId) {
-          checkTransactionStatus(transactionId);
-          return;
-        }
+      // Verificar si viene de un pago completado por redirect
+      const transactionId = params.get('id');
+      if (transactionId) {
+        checkTransactionStatus(transactionId);
+        return;
+      }
 
-        // Cargar datos de pago
-        loadPaymentData();
-      })();
+      // Cargar datos de pago (solo UI)
+      loadPaymentData();
     });
 
     function loadPaymentData() {
@@ -428,13 +425,17 @@
     // WOMPI CHECKOUT
     // =============================================
     async function openWompiCheckout() {
-      if (!CONFIG.wompiPublicKey) {
-        await loadWompiConfig();
-      }
-      if (!CONFIG.wompiPublicKey) {
-        showError('No se pudo cargar configuraciÃ³n de Wompi');
+      if (!paymentData) {
+        showError('No se encontr?? informaci??n de pago');
         return;
       }
+
+      await loadWompiConfig();
+      if (!CONFIG.wompiPublicKey) {
+        showError('No se pudo cargar configuraci??n de Wompi');
+        return;
+      }
+
       try {
         await ensureWompiScriptLoaded();
       } catch (e) {
@@ -442,8 +443,10 @@
         showError('No se pudo cargar el widget de Wompi');
         return;
       }
+
       const reference = paymentData.reference || `PAY_${Date.now()}`;
       const amountInCents = Math.round(paymentData.amount * 100);
+      integritySignature = '';
 
       try {
         const signatureResponse = await fetch(`${API_BASE}/api/wompi/integrity-signature`, {
@@ -465,12 +468,10 @@
         showError('No se pudo generar la firma de integridad');
         return;
       }
-      
-      // Construir URL de redirección con los datos originales
+
       const currentUrl = new URL(window.location.href);
       const redirectUrl = `${currentUrl.origin}${currentUrl.pathname}?data=${encodeURIComponent(currentUrl.searchParams.get('data'))}`;
 
-      // Limpiar teléfono y extraer solo los 10 dígitos
       let phone = paymentData.clientPhone?.replace(/\D/g, '') || '';
       if (phone.startsWith('57')) phone = phone.substring(2);
       if (phone.length > 10) phone = phone.substring(phone.length - 10);
@@ -478,10 +479,10 @@
       const checkout = new WidgetCheckout({
         currency: CONFIG.currency,
         amountInCents,
-        reference: reference,
+        reference,
         publicKey: CONFIG.wompiPublicKey,
-        redirectUrl: redirectUrl,
-        signature: integritySignature ? { integrity: integritySignature } : undefined,
+        redirectUrl,
+        signature: { integrity: integritySignature },
         customerData: {
           email: paymentData.clientEmail || 'cliente@ejemplo.com',
           fullName: paymentData.clientName || 'Cliente',
