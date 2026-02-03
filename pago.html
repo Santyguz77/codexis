@@ -461,6 +461,10 @@
       } catch (e) {
         console.error('Error obteniendo firma de integridad:', e);
       }
+      if (!integritySignature) {
+        showError('No se pudo generar la firma de integridad');
+        return;
+      }
       
       // Construir URL de redirección con los datos originales
       const currentUrl = new URL(window.location.href);
