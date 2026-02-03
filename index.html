@@ -1,2312 +1,600 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#000000">
-    <meta name="description" content="Sistema profesional de gestión de suscripciones, facturas y pagos">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="CODEXIS">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Icons -->
-    <link rel="icon" type="image/png" href="/icon-192.png">
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <title>CODEXIS - Gestión de Suscripciones</title>
-</head>
-<body>
-    <!-- Login Screen -->
-    <div id="login-screen">
-        <div class="login-container">
-            <div class="login-logo">
-                <div class="logo-symbol">&lt;&gt;</div>
-                <h1>CODEXIS</h1>
-                <p>Sistema de Gestión de Suscripciones</p>
-            </div>
-            <div class="login-tabs">
-                <button class="login-tab active" data-tab="login">Iniciar Sesión</button>
-                <button class="login-tab" data-tab="register">Registrarse</button>
-            </div>
-            <div id="login-form-container" class="login-form-section active">
-                <form id="login-form">
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="login-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-lock"></i> Contraseña</label>
-                        <input type="password" id="login-password" required>
-                    </div>
-                    <button type="submit" class="btn-primary btn-block">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                    </button>
-                </form>
-                <div id="login-error" class="error-message" style="display: none;"></div>
-            </div>
-            <div id="register-form-container" class="login-form-section">
-                <form id="register-form">
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i> Nombre</label>
-                        <input type="text" id="register-nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="register-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-lock"></i> Contraseña</label>
-                        <input type="password" id="register-password" required minlength="6">
-                    </div>
-                    <button type="submit" class="btn-primary btn-block">
-                        <i class="fas fa-user-plus"></i> Crear Cuenta
-                    </button>
-                </form>
-                <div id="register-error" class="error-message" style="display: none;"></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" style="display: none;">
-        <div class="logo">
-            <i class="fas fa-code"></i>
-            <span>CODEXIS</span>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6366f1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="description" content="Sistema de gestión de suscripciones, cobros y recordatorios">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon-192.svg">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1',
+            accent: '#8b5cf6',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          },
+          borderRadius: {
+            DEFAULT: '12px'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <title>Control de Suscripciones</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background: #f8fafc;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Layout */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: -280px;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar.mobile-open {
+      left: 0;
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 260px;
+      }
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    /* Navigation */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 4px;
+    }
+
+    .nav-item:hover {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .nav-item.active {
+      background: #eef2ff;
+      color: #6366f1;
+      font-weight: 500;
+    }
+
+    .nav-item.active .material-icons-round {
+      color: #6366f1;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-header {
+        display: none;
+      }
+    }
+
+    /* Bottom Navigation (Mobile) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    @media (min-width: 1024px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px;
+      color: #94a3b8;
+      font-size: 11px;
+      transition: color 0.2s;
+    }
+
+    .bottom-nav-item.active {
+      color: #6366f1;
+    }
+
+    .bottom-nav-item .material-icons-round {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #6366f1;
+      color: white;
+      border-radius: 12px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #4f46e5;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: #6366f1;
+      color: white;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 12px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: transparent;
+      color: #6366f1;
+      border: 2px solid #6366f1;
+      border-radius: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: #eef2ff;
+    }
+
+    /* Inputs */
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.2s;
+      background: #fff;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Filter buttons */
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      background: #f1f5f9;
+      color: #64748b;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      background: #6366f1;
+      color: white;
+    }
+
+    /* Toggle */
+    .toggle-btn {
+      width: 48px;
+      height: 26px;
+      background: #e2e8f0;
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: none;
+    }
+
+    .toggle-btn.active {
+      background: #6366f1;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle-btn.active .toggle-slider {
+      transform: translateX(22px);
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.flex {
+      display: flex;
+    }
+
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    /* Notifications */
+    .notifications-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Brand */
+    .brand {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #6366f1;
+      margin-bottom: 5px;
+    }
+
+    .brand span {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Splash Screen */
+    .splash-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .splash-logo {
+      width: 100px;
+      height: 100px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    .splash-logo .material-icons-round {
+      font-size: 48px;
+      color: #6366f1;
+    }
+
+    .splash-text {
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Splash Screen -->
+  <div class="splash-screen" id="splash">
+    <div class="splash-logo">
+      <span class="material-icons-round">subscriptions</span>
+    </div>
+    <p class="splash-text">Suscripciones</p>
+  </div>
+
+  <!-- App -->
+  <div class="app">
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay hidden" id="sidebar-overlay" onclick="App.toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar hide-scrollbar" id="sidebar">
+      <div class="brand">
+        <h1>Suscripciones</h1>
+        <span>Panel de Control</span>
+      </div>
+
+      <nav>
+        <div class="nav-item active" data-view="dashboard">
+          <span class="material-icons-round">dashboard</span>
+          Dashboard
         </div>
-        
-        <nav class="nav-menu">
-            <a href="#" class="nav-item active" data-page="dashboard">
-                <i class="fas fa-chart-line"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item" data-page="suscripciones">
-                <i class="fas fa-briefcase"></i>
-                <span>Suscripciones</span>
-            </a>
-            <a href="#" class="nav-item" data-page="facturas">
-                <i class="fas fa-file-invoice"></i>
-                <span>Facturas</span>
-            </a>
-            <a href="#" class="nav-item" data-page="pagos">
-                <i class="fas fa-credit-card"></i>
-                <span>Pagos</span>
-            </a>
-            <a href="#" class="nav-item" data-page="mensajes">
-                <i class="fas fa-comments"></i>
-                <span>Mensajes</span>
-                <span class="badge">0</span>
-            </a>
-            <a href="#" class="nav-item" data-page="clientes">
-                <i class="fas fa-users"></i>
-                <span>Clientes</span>
-            </a>
-            <a href="#" class="nav-item" data-page="cotizaciones">
-                <i class="fas fa-file-pdf"></i>
-                <span>Cotizaciones</span>
-            </a>
-            <a href="#" class="nav-item" data-page="configuracion">
-                <i class="fas fa-cog"></i>
-                <span>Configuración</span>
-            </a>
-        </nav>
+        <div class="nav-item" data-view="clients">
+          <span class="material-icons-round">people</span>
+          Clientes
+        </div>
+        <div class="nav-item" data-view="plans">
+          <span class="material-icons-round">inventory_2</span>
+          Planes
+        </div>
+        <div class="nav-item" data-view="subscriptions">
+          <span class="material-icons-round">repeat</span>
+          Suscripciones
+        </div>
+        <div class="nav-item" data-view="payments">
+          <span class="material-icons-round">receipt_long</span>
+          Pagos
+        </div>
+        <div class="nav-item" data-view="settings">
+          <span class="material-icons-round">settings</span>
+          Configuración
+        </div>
+      </nav>
+
+      <div class="mt-auto pt-6 border-t border-gray-100 mt-6">
+        <div class="flex items-center gap-3 px-4">
+          <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+            <span class="material-icons-round text-indigo-600">person</span>
+          </div>
+          <div>
+            <p class="font-medium text-gray-800 text-sm">Administrador</p>
+            <p class="text-xs text-gray-400">v1.0.0</p>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content" style="display: none;">
-        <!-- Top Bar -->
-        <header class="top-bar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar suscripciones, clientes, facturas...">
-            </div>
-            <div class="user-actions">
-                <button class="notification-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge-dot"></span>
-                </button>
-                <div class="user-profile">
-                    <div class="avatar">AD</div>
-                    <span>Admin</span>
-                </div>
-            </div>
-        </header>
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button onclick="App.toggleSidebar()" class="p-2">
+          <span class="material-icons-round text-gray-600">menu</span>
+        </button>
+        <h1 class="font-semibold text-gray-800">Suscripciones</h1>
+        <button onclick="Notifications.requestPermission()" class="p-2">
+          <span class="material-icons-round text-gray-600">notifications</span>
+        </button>
+      </header>
 
-        <!-- Dashboard Page -->
-        <section id="dashboard" class="page active">
-            <div class="page-header">
-                <h1>Dashboard</h1>
-                <button class="btn-primary" onclick="showModal('nuevaSuscripcion')">
-                    <i class="fas fa-plus"></i> Nueva Suscripción
-                </button>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card blue">
-                    <div class="stat-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="stat-activas">0</h3>
-                        <p>Suscripciones Activas</p>
-                    </div>
-                </div>
-                <div class="stat-card green">
-                    <div class="stat-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="stat-aldia">0</h3>
-                        <p>Pagos al Día</p>
-                    </div>
-                </div>
-                <div class="stat-card red">
-                    <div class="stat-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="stat-pendientes">0</h3>
-                        <p>Pagos Pendientes</p>
-                    </div>
-                </div>
-                <div class="stat-card purple">
-                    <div class="stat-icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="stat-ingresos">$ 0</h3>
-                        <p>Ingresos del Mes</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Próximos Vencimientos -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Próximos Vencimientos</h2>
-                    <a href="#" class="link">Ver todas</a>
-                </div>
-                <div class="table-container">
-                    <table id="tabla-vencimientos">
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Programa</th>
-                                <th>Fecha Inicio</th>
-                                <th>Fecha Corte</th>
-                                <th>Monto</th>
-                                <th>Estado</th>
-                                <th>Días Restantes</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Datos dinámicos -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Suscripciones Page -->
-        <section id="suscripciones" class="page">
-            <div class="page-header">
-                <h1>Gestión de Suscripciones</h1>
-                <button class="btn-primary" onclick="showModal('nuevaSuscripcion')">
-                    <i class="fas fa-plus"></i> Nueva Suscripción
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="table-container">
-                    <table id="tabla-suscripciones">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Programa</th>
-                                <th>Fecha Inicio</th>
-                                <th>Fecha Corte</th>
-                                <th>Monto</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Datos dinámicos -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Facturas Page -->
-        <section id="facturas" class="page">
-            <div class="page-header">
-                <h1>Facturas</h1>
-                <button class="btn-primary" onclick="generarFactura()">
-                    <i class="fas fa-file-invoice"></i> Generar Factura
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="table-container">
-                    <table id="tabla-facturas">
-                        <thead>
-                            <tr>
-                                <th>N° Factura</th>
-                                <th>Cliente</th>
-                                <th>Fecha</th>
-                                <th>Monto</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Datos dinámicos -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Pagos Page -->
-        <section id="pagos" class="page">
-            <div class="page-header">
-                <h1>Historial de Pagos</h1>
-            </div>
-            
-            <div class="card">
-                <div class="table-container">
-                    <table id="tabla-pagos">
-                        <thead>
-                            <tr>
-                                <th>ID Transacción</th>
-                                <th>Cliente</th>
-                                <th>Monto</th>
-                                <th>Método</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Datos dinámicos -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Mensajes Page -->
-        <section id="mensajes" class="page">
-            <div class="page-header">
-                <h1>Centro de Mensajes y Soporte</h1>
-            </div>
-            
-            <div class="mensajes-container">
-                <div class="mensajes-list">
-                    <div class="mensajes-header">
-                        <h3>Conversaciones</h3>
-                        <button class="btn-secondary" onclick="showModal('nuevoMensaje')">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <div id="lista-conversaciones">
-                        <!-- Lista de conversaciones -->
-                    </div>
-                </div>
-                <div class="mensajes-chat">
-                    <div class="chat-header">
-                        <h3>Selecciona una conversación</h3>
-                    </div>
-                    <div class="chat-messages" id="chat-messages">
-                        <!-- Mensajes -->
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" id="mensaje-input" placeholder="Escribe un mensaje...">
-                        <button class="btn-primary" onclick="enviarMensaje()">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Clientes Page -->
-        <section id="clientes" class="page">
-            <div class="page-header">
-                <h1>Gestión de Clientes</h1>
-                <button class="btn-primary" onclick="showModal('nuevoCliente')">
-                    <i class="fas fa-plus"></i> Nuevo Cliente
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="table-container">
-                    <table id="tabla-clientes">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Suscripciones</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Datos dinámicos -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cotizaciones Page -->
-        <section id="cotizaciones" class="page">
-            <div class="page-header">
-                <h1>Cotizaciones</h1>
-                <button class="btn-primary" onclick="showModal('nuevaCotizacion')">
-                    <i class="fas fa-plus"></i> Nueva Cotización
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <h2>Cotizaciones Generadas</h2>
-                </div>
-                <div class="table-container">
-                    <table id="tabla-cotizaciones">
-                        <thead>
-                            <tr>
-                                <th>Número</th>
-                                <th>Cliente</th>
-                                <th>Fecha</th>
-                                <th>Total</th>
-                                <th>Válida hasta</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
-                                    <i class="fas fa-file-pdf" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
-                                    No hay cotizaciones generadas aún
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Configuración Page -->
-        <section id="configuracion" class="page">
-            <div class="page-header">
-                <h1>Configuración</h1>
-            </div>
-            
-            <div class="settings-grid">
-                <div class="card">
-                    <h3>Configuración de Wompi</h3>
-                    <form id="form-wompi">
-                        <div class="form-group">
-                            <label>Public Key</label>
-                            <input type="text" id="wompi-public-key" placeholder="pub_test_...">
-                        </div>
-                        <div class="form-group">
-                            <label>Private Key</label>
-                            <input type="password" id="wompi-private-key" placeholder="prv_test_...">
-                        </div>
-                        <button type="submit" class="btn-primary">Guardar</button>
-                    </form>
-                </div>
-                
-                <div class="card">
-                    <h3>Programas Disponibles</h3>
-                    <div id="lista-programas">
-                        <!-- Lista de programas -->
-                    </div>
-                    <button class="btn-secondary" onclick="showModal('nuevoPrograma')">
-                        <i class="fas fa-plus"></i> Agregar Programa
-                    </button>
-                </div>
-
-                <div class="card">
-                    <h3>Sesión</h3>
-                    <p style="margin-bottom: 15px; color: #666;">
-                        <i class="fas fa-user"></i> Sesión activa
-                    </p>
-                    <button class="btn-secondary" onclick="cerrarSesion()" style="background-color: #e74c3c;">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-        </section>
+      <!-- Dynamic Content -->
+      <div id="main-content">
+        <!-- Content loaded by JavaScript -->
+      </div>
     </main>
 
-    <!-- Modal Nueva Suscripción -->
-    <div id="modal-nuevaSuscripcion" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Nueva Suscripción</h2>
-                <button class="close-btn" onclick="closeModal('nuevaSuscripcion')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="form-nueva-suscripcion" onsubmit="guardarSuscripcion(event)">
-                <div class="form-group">
-                    <label>Cliente</label>
-                    <div style="display: flex; gap: 8px;">
-                        <select id="suscripcion-cliente" style="flex: 1;" onchange="toggleNuevoCliente()">
-                            <option value="">Seleccionar cliente...</option>
-                            <option value="nuevo">+ Nuevo Cliente</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Campos para nuevo cliente -->
-                <div id="campos-nuevo-cliente" style="display: none; border-left: 3px solid #000; padding-left: 15px; margin: 15px 0;">
-                    <h4 style="margin-bottom: 10px;">Datos del Nuevo Cliente</h4>
-                    <div class="form-group">
-                        <label>Nombre Completo</label>
-                        <input type="text" id="nuevo-cliente-nombre">
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="nuevo-cliente-email">
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono</label>
-                        <input type="tel" id="nuevo-cliente-telefono">
-                    </div>
-                    <div class="form-group">
-                        <label>Dirección</label>
-                        <input type="text" id="nuevo-cliente-direccion">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Programa</label>
-                    <div style="display: flex; gap: 8px;">
-                        <select id="suscripcion-programa" style="flex: 1;" onchange="toggleNuevoPrograma()">
-                            <option value="">Seleccionar programa...</option>
-                            <option value="nuevo">+ Nuevo Programa</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Campos para nuevo programa -->
-                <div id="campos-nuevo-programa" style="display: none; border-left: 3px solid #000; padding-left: 15px; margin: 15px 0;">
-                    <h4 style="margin-bottom: 10px;">Datos del Nuevo Programa</h4>
-                    <div class="form-group">
-                        <label>Nombre del Programa</label>
-                        <input type="text" id="nuevo-programa-nombre">
-                    </div>
-                    <div class="form-group">
-                        <label>Descripción</label>
-                        <textarea id="nuevo-programa-descripcion" rows="2"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Precio</label>
-                        <input type="number" id="nuevo-programa-precio" min="0">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Fecha de Inicio</label>
-                    <input type="date" id="suscripcion-fecha-inicio" required>
-                </div>
-                <div class="form-group">
-                    <label>Monto</label>
-                    <input type="number" id="suscripcion-monto" placeholder="$ 0" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('nuevaSuscripcion')">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-item active" data-view="dashboard">
+        <span class="material-icons-round">dashboard</span>
+        Inicio
+      </div>
+      <div class="bottom-nav-item" data-view="clients">
+        <span class="material-icons-round">people</span>
+        Clientes
+      </div>
+      <div class="bottom-nav-item" data-view="subscriptions">
+        <span class="material-icons-round">repeat</span>
+        Suscripciones
+      </div>
+      <div class="bottom-nav-item" data-view="payments">
+        <span class="material-icons-round">receipt_long</span>
+        Pagos
+      </div>
+    </nav>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal hidden" id="modal">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="text-lg font-semibold text-gray-800" id="modal-title">Modal</h2>
+      </div>
+      <div class="modal-body" id="modal-content">
+        <!-- Content -->
+      </div>
+      <div class="modal-footer" id="modal-actions">
+        <!-- Actions -->
+      </div>
     </div>
-
-    <!-- Modal Nuevo Cliente -->
-    <div id="modal-nuevoCliente" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Nuevo Cliente</h2>
-                <button class="close-btn" onclick="closeModal('nuevoCliente')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="form-nuevo-cliente" onsubmit="guardarCliente(event)">
-                <div class="form-group">
-                    <label>Nombre Completo</label>
-                    <input type="text" id="cliente-nombre" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="cliente-email" required>
-                </div>
-                <div class="form-group">
-                    <label>Teléfono</label>
-                    <input type="tel" id="cliente-telefono" required>
-                </div>
-                <div class="form-group">
-                    <label>Dirección</label>
-                    <input type="text" id="cliente-direccion">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('nuevoCliente')">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Pago Wompi -->
-    <div id="modal-pago" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Procesar Pago</h2>
-                <button class="close-btn" onclick="closeModal('pago')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="pago-info">
-                <h3>Detalles del Pago</h3>
-                <div class="pago-detalle">
-                    <span>Cliente:</span>
-                    <span id="pago-cliente"></span>
-                </div>
-                <div class="pago-detalle">
-                    <span>Concepto:</span>
-                    <span id="pago-concepto"></span>
-                </div>
-                <div class="pago-detalle total">
-                    <span>Total:</span>
-                    <span id="pago-monto"></span>
-                </div>
-            </div>
-            <div id="wompi-payment-widget"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('pago')">Cancelar</button>
-                <button type="button" class="btn-primary" onclick="procesarPagoWompi()">Pagar con Wompi</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Nueva Cotización -->
-    <div id="modal-nuevaCotizacion" class="modal">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-file-invoice"></i> Nueva Cotización</h2>
-                <button class="close-btn" onclick="closeModal('nuevaCotizacion')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="form-cotizacion" onsubmit="guardarYGenerarCotizacion(event)">
-                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                    <!-- Cliente (Opcional) -->
-                    <div class="form-section">
-                        <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: #666;">
-                            <i class="fas fa-user"></i> Cliente <span style="font-size: 12px; font-weight: normal;">(Opcional)</span>
-                        </h3>
-                        <div class="form-row" style="grid-template-columns: 1fr 1fr;">
-                            <div class="form-group">
-                                <label>Nombre</label>
-                                <input type="text" id="cot-cliente-nombre" placeholder="Nombre del cliente o empresa">
-                            </div>
-                            <div class="form-group">
-                                <label>NIT/CC</label>
-                                <input type="text" id="cot-cliente-nit" placeholder="Número de identificación">
-                            </div>
-                        </div>
-                        <div class="form-row" style="grid-template-columns: 1fr 1fr;">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" id="cot-cliente-email" placeholder="cliente@empresa.com">
-                            </div>
-                            <div class="form-group">
-                                <label>Teléfono</label>
-                                <input type="tel" id="cot-cliente-telefono" placeholder="3001234567">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Dirección</label>
-                            <input type="text" id="cot-cliente-direccion" placeholder="Dirección completa">
-                        </div>
-                    </div>
-                    
-                    <!-- Items -->
-                    <div class="form-section" style="margin-top: 30px; border-top: 2px solid #f0f0f0; padding-top: 20px;">
-                        <h3 style="margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
-                            <span style="display: flex; align-items: center; gap: 10px;">
-                                <i class="fas fa-list"></i> Servicios/Productos
-                            </span>
-                            <button type="button" class="btn-secondary" onclick="agregarItemCotizacion()" style="font-size: 13px; padding: 6px 12px;">
-                                <i class="fas fa-plus"></i> Agregar
-                            </button>
-                        </h3>
-                        <div id="items-cotizacion">
-                            <div class="item-cotizacion" style="background: #fafafa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                                <div class="form-group">
-                                    <label>Descripción *</label>
-                                    <textarea class="item-descripcion" rows="2" required placeholder="Describe el servicio o producto..."></textarea>
-                                </div>
-                                <div style="display: grid; grid-template-columns: 100px 1fr 1fr 40px; gap: 10px; align-items: end;">
-                                    <div class="form-group" style="margin: 0;">
-                                        <label>Cant. *</label>
-                                        <input type="number" class="item-cantidad" value="1" min="1" required>
-                                    </div>
-                                    <div class="form-group" style="margin: 0;">
-                                        <label>Precio Unit. *</label>
-                                        <input type="number" class="item-precio" min="0" required placeholder="0">
-                                    </div>
-                                    <div class="form-group" style="margin: 0;">
-                                        <label>Subtotal</label>
-                                        <input type="number" class="item-subtotal" readonly style="background: #e9ecef; font-weight: 600;">
-                                    </div>
-                                    <button type="button" class="btn-icon" onclick="eliminarItemCotizacion(this)" title="Eliminar" style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; height: 38px;">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Observaciones y Validez -->
-                    <div class="form-section" style="margin-top: 30px; border-top: 2px solid #f0f0f0; padding-top: 20px;">
-                        <div class="form-group">
-                            <label><i class="fas fa-comment-dots"></i> Observaciones</label>
-                            <textarea id="cot-observaciones" rows="3" placeholder="Términos, condiciones, tiempo de entrega, garantías, etc."></textarea>
-                        </div>
-                        <div class="form-row" style="grid-template-columns: 200px;">
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar-alt"></i> Validez (días) *</label>
-                                <input type="number" id="cot-validez" value="30" min="1" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Totales -->
-                    <div class="totales-cotizacion" style="margin-top: 30px; padding: 20px; background: #000; color: #fff; border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
-                            <span>Subtotal:</span>
-                            <span id="cot-subtotal-preview">$ 0</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                            <span>IVA (19%):</span>
-                            <span id="cot-iva-preview">$ 0</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 1px solid #fff; font-size: 20px;">
-                            <strong>TOTAL:</strong>
-                            <strong id="cot-total-preview">$ 0</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('nuevaCotizacion')">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-file-pdf"></i> Generar PDF
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Wompi Widget -->
-    <script src="https://checkout.wompi.co/widget.js"></script>
-    
-    <!-- PWA Installation Script -->
-    <script></script>
-    <script>
-        // ========== CONFIGURACIÓN API ==========
-        // URL fija del backend (tu túnel de Cloudflare)
-        const API_URL = 'https://impressed-arrival-steel-telecharger.trycloudflare.com';
-        let authToken = localStorage.getItem('authToken') || null;
-
-        // ========== LOGIN/REGISTRO ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            // Si hay token, verificar y mostrar app
-            if (authToken) {
-                verificarToken();
-            }
-
-            // Tabs de login/registro
-            document.querySelectorAll('.login-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.login-form-section').forEach(s => s.classList.remove('active'));
-                    
-                    tab.classList.add('active');
-                    const targetTab = tab.dataset.tab;
-                    document.getElementById(`${targetTab}-form-container`).classList.add('active');
-                });
-            });
-
-            // Login form
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const errorDiv = document.getElementById('login-error');
-
-                try {
-                    const response = await fetch(`${API_URL}/api/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
-                    });
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Error al iniciar sesión');
-                    }
-
-                    const data = await response.json();
-                    authToken = data.token;
-                    localStorage.setItem('authToken', authToken);
-                    
-                    mostrarApp();
-                    syncWithServer();
-                } catch (error) {
-                    console.error('Error en login:', error);
-                    errorDiv.textContent = error.message;
-                    errorDiv.style.display = 'block';
-                }
-            });
-
-            // Register form
-            document.getElementById('register-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const nombre = document.getElementById('register-nombre').value;
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                const errorDiv = document.getElementById('register-error');
-
-                try {
-                    const response = await fetch(`${API_URL}/api/register`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nombre, email, password })
-                    });
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Error al registrarse');
-                    }
-
-                    const data = await response.json();
-                    authToken = data.token;
-                    localStorage.setItem('authToken', authToken);
-                    
-                    mostrarApp();
-                    syncWithServer();
-                } catch (error) {
-                    console.error('Error en registro:', error);
-                    errorDiv.textContent = error.message;
-                    errorDiv.style.display = 'block';
-                }
-            });
-        });
-
-        async function verificarToken() {
-            try {
-                const response = await fetch(`${API_URL}/api/programas`, {
-                    headers: { 
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    mostrarApp();
-                    syncWithServer();
-                } else {
-                    // Token inválido
-                    localStorage.removeItem('authToken');
-                    authToken = null;
-                }
-            } catch (error) {
-                console.error('Error verificando token:', error);
-                localStorage.removeItem('authToken');
-                authToken = null;
-            }
-        }
-
-        function mostrarApp() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.querySelector('.sidebar').style.display = 'block';
-            document.querySelector('.main-content').style.display = 'flex';
-        }
-
-        function cerrarSesion() {
-            localStorage.removeItem('authToken');
-            authToken = null;
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.querySelector('.sidebar').style.display = 'none';
-            document.querySelector('.main-content').style.display = 'none';
-            location.reload();
-        }
-
-        // ========== REGISTRO DEL SERVICE WORKER ==========
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('✅ Service Worker registrado:', registration.scope);
-                    })
-                    .catch(err => {
-                        console.error('❌ Error al registrar Service Worker:', err);
-                    });
-            });
-        }
-
-        // ========== INSTALACIÓN DE PWA ==========
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Mostrar botón de instalación (opcional)
-            const installBtn = document.createElement('button');
-            installBtn.className = 'btn-primary';
-            installBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999;';
-            installBtn.innerHTML = '<i class="fas fa-download"></i> Instalar App';
-            installBtn.onclick = async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`Resultado de instalación: ${outcome}`);
-                    deferredPrompt = null;
-                    installBtn.remove();
-                }
-            };
-            document.body.appendChild(installBtn);
-        });
-
-        // ========== DATOS Y ESTADO ==========
-        let suscripciones = [];
-        let clientes = [];
-        let facturas = [];
-        let pagos = [];
-        let mensajes = [];
-        let programas = [];
-        let cotizaciones = [];
-        
-        let currentPage = 'dashboard';
-        let wompiConfig = {
-            publicKey: 'pub_test_G6gQRPaqYwcmq0xrEv6pBgYBWOx7hTBW',
-            currency: 'COP'
-        };
-
-        // ========== UTILIDADES API ==========
-        async function fetchAPI(endpoint, options = {}) {
-            try {
-                const headers = {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                };
-
-                if (authToken) {
-                    headers['Authorization'] = `Bearer ${authToken}`;
-                }
-
-                const response = await fetch(`${API_URL}${endpoint}`, {
-                    ...options,
-                    headers
-                });
-
-                if (response.status === 401) {
-                    // Token inválido, redirigir a login
-                    localStorage.removeItem('authToken');
-                    alert('Sesión expirada. Por favor inicie sesión nuevamente.');
-                    return null;
-                }
-
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error('Error en API:', error);
-                
-                // Si falla la API, usar datos locales como respaldo
-                if (options.fallbackData) {
-                    return options.fallbackData;
-                }
-                
-                throw error;
-            }
-        }
-
-        // ========== SINCRONIZACIÓN DE DATOS ==========
-        async function syncWithServer() {
-            try {
-                if (!authToken) {
-                    console.log('⚠️ No hay token de autenticación. Cargando datos de ejemplo...');
-                    cargarDatosEjemplo();
-                    return;
-                }
-
-                // Cargar datos SOLO del servidor (nada de localStorage)
-                const [subsData, clientsData, facturasData, pagosData, programasData] = await Promise.all([
-                    fetchAPI('/api/suscripciones').catch(() => null),
-                    fetchAPI('/api/clientes').catch(() => null),
-                    fetchAPI('/api/facturas').catch(() => null),
-                    fetchAPI('/api/pagos').catch(() => null),
-                    fetchAPI('/api/programas').catch(() => null)
-                ]);
-
-                if (subsData && subsData.length >= 0) suscripciones = subsData;
-                if (clientsData && clientsData.length >= 0) clientes = clientsData;
-                if (facturasData && facturasData.length >= 0) facturas = facturasData;
-                if (pagosData && pagosData.length >= 0) pagos = pagosData;
-                if (programasData && programasData.length >= 0) programas = programasData;
-                
-                console.log('✅ Datos cargados desde el servidor (nube)');
-            } catch (error) {
-                console.error('❌ Error al cargar datos del servidor:', error);
-                console.log('📊 Cargando datos de ejemplo...');
-                cargarDatosEjemplo();
-            }
-        }
-
-        function cargarDatosEjemplo() {
-            // Datos de ejemplo para demostración
-            const hoy = new Date();
-            
-            programas = [
-                { id: 1, nombre: 'Sistema de Facturación', descripcion: 'Sistema completo de facturación electrónica', precio: 500000, activo: 1 },
-                { id: 2, nombre: 'ERP Empresarial', descripcion: 'Sistema de gestión empresarial', precio: 1200000, activo: 1 },
-                { id: 3, nombre: 'CRM Ventas', descripcion: 'Gestión de relaciones con clientes', precio: 800000, activo: 1 }
-            ];
-            
-            clientes = [
-                { id: 1, nombre: 'Comercializadora XYZ', email: 'contacto@xyz.com', telefono: '3101234567', direccion: 'Calle 123 #45-67', estado: 'activo' },
-                { id: 2, nombre: 'Distribuidora ABC S.A.S.', email: 'info@abc.com', telefono: '3209876543', direccion: 'Av. Principal 89', estado: 'activo' },
-                { id: 3, nombre: 'Empresa Demo Ltda.', email: 'demo@empresa.com', telefono: '3156789012', direccion: 'Carrera 50 #30-20', estado: 'activo' }
-            ];
-            
-            suscripciones = [
-                {
-                    id: 1,
-                    clienteNombre: 'Comercializadora XYZ',
-                    clienteId: 1,
-                    programa: 'Sistema de Facturación',
-                    fechaInicio: new Date(2025, 0, 15).toISOString(),
-                    fechaCorte: new Date(2025, 11, 28).toISOString(),
-                    monto: 500000,
-                    estado: 'pagado'
-                },
-                {
-                    id: 2,
-                    clienteNombre: 'Distribuidora ABC S.A.S.',
-                    clienteId: 2,
-                    programa: 'ERP Empresarial',
-                    fechaInicio: new Date(2025, 1, 1).toISOString(),
-                    fechaCorte: new Date(2025, 11, 20).toISOString(),
-                    monto: 1200000,
-                    estado: 'pendiente'
-                },
-                {
-                    id: 3,
-                    clienteNombre: 'Empresa Demo Ltda.',
-                    clienteId: 3,
-                    programa: 'CRM Ventas',
-                    fechaInicio: new Date(2025, 2, 10).toISOString(),
-                    fechaCorte: new Date(2025, 11, 25).toISOString(),
-                    monto: 800000,
-                    estado: 'pagado'
-                }
-            ];
-            
-            facturas = [
-                { id: 1, numero: 'FAC-001', cliente: 'Comercializadora XYZ', monto: 500000, fecha: new Date(2025, 0, 15).toISOString(), estado: 'pagado' },
-                { id: 2, numero: 'FAC-002', cliente: 'Distribuidora ABC S.A.S.', monto: 1200000, fecha: new Date(2025, 1, 1).toISOString(), estado: 'pendiente' }
-            ];
-            
-            pagos = [
-                { id: 1, transactionId: 'TRX-001', cliente: 'Comercializadora XYZ', monto: 500000, metodo: 'Wompi', fecha: new Date(2025, 0, 15).toISOString(), estado: 'aprobado' }
-            ];
-            
-            console.log('📊 Datos de ejemplo cargados correctamente');
-        }
-
-        // Cargar selects del modal de nueva suscripción
-        function cargarSelectClientes() {
-            const select = document.getElementById('suscripcion-cliente');
-            if (!select) {
-                console.warn('No se encontró el select de clientes');
-                return;
-            }
-            // Mantener las primeras dos opciones
-            select.innerHTML = `
-                <option value="">Seleccionar cliente...</option>
-                <option value="nuevo">+ Nuevo Cliente</option>
-            `;
-            // Agregar clientes existentes
-            clientes.forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente.id;
-                option.textContent = cliente.nombre;
-                select.appendChild(option);
-            });
-        }
-
-        function cargarSelectProgramas() {
-            const select = document.getElementById('suscripcion-programa');
-            if (!select) {
-                console.warn('No se encontró el select de programas');
-                return;
-            }
-            // Mantener las primeras dos opciones
-            select.innerHTML = `
-                <option value="">Seleccionar programa...</option>
-                <option value="nuevo">+ Nuevo Programa</option>
-            `;
-            // Agregar programas existentes
-            programas.forEach(programa => {
-                const option = document.createElement('option');
-                option.value = programa.id;
-                option.textContent = `${programa.nombre} - $${programa.precio.toLocaleString('es-CO')}`;
-                select.appendChild(option);
-            });
-        }
-
-        // ========== INICIALIZACIÓN ==========
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Iniciando CODEXIS...');
-            
-            // Configurar navegación PRIMERO (antes de cargar datos)
-            configurarNavegacion();
-            console.log('✅ Navegación configurada');
-            
-            // Cargar datos del servidor o ejemplos
-            await syncWithServer();
-            
-            // Llenar selects del modal
-            cargarSelectClientes();
-            cargarSelectProgramas();
-            
-            // Actualizar vistas
-            actualizarDashboard();
-            cargarProgramas();
-            
-            console.log('✅ CODEXIS iniciado correctamente');
-        });
-
-        function cargarDatosIniciales() {
-            // Cargar datos de localStorage si existen
-            if (localStorage.getItem('suscripciones')) {
-                suscripciones = JSON.parse(localStorage.getItem('suscripciones'));
-            } else {
-                // Datos de ejemplo
-                const hoy = new Date();
-                suscripciones = [
-                    {
-                        id: 1,
-                        clienteNombre: 'Comercializadora XYZ',
-                        programa: 'Sistema de Facturación',
-                        fechaInicio: new Date(2025, 10, 13).toISOString(),
-                        fechaCorte: new Date(2025, 11, 12).toISOString(),
-                        monto: 250000,
-                        estado: 'pendiente'
-                    },
-                    {
-                        id: 2,
-                        clienteNombre: 'Empresa ABC S.A.S',
-                        programa: 'Software ERP Premium',
-                        fechaInicio: new Date(2025, 10, 29).toISOString(),
-                        fechaCorte: new Date(2025, 11, 29).toISOString(),
-                        monto: 500000,
-                        estado: 'pagado'
-                    },
-                    {
-                        id: 3,
-                        clienteNombre: 'Servicios Integrales LTDA',
-                        programa: 'CRM Empresarial',
-                        fechaInicio: new Date(2025, 11, 3).toISOString(),
-                        fechaCorte: new Date(2026, 0, 2).toISOString(),
-                        monto: 350000,
-                        estado: 'pagado'
-                    }
-                ];
-            }
-            
-            if (localStorage.getItem('clientes')) {
-                clientes = JSON.parse(localStorage.getItem('clientes'));
-            } else {
-                clientes = [
-                    { id: 1, nombre: 'Comercializadora XYZ', email: 'contacto@xyz.com', telefono: '3001234567', estado: 'activo' },
-                    { id: 2, nombre: 'Empresa ABC S.A.S', email: 'info@abc.com', telefono: '3007654321', estado: 'activo' },
-                    { id: 3, nombre: 'Servicios Integrales LTDA', email: 'ventas@servicios.com', telefono: '3009876543', estado: 'activo' }
-                ];
-            }
-
-            guardarDatos();
-        }
-
-        function guardarDatos() {
-            localStorage.setItem('suscripciones', JSON.stringify(suscripciones));
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-            localStorage.setItem('facturas', JSON.stringify(facturas));
-            localStorage.setItem('pagos', JSON.stringify(pagos));
-        }
-
-        // ========== NAVEGACIÓN ==========
-        function configurarNavegacion() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    cambiarPagina(page);
-                });
-            });
-        }
-
-        function cambiarPagina(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            const pageElement = document.getElementById(page);
-            const navElement = document.querySelector(`[data-page="${page}"]`);
-            
-            if (pageElement) pageElement.classList.add('active');
-            if (navElement) navElement.classList.add('active');
-            
-            currentPage = page;
-            
-            // Cargar datos de la página
-            switch(page) {
-                case 'dashboard':
-                    actualizarDashboard();
-                    break;
-                case 'suscripciones':
-                    cargarSuscripciones();
-                    break;
-                case 'facturas':
-                    cargarFacturas();
-                    break;
-                case 'pagos':
-                    cargarPagos();
-                    break;
-                case 'clientes':
-                    cargarClientes();
-                    break;
-                case 'mensajes':
-                    cargarMensajes();
-                    break;
-                case 'cotizaciones':
-                    cargarCotizaciones();
-                    break;
-                case 'configuracion':
-                    // Página de configuración
-                    console.log('Página de configuración cargada');
-                    break;
-            }
-        }
-
-        // ========== DASHBOARD ==========
-        function actualizarDashboard() {
-            try {
-                const activas = suscripciones.length;
-                const pagados = suscripciones.filter(s => s.estado === 'pagado').length;
-                const pendientes = suscripciones.filter(s => s.estado === 'pendiente').length;
-                const ingresos = suscripciones.reduce((sum, s) => s.estado === 'pagado' ? sum + s.monto : sum, 0);
-                
-                const elemActivas = document.getElementById('stat-activas');
-                const elemAldia = document.getElementById('stat-aldia');
-                const elemPendientes = document.getElementById('stat-pendientes');
-                const elemIngresos = document.getElementById('stat-ingresos');
-                
-                if (elemActivas) elemActivas.textContent = activas;
-                if (elemAldia) elemAldia.textContent = pagados;
-                if (elemPendientes) elemPendientes.textContent = pendientes;
-                if (elemIngresos) elemIngresos.textContent = '$ ' + ingresos.toLocaleString('es-CO');
-                
-                cargarProximosVencimientos();
-            } catch (error) {
-                console.error('Error al actualizar dashboard:', error);
-            }
-        }
-
-        function cargarProximosVencimientos() {
-            const tbody = document.querySelector('#tabla-vencimientos tbody');
-            tbody.innerHTML = '';
-            
-            const hoy = new Date();
-            const proximos = suscripciones
-                .map(s => ({
-                    ...s,
-                    diasRestantes: Math.ceil((new Date(s.fechaCorte) - hoy) / (1000 * 60 * 60 * 24))
-                }))
-                .sort((a, b) => a.diasRestantes - b.diasRestantes);
-            
-            proximos.forEach(s => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${s.clienteNombre}</td>
-                    <td>${s.programa}</td>
-                    <td>${formatDate(s.fechaInicio)}</td>
-                    <td>${formatDate(s.fechaCorte)}</td>
-                    <td>$ ${s.monto.toLocaleString('es-CO')}</td>
-                    <td><span class="badge-status ${s.estado}">${s.estado === 'pagado' ? 'Pagado' : 'Pendiente'}</span></td>
-                    <td>${s.diasRestantes} días</td>
-                    <td>
-                        <button class="action-btn" onclick="verDetalle(${s.id})" title="Ver"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn" onclick="editarSuscripcion(${s.id})" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" onclick="enviarMensajeCliente(${s.id})" title="Mensaje"><i class="fas fa-comment"></i></button>
-                        <button class="action-btn" onclick="iniciarPago(${s.id})" title="Pagar"><i class="fas fa-dollar-sign"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ========== SUSCRIPCIONES ==========
-        function cargarSuscripciones() {
-            const tbody = document.querySelector('#tabla-suscripciones tbody');
-            tbody.innerHTML = '';
-            
-            suscripciones.forEach(s => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>#${s.id}</td>
-                    <td>${s.clienteNombre}</td>
-                    <td>${s.programa}</td>
-                    <td>${formatDate(s.fechaInicio)}</td>
-                    <td>${formatDate(s.fechaCorte)}</td>
-                    <td>$ ${s.monto.toLocaleString('es-CO')}</td>
-                    <td><span class="badge-status ${s.estado}">${s.estado === 'pagado' ? 'Pagado' : 'Pendiente'}</span></td>
-                    <td>
-                        <button class="action-btn" onclick="editarSuscripcion(${s.id})"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" onclick="eliminarSuscripcion(${s.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            
-            cargarClientesSelect();
-            cargarProgramasSelect();
-        }
-
-        async function guardarSuscripcion(event) {
-            event.preventDefault();
-            
-            let clienteId = document.getElementById('suscripcion-cliente').value;
-            let programaId = document.getElementById('suscripcion-programa').value;
-            const fechaInicio = document.getElementById('suscripcion-fecha-inicio').value;
-            let monto = parseFloat(document.getElementById('suscripcion-monto').value);
-            
-            try {
-                // Si se eligió crear nuevo cliente
-                if (clienteId === 'nuevo') {
-                    const nuevoCliente = {
-                        nombre: document.getElementById('nuevo-cliente-nombre').value,
-                        email: document.getElementById('nuevo-cliente-email').value,
-                        telefono: document.getElementById('nuevo-cliente-telefono').value,
-                        direccion: document.getElementById('nuevo-cliente-direccion').value
-                    };
-                    
-                    if (!nuevoCliente.nombre || !nuevoCliente.email) {
-                        alert('Por favor completa los datos del nuevo cliente');
-                        return;
-                    }
-                    
-                    // Crear cliente en el servidor
-                    const clienteCreado = await fetchAPI('/api/clientes', {
-                        method: 'POST',
-                        body: JSON.stringify(nuevoCliente)
-                    });
-                    
-                    if (!clienteCreado) {
-                        alert('❌ Error al crear el cliente');
-                        return;
-                    }
-                    
-                    clienteId = clienteCreado.id;
-                    clientes.push(clienteCreado);
-                    cargarSelectClientes();
-                }
-                
-                // Si se eligió crear nuevo programa
-                if (programaId === 'nuevo') {
-                    const nuevoPrograma = {
-                        nombre: document.getElementById('nuevo-programa-nombre').value,
-                        descripcion: document.getElementById('nuevo-programa-descripcion').value,
-                        precio: parseFloat(document.getElementById('nuevo-programa-precio').value),
-                        estado: 'activo'
-                    };
-                    
-                    if (!nuevoPrograma.nombre || !nuevoPrograma.precio) {
-                        alert('Por favor completa los datos del nuevo programa');
-                        return;
-                    }
-                    
-                    // Crear programa en el servidor
-                    const programaCreado = await fetchAPI('/api/programas', {
-                        method: 'POST',
-                        body: JSON.stringify(nuevoPrograma)
-                    });
-                    
-                    if (!programaCreado) {
-                        alert('❌ Error al crear el programa');
-                        return;
-                    }
-                    
-                    programaId = programaCreado.id;
-                    monto = programaCreado.precio;
-                    programas.push(programaCreado);
-                    cargarSelectProgramas();
-                }
-                
-                const cliente = clientes.find(c => c.id == clienteId);
-                const programa = programas.find(p => p.id == programaId);
-                
-                const fechaCorte = new Date(fechaInicio);
-                fechaCorte.setMonth(fechaCorte.getMonth() + 1);
-                
-                const nuevaSuscripcion = {
-                    clienteNombre: cliente.nombre,
-                    clienteId: parseInt(clienteId),
-                    programa: programa.nombre,
-                    fechaInicio: new Date(fechaInicio).toISOString(),
-                    fechaCorte: fechaCorte.toISOString(),
-                    monto: monto,
-                    estado: 'pendiente'
-                };
-                
-                // Guardar en el servidor (nube)
-                const response = await fetchAPI('/api/suscripciones', {
-                    method: 'POST',
-                    body: JSON.stringify(nuevaSuscripcion)
-                });
-                
-                if (response) {
-                    suscripciones.push(response);
-                } else {
-                    alert('❌ Error al guardar en el servidor');
-                    return;
-                }
-                
-                closeModal('nuevaSuscripcion');
-                cargarSuscripciones();
-                actualizarDashboard();
-                
-                alert('✅ Suscripción creada exitosamente');
-                
-            } catch (error) {
-                alert('❌ No se pudo guardar: ' + error.message);
-                return;
-            }
-        }
-
-        // ========== CLIENTES ==========
-        function cargarClientes() {
-            const tbody = document.querySelector('#tabla-clientes tbody');
-            tbody.innerHTML = '';
-            
-            clientes.forEach(c => {
-                const suscrip = suscripciones.filter(s => s.clienteNombre === c.nombre).length;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>#${c.id}</td>
-                    <td>${c.nombre}</td>
-                    <td>${c.email}</td>
-                    <td>${c.telefono}</td>
-                    <td>${suscrip}</td>
-                    <td><span class="badge-status pagado">${c.estado}</span></td>
-                    <td>
-                        <button class="action-btn" onclick="editarCliente(${c.id})"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" onclick="eliminarCliente(${c.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        async function guardarCliente(event) {
-            event.preventDefault();
-            
-            const nuevoCliente = {
-                nombre: document.getElementById('cliente-nombre').value,
-                email: document.getElementById('cliente-email').value,
-                telefono: document.getElementById('cliente-telefono').value,
-                direccion: document.getElementById('cliente-direccion').value,
-                estado: 'activo'
-            };
-            
-            try {
-                // Guardar en el servidor (nube)
-                const response = await fetchAPI('/api/clientes', {
-                    method: 'POST',
-                    body: JSON.stringify(nuevoCliente)
-                });
-                
-                if (response) {
-                    clientes.push(response);
-                    cargarSelectClientes(); // Actualizar select
-                } else {
-                    alert('❌ Error al guardar en el servidor');
-                    return;
-                }
-            } catch (error) {
-                alert('❌ No se pudo guardar: ' + error.message);
-                return;
-            }
-            closeModal('nuevoCliente');
-            cargarClientes();
-            
-            alert('✅ Cliente agregado exitosamente');
-        }
-
-        function cargarClientesSelect() {
-            const select = document.getElementById('suscripcion-cliente');
-            select.innerHTML = '<option value="">Seleccionar cliente...</option>';
-            clientes.forEach(c => {
-                select.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
-            });
-        }
-
-        // ========== FACTURAS ==========
-        function cargarFacturas() {
-            const tbody = document.querySelector('#tabla-facturas tbody');
-            tbody.innerHTML = '';
-            
-            // Generar facturas automáticamente de suscripciones pagadas
-            const facturasAuto = suscripciones.filter(s => s.estado === 'pagado').map((s, i) => ({
-                numero: `F-${String(i + 1).padStart(5, '0')}`,
-                cliente: s.clienteNombre,
-                fecha: s.fechaInicio,
-                monto: s.monto,
-                estado: 'pagada'
-            }));
-            
-            facturasAuto.forEach(f => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${f.numero}</td>
-                    <td>${f.cliente}</td>
-                    <td>${formatDate(f.fecha)}</td>
-                    <td>$ ${f.monto.toLocaleString('es-CO')}</td>
-                    <td><span class="badge-status pagado">${f.estado}</span></td>
-                    <td>
-                        <button class="action-btn" onclick="descargarFactura('${f.numero}')"><i class="fas fa-download"></i></button>
-                        <button class="action-btn" onclick="enviarFactura('${f.numero}')"><i class="fas fa-paper-plane"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function descargarFactura(numero) {
-            alert(`Descargando factura ${numero}...`);
-            // Aquí puedes implementar la generación de PDF
-        }
-
-        function enviarFactura(numero) {
-            alert(`Enviando factura ${numero} por email...`);
-        }
-
-        // ========== PAGOS WOMPI ==========
-        function iniciarPago(suscripcionId) {
-            const suscripcion = suscripciones.find(s => s.id === suscripcionId);
-            
-            document.getElementById('pago-cliente').textContent = suscripcion.clienteNombre;
-            document.getElementById('pago-concepto').textContent = suscripcion.programa;
-            document.getElementById('pago-monto').textContent = '$ ' + suscripcion.monto.toLocaleString('es-CO');
-            
-            document.getElementById('modal-pago').dataset.suscripcionId = suscripcionId;
-            showModal('pago');
-        }
-
-        function procesarPagoWompi() {
-            const suscripcionId = parseInt(document.getElementById('modal-pago').dataset.suscripcionId);
-            const suscripcion = suscripciones.find(s => s.id === suscripcionId);
-            
-            // Configurar checkout de Wompi
-            var checkout = new WidgetCheckout({
-                currency: 'COP',
-                amountInCents: suscripcion.monto * 100,
-                reference: `SUB-${suscripcionId}-${Date.now()}`,
-                publicKey: wompiConfig.publicKey,
-                redirectUrl: window.location.href
-            });
-            
-            checkout.open(function (result) {
-                var transaction = result.transaction;
-                
-                if (transaction.status === 'APPROVED') {
-                    // Actualizar estado de suscripción
-                    suscripcion.estado = 'pagado';
-                    
-                    // Registrar pago
-                    pagos.push({
-                        id: pagos.length + 1,
-                        transactionId: transaction.id,
-                        cliente: suscripcion.clienteNombre,
-                        monto: suscripcion.monto,
-                        metodo: 'Wompi',
-                        fecha: new Date().toISOString(),
-                        estado: 'aprobado'
-                    });
-                    
-                    guardarDatos();
-                    closeModal('pago');
-                    actualizarDashboard();
-                    
-                    alert('¡Pago procesado exitosamente!');
-                } else {
-                    alert('El pago no pudo ser procesado');
-                }
-            });
-        }
-
-        function cargarPagos() {
-            const tbody = document.querySelector('#tabla-pagos tbody');
-            tbody.innerHTML = '';
-            
-            pagos.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${p.transactionId}</td>
-                    <td>${p.cliente}</td>
-                    <td>$ ${p.monto.toLocaleString('es-CO')}</td>
-                    <td>${p.metodo}</td>
-                    <td>${formatDate(p.fecha)}</td>
-                    <td><span class="badge-status pagado">${p.estado}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ========== MENSAJES ==========
-        function cargarMensajes() {
-            // Implementación básica de mensajes
-            const lista = document.getElementById('lista-conversaciones');
-            lista.innerHTML = `
-                <div class="conversacion-item">
-                    <div class="avatar">CX</div>
-                    <div class="conversacion-info">
-                        <h4>Comercializadora XYZ</h4>
-                        <p>Consulta sobre renovación...</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function enviarMensaje() {
-            const input = document.getElementById('mensaje-input');
-            if (input.value.trim()) {
-                alert('Mensaje enviado: ' + input.value);
-                input.value = '';
-            }
-        }
-
-        // ========== PROGRAMAS ==========
-        function cargarProgramas() {
-            const lista = document.getElementById('lista-programas');
-            if (lista) {
-                lista.innerHTML = '';
-                programas.forEach(p => {
-                    lista.innerHTML += `
-                        <div class="programa-item">
-                            <span>${p.nombre}</span>
-                            <span>$ ${p.precio.toLocaleString('es-CO')}</span>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        function cargarProgramasSelect() {
-            const select = document.getElementById('suscripcion-programa');
-            select.innerHTML = '<option value="">Seleccionar programa...</option>';
-            programas.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.nombre} - $${p.precio.toLocaleString('es-CO')}</option>`;
-            });
-        }
-
-        // ========== MODALES ==========
-        function showModal(modalId) {
-            document.getElementById('modal-' + modalId).classList.add('show');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById('modal-' + modalId).classList.remove('show');
-        }
-
-        // Cerrar modal al hacer click fuera
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('show');
-            }
-        }
-
-        // ========== UTILIDADES ==========
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
-        function verDetalle(id) {
-            alert('Ver detalle de suscripción #' + id);
-        }
-
-        function editarSuscripcion(id) {
-            alert('Editar suscripción #' + id);
-        }
-
-        async function eliminarSuscripcion(id) {
-            if (confirm('¿Está seguro de eliminar esta suscripción?')) {
-                try {
-                    await fetchAPI(`/api/suscripciones/${id}`, { method: 'DELETE' });
-                    suscripciones = suscripciones.filter(s => s.id !== id);
-                    cargarSuscripciones();
-                    actualizarDashboard();
-                    alert('✅ Suscripción eliminada');
-                } catch (error) {
-                    alert('❌ Error al eliminar: ' + error.message);
-                }
-            }
-        }
-
-        function editarCliente(id) {
-            alert('Editar cliente #' + id);
-        }
-
-        async function eliminarCliente(id) {
-            if (confirm('¿Está seguro de eliminar este cliente?')) {
-                try {
-                    await fetchAPI(`/api/clientes/${id}`, { method: 'DELETE' });
-                    clientes = clientes.filter(c => c.id !== id);
-                    cargarClientes();
-                    alert('✅ Cliente eliminado');
-                } catch (error) {
-                    alert('❌ Error al eliminar: ' + error.message);
-                }
-            }
-        }
-
-        function enviarMensajeCliente(id) {
-            cambiarPagina('mensajes');
-        }
-
-        function generarFactura() {
-            alert('Generar nueva factura');
-        }
-
-        // ========== FUNCIONES PARA MODAL DE SUSCRIPCIÓN ==========
-        function toggleNuevoCliente() {
-            const select = document.getElementById('suscripcion-cliente');
-            const campos = document.getElementById('campos-nuevo-cliente');
-            if (select.value === 'nuevo') {
-                campos.style.display = 'block';
-            } else {
-                campos.style.display = 'none';
-            }
-        }
-
-        function toggleNuevoPrograma() {
-            const select = document.getElementById('suscripcion-programa');
-            const campos = document.getElementById('campos-nuevo-programa');
-            const montoInput = document.getElementById('suscripcion-monto');
-            
-            if (select.value === 'nuevo') {
-                campos.style.display = 'block';
-            } else {
-                campos.style.display = 'none';
-                // Auto-llenar monto si selecciona programa existente
-                if (select.value) {
-                    const programa = programas.find(p => p.id == select.value);
-                    if (programa) {
-                        montoInput.value = programa.precio;
-                    }
-                }
-            }
-        }
-
-        // ========== COTIZACIONES ==========
-        function abrirModalCotizacion() {
-            limpiarFormularioCotizacion();
-            showModal('nuevaCotizacion');
-        }
-
-        function limpiarFormularioCotizacion() {
-            document.getElementById('form-cotizacion').reset();
-            document.getElementById('items-cotizacion').innerHTML = `
-                <div class="item-cotizacion" style="background: #fafafa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                    <div class="form-group">
-                        <label>Descripción *</label>
-                        <textarea class="item-descripcion" rows="2" required placeholder="Describe el servicio o producto..."></textarea>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 100px 1fr 1fr 40px; gap: 10px; align-items: end;">
-                        <div class="form-group" style="margin: 0;">
-                            <label>Cant. *</label>
-                            <input type="number" class="item-cantidad" value="1" min="1" required>
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label>Precio Unit. *</label>
-                            <input type="number" class="item-precio" min="0" required placeholder="0">
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label>Subtotal</label>
-                            <input type="number" class="item-subtotal" readonly style="background: #e9ecef; font-weight: 600;">
-                        </div>
-                        <button type="button" class="btn-icon" onclick="eliminarItemCotizacion(this)" title="Eliminar" style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; height: 38px;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            actualizarTotalesCotizacion();
-        }
-
-        function agregarItemCotizacion() {
-            const container = document.getElementById('items-cotizacion');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item-cotizacion';
-            itemDiv.style.cssText = 'background: #fafafa; padding: 15px; border-radius: 8px; margin-bottom: 10px;';
-            itemDiv.innerHTML = `
-                <div class="form-group">
-                    <label>Descripción *</label>
-                    <textarea class="item-descripcion" rows="2" required placeholder="Describe el servicio o producto..."></textarea>
-                </div>
-                <div style="display: grid; grid-template-columns: 100px 1fr 1fr 40px; gap: 10px; align-items: end;">
-                    <div class="form-group" style="margin: 0;">
-                        <label>Cant. *</label>
-                        <input type="number" class="item-cantidad" value="1" min="1" required>
-                    </div>
-                    <div class="form-group" style="margin: 0;">
-                        <label>Precio Unit. *</label>
-                        <input type="number" class="item-precio" min="0" required placeholder="0">
-                    </div>
-                    <div class="form-group" style="margin: 0;">
-                        <label>Subtotal</label>
-                        <input type="number" class="item-subtotal" readonly style="background: #e9ecef; font-weight: 600;">
-                    </div>
-                    <button type="button" class="btn-icon" onclick="eliminarItemCotizacion(this)" title="Eliminar" style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 8px; cursor: pointer; height: 38px;">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(itemDiv);
-            
-            // Agregar listeners para calcular subtotales
-            const inputs = itemDiv.querySelectorAll('.item-cantidad, .item-precio');
-            inputs.forEach(input => {
-                input.addEventListener('input', () => actualizarTotalesCotizacion());
-            });
-        }
-
-        function eliminarItemCotizacion(btn) {
-            const items = document.querySelectorAll('.item-cotizacion');
-            if (items.length > 1) {
-                btn.closest('.item-cotizacion').remove();
-                actualizarTotalesCotizacion();
-            } else {
-                alert('Debe haber al menos un item en la cotización');
-            }
-        }
-
-        function actualizarTotalesCotizacion() {
-            const items = document.querySelectorAll('.item-cotizacion');
-            let subtotalTotal = 0;
-            
-            items.forEach(item => {
-                const cantidad = parseFloat(item.querySelector('.item-cantidad').value) || 0;
-                const precio = parseFloat(item.querySelector('.item-precio').value) || 0;
-                const subtotal = cantidad * precio;
-                item.querySelector('.item-subtotal').value = subtotal.toFixed(0);
-                subtotalTotal += subtotal;
-            });
-            
-            const iva = subtotalTotal * 0.19;
-            const total = subtotalTotal + iva;
-            
-            document.getElementById('cot-subtotal-preview').textContent = '$ ' + subtotalTotal.toLocaleString('es-CO');
-            document.getElementById('cot-iva-preview').textContent = '$ ' + iva.toLocaleString('es-CO');
-            document.getElementById('cot-total-preview').textContent = '$ ' + total.toLocaleString('es-CO');
-        }
-
-        function cargarCotizaciones() {
-            const tbody = document.querySelector('#tabla-cotizaciones tbody');
-            tbody.innerHTML = '';
-            
-            if (cotizaciones.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
-                            <i class="fas fa-file-pdf" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
-                            No hay cotizaciones generadas aún
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            cotizaciones.forEach(cot => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${cot.numero}</strong></td>
-                    <td>${cot.cliente || '<em>Sin cliente</em>'}</td>
-                    <td>${formatDate(cot.fecha)}</td>
-                    <td><strong>$ ${cot.total.toLocaleString('es-CO')}</strong></td>
-                    <td>${formatDate(cot.validaHasta)}</td>
-                    <td>
-                        <button class="action-btn" onclick="verCotizacionPDF(${cot.id})" title="Ver PDF">
-                            <i class="fas fa-file-pdf"></i>
-                        </button>
-                        <button class="action-btn" onclick="eliminarCotizacion(${cot.id})" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function eliminarCotizacion(id) {
-            if (confirm('¿Eliminar esta cotización?')) {
-                cotizaciones = cotizaciones.filter(c => c.id !== id);
-                cargarCotizaciones();
-            }
-        }
-
-        function guardarYGenerarCotizacion(event) {
-            event.preventDefault();
-            generarPDFCotizacion();
-        }
-
-        function verCotizacionPDF(id) {
-            const cot = cotizaciones.find(c => c.id === id);
-            if (!cot) {
-                alert('Cotización no encontrada');
-                return;
-            }
-            
-            const fechaCot = new Date(cot.fecha);
-            const fechaValid = new Date(cot.validaHasta);
-            
-            // Crear HTML para el PDF
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { font-family: Arial, sans-serif; padding: 30px; color: #000; font-size: 12px; }
-                        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #000; padding-bottom: 15px; }
-                        .logo { display: flex; align-items: center; gap: 12px; }
-                        .logo-icon { font-size: 36px; font-weight: bold; color: #000; font-family: monospace; }
-                        .logo-text { font-size: 28px; font-weight: bold; color: #000; letter-spacing: 2px; }
-                        .company-info { text-align: right; line-height: 1.5; font-size: 11px; }
-                        .title { background: #000; color: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; margin: 25px 0; letter-spacing: 1px; }
-                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-                        .info-box { border: 1px solid #ddd; padding: 12px; }
-                        .info-box h3 { background: #f0f0f0; padding: 8px; margin: -12px -12px 10px -12px; font-size: 12px; }
-                        .info-box strong { display: block; margin-bottom: 6px; font-size: 11px; }
-                        .info-box { font-size: 11px; line-height: 1.6; }
-                        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11px; }
-                        th { background: #000; color: #fff; padding: 10px; text-align: left; font-size: 11px; }
-                        td { padding: 8px; border-bottom: 1px solid #ddd; }
-                        tr:nth-child(even) { background: #f9f9f9; }
-                        .totals { margin-top: 15px; text-align: right; }
-                        .totals table { width: auto; margin-left: auto; }
-                        .totals td { border: none; padding: 4px 12px; font-size: 11px; }
-                        .totals .total-final { font-size: 14px; font-weight: bold; background: #000; color: #fff; }
-                        .observaciones { margin: 25px 0; padding: 12px; background: #f9f9f9; border-left: 4px solid #000; font-size: 11px; line-height: 1.5; }
-                        .observaciones h3 { font-size: 12px; margin-bottom: 8px; }
-                        .footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #ddd; text-align: center; font-size: 10px; line-height: 1.6; }
-                        .firma { margin-top: 40px; text-align: center; font-size: 11px; }
-                        .firma-linea { border-top: 2px solid #000; width: 250px; margin: 0 auto 8px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div class="logo">
-                            <div class="logo-icon">&lt;/&gt;</div>
-                            <div class="logo-text">CODEXIS</div>
-                        </div>
-                        <div class="company-info">
-                            <strong>CODEXIS</strong><br>
-                            Ing. Santiago Guzmán<br>
-                            CC: 1007771921<br>
-                            Email: santyguz77@gmail.com<br>
-                            Cel: 3174190562
-                        </div>
-                    </div>
-
-                    <div class="title">COTIZACIÓN ${cot.numero}</div>
-
-                    <div class="info-grid">
-                        ${cot.cliente ? `
-                        <div class="info-box">
-                            <h3>INFORMACIÓN DEL CLIENTE</h3>
-                            ${cot.cliente ? `<strong>Cliente:</strong> ${cot.cliente}<br>` : ''}
-                            ${cot.nit ? `<strong>NIT/CC:</strong> ${cot.nit}<br>` : ''}
-                            ${cot.email ? `<strong>Email:</strong> ${cot.email}<br>` : ''}
-                            ${cot.telefono ? `<strong>Teléfono:</strong> ${cot.telefono}<br>` : ''}
-                            ${cot.direccion ? `<strong>Dirección:</strong> ${cot.direccion}` : ''}
-                        </div>
-                        ` : ''}
-                        <div class="info-box" style="${!cot.cliente ? 'grid-column: 1 / -1;' : ''}">
-                            <h3>INFORMACIÓN DE LA COTIZACIÓN</h3>
-                            <strong>Número:</strong> ${cot.numero}<br>
-                            <strong>Fecha:</strong> ${fechaCot.toLocaleDateString('es-CO')}<br>
-                            <strong>Válida hasta:</strong> ${fechaValid.toLocaleDateString('es-CO')}<br>
-                            <strong>Responsable:</strong> Ing. Santiago Guzmán
-                        </div>
-                    </div>
-
-                    <h3 style="margin: 30px 0 10px;">DETALLE DE SERVICIOS/PRODUCTOS</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">#</th>
-                                <th>Descripción</th>
-                                <th style="width: 100px;">Cantidad</th>
-                                <th style="width: 120px;">Precio Unit.</th>
-                                <th style="width: 120px;">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${cot.items.map((item, index) => `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${item.descripcion}</td>
-                                    <td>${item.cantidad}</td>
-                                    <td>$ ${item.precio.toLocaleString('es-CO')}</td>
-                                    <td>$ ${item.subtotal.toLocaleString('es-CO')}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-
-                    <div class="totals">
-                        <table>
-                            <tr>
-                                <td><strong>Subtotal:</strong></td>
-                                <td>$ ${cot.subtotal.toLocaleString('es-CO')}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>IVA (19%):</strong></td>
-                                <td>$ ${cot.iva.toLocaleString('es-CO')}</td>
-                            </tr>
-                            <tr class="total-final">
-                                <td><strong>TOTAL:</strong></td>
-                                <td><strong>$ ${cot.total.toLocaleString('es-CO')}</strong></td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    ${cot.observaciones ? `
-                    <div class="observaciones">
-                        <h3 style="margin-bottom: 10px;">OBSERVACIONES</h3>
-                        <p>${cot.observaciones.replace(/\n/g, '<br>')}</p>
-                    </div>
-                    ` : ''}
-
-                    <div class="observaciones">
-                        <h3 style="margin-bottom: 10px;">TÉRMINOS Y CONDICIONES</h3>
-                        <p>
-                            • Esta cotización es válida por ${cot.validez} días a partir de su fecha de emisión.<br>
-                            • Los precios incluyen IVA.<br>
-                            • Tiempo de entrega: A convenir según proyecto.<br>
-                            • Forma de pago: 50% de anticipo, 50% contra entrega.<br>
-                            • Garantía: Según términos del contrato de servicio.
-                        </p>
-                    </div>
-
-                    <div class="firma">
-                        <div class="firma-linea"></div>
-                        <strong>Ing. Santiago Guzmán</strong><br>
-                        Ingeniero de Sistemas<br>
-                        CODEXIS<br>
-                        CC: 1007771921
-                    </div>
-
-                    <div class="footer">
-                        <strong>CODEXIS - Soluciones Tecnológicas</strong><br>
-                        Email: santyguz77@gmail.com | Teléfono: 3174190562<br>
-                        Generado el ${fechaCot.toLocaleDateString('es-CO')}
-                    </div>
-                </body>
-                </html>
-            `;
-            
-            const ventana = window.open('', '_blank');
-            ventana.document.write(htmlContent);
-            ventana.document.close();
-            
-            setTimeout(() => {
-                ventana.print();
-            }, 500);
-        }
-
-        function generarPDFCotizacion() {
-            // Obtener datos del formulario (cliente opcional)
-            const clienteNombre = document.getElementById('cot-cliente-nombre').value.trim();
-            const clienteNIT = document.getElementById('cot-cliente-nit').value.trim();
-            const clienteEmail = document.getElementById('cot-cliente-email').value.trim();
-            const clienteTelefono = document.getElementById('cot-cliente-telefono').value.trim();
-            const clienteDireccion = document.getElementById('cot-cliente-direccion').value.trim();
-            const observaciones = document.getElementById('cot-observaciones').value;
-            const validez = document.getElementById('cot-validez').value;
-
-            // Obtener items
-            const items = [];
-            const itemElements = document.querySelectorAll('.item-cotizacion');
-            
-            itemElements.forEach(item => {
-                const descripcion = item.querySelector('.item-descripcion').value;
-                const cantidad = parseFloat(item.querySelector('.item-cantidad').value);
-                const precio = parseFloat(item.querySelector('.item-precio').value);
-                
-                if (descripcion && cantidad && precio) {
-                    items.push({
-                        descripcion,
-                        cantidad,
-                        precio,
-                        subtotal: cantidad * precio
-                    });
-                }
-            });
-
-            if (items.length === 0) {
-                alert('⚠️ Agrega al menos un item a la cotización');
-                return;
-            }
-
-            // Calcular totales
-            const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
-            const iva = subtotal * 0.19;
-            const total = subtotal + iva;
-
-            // Generar número de cotización
-            const numeroCotizacion = 'COT-' + Date.now();
-            const fechaActual = new Date();
-            const fechaValidez = new Date();
-            fechaValidez.setDate(fechaValidez.getDate() + parseInt(validez));
-            
-            // Guardar cotización en el array
-            const nuevaCotizacion = {
-                id: Date.now(),
-                numero: numeroCotizacion,
-                cliente: clienteNombre || null,
-                nit: clienteNIT,
-                email: clienteEmail,
-                telefono: clienteTelefono,
-                direccion: clienteDireccion,
-                items: items,
-                observaciones: observaciones,
-                validez: parseInt(validez),
-                subtotal: subtotal,
-                iva: iva,
-                total: total,
-                fecha: fechaActual.toISOString(),
-                validaHasta: fechaValidez.toISOString()
-            };
-            
-            cotizaciones.push(nuevaCotizacion);
-            localStorage.setItem('cotizaciones', JSON.stringify(cotizaciones));
-
-            // Crear HTML para el PDF
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { font-family: Arial, sans-serif; padding: 30px; color: #000; font-size: 12px; }
-                        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #000; padding-bottom: 15px; }
-                        .logo { display: flex; align-items: center; gap: 12px; }
-                        .logo-icon { font-size: 36px; font-weight: bold; color: #000; font-family: monospace; }
-                        .logo-text { font-size: 28px; font-weight: bold; color: #000; letter-spacing: 2px; }
-                        .company-info { text-align: right; line-height: 1.5; font-size: 11px; }
-                        .title { background: #000; color: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; margin: 25px 0; letter-spacing: 1px; }
-                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-                        .info-box { border: 1px solid #ddd; padding: 12px; }
-                        .info-box h3 { background: #f0f0f0; padding: 8px; margin: -12px -12px 10px -12px; font-size: 12px; }
-                        .info-box strong { display: block; margin-bottom: 6px; font-size: 11px; }
-                        .info-box { font-size: 11px; line-height: 1.6; }
-                        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11px; }
-                        th { background: #000; color: #fff; padding: 10px; text-align: left; font-size: 11px; }
-                        td { padding: 8px; border-bottom: 1px solid #ddd; }
-                        tr:nth-child(even) { background: #f9f9f9; }
-                        .totals { margin-top: 15px; text-align: right; }
-                        .totals table { width: auto; margin-left: auto; }
-                        .totals td { border: none; padding: 4px 12px; font-size: 11px; }
-                        .totals .total-final { font-size: 14px; font-weight: bold; background: #000; color: #fff; }
-                        .observaciones { margin: 25px 0; padding: 12px; background: #f9f9f9; border-left: 4px solid #000; font-size: 11px; line-height: 1.5; }
-                        .observaciones h3 { font-size: 12px; margin-bottom: 8px; }
-                        .footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #ddd; text-align: center; font-size: 10px; line-height: 1.6; }
-                        .firma { margin-top: 40px; text-align: center; font-size: 11px; }
-                        .firma-linea { border-top: 2px solid #000; width: 250px; margin: 0 auto 8px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div class="logo">
-                            <div class="logo-icon">&lt;/&gt;</div>
-                            <div class="logo-text">CODEXIS</div>
-                        </div>
-                        <div class="company-info">
-                            <strong>CODEXIS</strong><br>
-                            Ing. Santiago Guzmán<br>
-                            CC: 1007771921<br>
-                            Email: santyguz77@gmail.com<br>
-                            Cel: 3174190562
-                        </div>
-                    </div>
-
-                    <div class="title">COTIZACIÓN ${numeroCotizacion}</div>
-
-                    <div class="info-grid">
-                        ${clienteNombre ? `
-                        <div class="info-box">
-                            <h3>INFORMACIÓN DEL CLIENTE</h3>
-                            ${clienteNombre ? `<strong>Cliente:</strong> ${clienteNombre}<br>` : ''}
-                            ${clienteNIT ? `<strong>NIT/CC:</strong> ${clienteNIT}<br>` : ''}
-                            ${clienteEmail ? `<strong>Email:</strong> ${clienteEmail}<br>` : ''}
-                            ${clienteTelefono ? `<strong>Teléfono:</strong> ${clienteTelefono}<br>` : ''}
-                            ${clienteDireccion ? `<strong>Dirección:</strong> ${clienteDireccion}` : ''}
-                        </div>
-                        ` : ''}
-                        <div class="info-box" style="${!clienteNombre ? 'grid-column: 1 / -1;' : ''}">
-                            <h3>INFORMACIÓN DE LA COTIZACIÓN</h3>
-                            <strong>Número:</strong> ${numeroCotizacion}<br>
-                            <strong>Fecha:</strong> ${fechaActual.toLocaleDateString('es-CO')}<br>
-                            <strong>Válida hasta:</strong> ${fechaValidez.toLocaleDateString('es-CO')}<br>
-                            <strong>Responsable:</strong> Ing. Santiago Guzmán
-                        </div>
-                    </div>
-
-                    <h3 style="margin: 30px 0 10px;">DETALLE DE SERVICIOS/PRODUCTOS</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">#</th>
-                                <th>Descripción</th>
-                                <th style="width: 100px;">Cantidad</th>
-                                <th style="width: 120px;">Precio Unit.</th>
-                                <th style="width: 120px;">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${items.map((item, index) => `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${item.descripcion}</td>
-                                    <td>${item.cantidad}</td>
-                                    <td>$ ${item.precio.toLocaleString('es-CO')}</td>
-                                    <td>$ ${item.subtotal.toLocaleString('es-CO')}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-
-                    <div class="totals">
-                        <table>
-                            <tr>
-                                <td><strong>Subtotal:</strong></td>
-                                <td>$ ${subtotal.toLocaleString('es-CO')}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>IVA (19%):</strong></td>
-                                <td>$ ${iva.toLocaleString('es-CO')}</td>
-                            </tr>
-                            <tr class="total-final">
-                                <td><strong>TOTAL:</strong></td>
-                                <td><strong>$ ${total.toLocaleString('es-CO')}</strong></td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    ${observaciones ? `
-                    <div class="observaciones">
-                        <h3 style="margin-bottom: 10px;">OBSERVACIONES</h3>
-                        <p>${observaciones.replace(/\n/g, '<br>')}</p>
-                    </div>
-                    ` : ''}
-
-                    <div class="observaciones">
-                        <h3 style="margin-bottom: 10px;">TÉRMINOS Y CONDICIONES</h3>
-                        <p>
-                            • Esta cotización es válida por ${validez} días a partir de su fecha de emisión.<br>
-                            • Los precios incluyen IVA.<br>
-                            • Tiempo de entrega: A convenir según proyecto.<br>
-                            • Forma de pago: 50% de anticipo, 50% contra entrega.<br>
-                            • Garantía: Según términos del contrato de servicio.
-                        </p>
-                    </div>
-
-                    <div class="firma">
-                        <div class="firma-linea"></div>
-                        <strong>Ing. Santiago Guzmán</strong><br>
-                        Ingeniero de Sistemas<br>
-                        CODEXIS<br>
-                        CC: 1007771921
-                    </div>
-
-                    <div class="footer">
-                        <strong>CODEXIS - Soluciones Tecnológicas</strong><br>
-                        Email: santyguz77@gmail.com | Teléfono: 3174190562<br>
-                        Generado el ${fechaActual}
-                    </div>
-                </body>
-                </html>
-            `;
-
-            // Abrir en nueva ventana para imprimir como PDF
-            const ventana = window.open('', '_blank');
-            ventana.document.write(htmlContent);
-            ventana.document.close();
-            
-            // Esperar a que cargue y abrir diálogo de impresión
-            setTimeout(() => {
-                ventana.print();
-            }, 500);
-
-            // Cerrar modal y actualizar lista
-            closeModal('nuevaCotizacion');
-            cargarCotizaciones();
-            
-            alert('✅ Cotización generada y guardada. Use Ctrl+P o el diálogo de impresión para guardar como PDF');
-        }
-
-        // Agregar listeners para calcular subtotales en items existentes
-        document.addEventListener('DOMContentLoaded', () => {
-            document.addEventListener('input', (e) => {
-                if (e.target.classList.contains('item-cantidad') || e.target.classList.contains('item-precio')) {
-                    actualizarTotalesCotizacion();
-                }
-            });
-            
-            // Cargar cotizaciones del localStorage
-            const cotizacionesGuardadas = localStorage.getItem('cotizaciones');
-            if (cotizacionesGuardadas) {
-                cotizaciones = JSON.parse(cotizacionesGuardadas);
-            }
-        });
-    </script>
+  </div>
+
+  <!-- Notifications Container -->
+  <div class="notifications-container" id="notifications"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  
+  <script>
+    // Hide splash screen after load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('splash').classList.add('hidden');
+      }, 1000);
+    });
+  </script>
 </body>
+
 </html>

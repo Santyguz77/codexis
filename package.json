@@ -1,21 +1,23 @@
 {
-  "name": "codexis-subscriptions",
+  "name": "control-suscripciones",
   "version": "1.0.0",
-  "description": "Sistema PWA para gestión de suscripciones - CODEXIS",
+  "description": "Sistema PWA para gestión de suscripciones con cobros y recordatorios - Integración Wompi",
   "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["suscripciones", "pwa", "codexis", "invoices"],
-  "author": "CODEXIS",
+  "keywords": ["suscripciones", "pagos", "wompi", "recordatorios", "pwa", "clientes"],
+  "author": "",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "body-parser": "^1.20.2",
     "sqlite3": "^5.1.6",
-    "sqlite": "^5.0.1"
+    "sqlite": "^5.0.1",
+    "node-cron": "^3.0.3",
+    "crypto": "^1.0.1"
   }
 }

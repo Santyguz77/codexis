@@ -1,18 +1,15 @@
-const CACHE_NAME = 'codexis-v1';
+const CACHE_NAME = 'suscripciones-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://checkout.wompi.co/widget.js'
+  './',
+  'index.html',
+  'app.js',
+  'styles.css',
+  'manifest.json'
 ];
 
 // Instalación del service worker
 self.addEventListener('install', event => {
-  console.log('[SW] Instalando CODEXIS Service Worker v1...');
+  console.log('[SW] Instalando Service Worker Suscripciones...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -22,7 +19,7 @@ self.addEventListener('install', event => {
         });
       })
       .then(() => {
-        console.log('[SW] Service Worker instalado correctamente');
+        console.log('[SW] Service Worker instalado');
         return self.skipWaiting();
       })
   );
@@ -30,81 +27,81 @@ self.addEventListener('install', event => {
 
 // Activación y limpieza de caché antiguo
 self.addEventListener('activate', event => {
-  console.log('[SW] Activando Service Worker...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Eliminando caché antiguo:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => {
-      console.log('[SW] Service Worker activado');
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 // Estrategia: Network First, fallback a Cache
 self.addEventListener('fetch', event => {
-  // Ignorar llamadas a APIs externas (Wompi) y túneles de Cloudflare
-  if (event.request.url.includes('wompi.co') || 
-      event.request.url.includes('api.') ||
-      event.request.method !== 'GET') {
-    return;
+  // No cachear llamadas a la API
+  if (event.request.url.includes('/api/')) {
+    return event.respondWith(fetch(event.request));
   }
-
+  
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Si la respuesta es válida, guardarla en caché
-        if (response && response.status === 200) {
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
-          });
-        }
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
         return response;
       })
       .catch(() => {
-        // Si falla la red, buscar en caché
-        return caches.match(event.request).then(response => {
-          return response || new Response('Offline', {
-            status: 503,
-            statusText: 'Service Unavailable'
-          });
-        });
+        return caches.match(event.request);
       })
   );
 });
 
-// Sincronización en segundo plano
-self.addEventListener('sync', event => {
-  console.log('[SW] Sincronización en segundo plano:', event.tag);
-  if (event.tag === 'sync-data') {
-    event.waitUntil(syncData());
+// Escuchar mensajes para mostrar notificaciones
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const { title, options } = event.data;
+    self.registration.showNotification(title, options);
   }
 });
 
-async function syncData() {
-  console.log('[SW] Sincronizando datos con el servidor...');
-  // Aquí puedes implementar lógica de sincronización
-}
+// Manejar clics en notificaciones
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(clientList => {
+        if (clientList.length > 0) {
+          return clientList[0].focus();
+        }
+        return clients.openWindow('/');
+      })
+  );
+});
 
-// Notificaciones push (opcional para futuras implementaciones)
+// Push notifications
 self.addEventListener('push', event => {
-  console.log('[SW] Notificación push recibida');
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Recordatorio de Suscripción';
   const options = {
-    body: event.data ? event.data.text() : 'Nueva notificación de CODEXIS',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
-    vibrate: [100, 50, 100]
+    body: data.body || 'Tienes pagos pendientes',
+    icon: 'icon-192.svg',
+    badge: 'icon-192.svg',
+    vibrate: [200, 100, 200],
+    data: data.data || {},
+    actions: [
+      { action: 'view', title: 'Ver detalles' },
+      { action: 'dismiss', title: 'Descartar' }
+    ]
   };
   
   event.waitUntil(
-    self.registration.showNotification('CODEXIS', options)
+    self.registration.showNotification(title, options)
   );
 });

@@ -1,31 +1,31 @@
 {
-  "name": "CODEXIS - Gestión de Suscripciones",
-  "short_name": "CODEXIS",
-  "description": "Sistema profesional de gestión de suscripciones, facturas y pagos",
-  "start_url": "/index.html",
-  "scope": "/",
+  "name": "Control de Suscripciones",
+  "short_name": "Suscripciones",
+  "description": "Sistema de gestión de suscripciones, cobros y recordatorios",
+  "start_url": "index.html",
+  "scope": ".",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
   "orientation": "any",
-  "categories": ["business", "finance", "productivity"],
+  "categories": ["business", "finance"],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "icon-192.svg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "maskable"
     }
   ]

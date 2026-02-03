@@ -1,27 +1,27 @@
-# node_modules
-node_modules/
-npm-debug.log*
-
-# Base de datos
+# Suscripciones DB
 *.db
-*.db-shm
-*.db-wal
+*.db-journal
 
-# Logs
-logs/
-*.log
+# Dependencias
+node_modules/
 
-# Environment
+# Variables de entorno
 .env
 .env.local
+.env.production
 
-# Sistema operativo
+# Logs
+*.log
+npm-debug.log*
+
+# OS
 .DS_Store
 Thumbs.db
 
-# PM2
-.pm2/
+# IDE
+.vscode/
+.idea/
 
-# Temporal
-temp/
-tmp/
+# Build
+dist/
+build/
