@@ -342,6 +342,7 @@
         const data = await response.json();
         if (data.publicKey) CONFIG.wompiPublicKey = data.publicKey;
         if (data.baseUrl) CONFIG.wompiBaseUrl = data.baseUrl;
+        renderDebugInfo();
       } catch (e) {
         console.warn('No se pudo cargar configuraciÃ³n de Wompi');
       }
@@ -435,6 +436,7 @@
         });
         const signatureData = await signatureResponse.json();
         integritySignature = signatureData.signature || '';
+        renderDebugInfo();
       } catch (e) {
         console.error('Error obteniendo firma de integridad:', e);
       }
