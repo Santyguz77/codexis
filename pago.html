@@ -12,8 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   
-  <!-- Wompi Widget -->
-  <script src="https://checkout.wompi.co/widget.js"></script>
+  <!-- Wompi Widget (se carga dinÃ¡micamente despuÃ©s de tener config) -->
   
   <script>
     tailwind.config = {
@@ -334,6 +333,7 @@
     let paymentData = null;
     let transactionResult = null;
     let integritySignature = '';
+    let wompiScriptPromise = null;
 
     async function loadWompiConfig() {
       try {
@@ -346,6 +346,20 @@
       } catch (e) {
         console.warn('No se pudo cargar configuraciÃ³n de Wompi');
       }
+    }
+
+    function ensureWompiScriptLoaded() {
+      if (window.WidgetCheckout) return Promise.resolve();
+      if (wompiScriptPromise) return wompiScriptPromise;
+      wompiScriptPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.wompi.co/widget.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('No se pudo cargar widget Wompi'));
+        document.head.appendChild(script);
+      });
+      return wompiScriptPromise;
     }
 
     // =============================================
@@ -419,6 +433,13 @@
       }
       if (!CONFIG.wompiPublicKey) {
         showError('No se pudo cargar configuraciÃ³n de Wompi');
+        return;
+      }
+      try {
+        await ensureWompiScriptLoaded();
+      } catch (e) {
+        console.error('Error cargando widget:', e);
+        showError('No se pudo cargar el widget de Wompi');
         return;
       }
       const reference = paymentData.reference || `PAY_${Date.now()}`;
@@ -710,6 +731,7 @@
         <div><strong>publicKey:</strong> ${CONFIG.wompiPublicKey || '-'}</div>
         <div><strong>reference:</strong> ${paymentData?.reference || '-'}</div>
         <div><strong>signature:</strong> ${integritySignature || '-'}</div>
+        <div><strong>widgetLoaded:</strong> ${window.WidgetCheckout ? 'si' : 'no'}</div>
       `;
     }
 
