@@ -2163,6 +2163,7 @@
 				<li data-view="finance"><span class="material-icons-round">payments</span> Finanzas</li>
 				<li data-view="inventory"><span class="material-icons-round">inventory_2</span> Inventario / Catálogo
 				</li>
+				<li data-view="debts"><span class="material-icons-round">money_off</span> Deudas y Abonos</li>
 				<li data-view="assistant"><span class="material-icons-round">smart_toy</span> Asistente IA</li>
 				<li data-view="settings"><span class="material-icons-round">settings</span> Configuración</li>
 			</ul>
@@ -2523,7 +2524,64 @@
 				<div class="cards-container" id="transactions-cards-container">
 					<!-- Tarjetas generadas por JS -->
 				</div>
-			</section> <!-- NUEVO: Sección Inventario / Catálogo -->
+			</section>
+
+			<!-- NUEVO: Sección Deudas y Abonos -->
+			<section id="debts-section" class="card" style="display:none;margin-top:12px">
+				<h3>Deudas y Abonos</h3>
+				
+				<!-- Tarjetas de Resumen de Deudas -->
+				<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:20px">
+					<div class="stat-card" style="border-left:4px solid #ef5350">
+						<div class="stat-card-title">Yo Debo (Por Pagar)</div>
+						<div class="stat-card-value" id="debt-total-payable" style="color:#c62828">$0</div>
+						<div class="stat-card-subtitle">Cuentas por pagar</div>
+					</div>
+					<div class="stat-card" style="border-left:4px solid #66bb6a">
+						<div class="stat-card-title">Me Deben (Por Cobrar)</div>
+						<div class="stat-card-value" id="debt-total-receivable" style="color:#2e7d32">$0</div>
+						<div class="stat-card-subtitle">Cuentas por cobrar</div>
+					</div>
+				</div>
+
+				<div class="controls" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+					<button class="btn" onclick="openDebtModal()">+ Nueva Deuda</button>
+					<div style="flex-grow:1"></div>
+					<select id="debt-type-filter" onchange="renderDebts()" style="padding:8px;border:1px solid #ddd;border-radius:0">
+						<option value="all">Tipos: Todos</option>
+						<option value="payable">Deudas Mías</option>
+						<option value="receivable">Me deben</option>
+					</select>
+					<select id="debt-status-filter" onchange="renderDebts()" style="padding:8px;border:1px solid #ddd;border-radius:0">
+						<option value="pending">Estado: Pendientes</option>
+						<option value="paid">Estado: Pagados</option>
+						<option value="all">Estado: Todos</option>
+					</select>
+				</div>
+
+				<div class="table-scroll">
+					<table id="debts-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Contacto</th>
+								<th>Fecha</th>
+								<th>Monto Total</th>
+								<th>Saldo Pendiente</th>
+								<th>Progreso</th>
+								<th>Tipo</th>
+								<th>Acciones</th>
+							</tr>
+						</thead>
+						<tbody id="debts-table-body"></tbody>
+					</table>
+				</div>
+
+				<!-- Vista de tarjetas móvil para deudas -->
+				<div class="cards-container" id="debts-cards-container" style="display:none"></div>
+			</section>
+
+			<!-- NUEVO: Sección Inventario / Catálogo -->
 			<section id="inventory-section" class="card" style="display:none;margin-top:12px">
 				<!-- Subtabs -->
 				<div
@@ -3102,7 +3160,64 @@
 		</div>
 	</div>
 
-	<!-- NUEVO: Modal Visualización de QR Profesional -->
+	<!-- NUEVO: Modal crear/editar deuda -->
+	<div class="modal" id="modal-debt">
+		<div class="panel">
+			<h3 id="modal-debt-title">Nueva Deuda</h3>
+			<form id="form-debt">
+				<input type="hidden" id="debt-id">
+				<div class="form-row">
+					<select id="debt-type" required style="flex:1;padding:10px;border:1px solid #ddd">
+						<option value="payable">Yo debo (Cuenta por Pagar)</option>
+						<option value="receivable">Me deben (Cuenta por Cobrar)</option>
+					</select>
+				</div>
+				<div class="form-row">
+					<input type="text" id="debt-contact" placeholder="Nombre de la persona o entidad" required style="flex:1;padding:10px;border:1px solid #ddd">
+				</div>
+				<div class="form-row">
+					<input type="number" id="debt-amount" placeholder="Monto total de la deuda" required style="flex:1;padding:10px;border:1px solid #ddd">
+					<input type="date" id="debt-date" required style="flex:1;padding:10px;border:1px solid #ddd">
+				</div>
+				<div class="form-row">
+					<textarea id="debt-notes" placeholder="Notas adicionales (descripción de la deuda)" rows="2" style="flex:1;padding:10px;border:1px solid #ddd;font-family:inherit"></textarea>
+				</div>
+				<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+					<button type="button" class="btn" id="btn-close-debt" style="background:#64707a">Cancelar</button>
+					<button type="submit" class="btn">Guardar Deuda</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- NUEVO: Modal registrar abono -->
+	<div class="modal" id="modal-abono">
+		<div class="panel" style="max-width:400px">
+			<h3>Registrar Abono</h3>
+			<form id="form-abono">
+				<input type="hidden" id="abono-debt-id">
+				<div style="background:#f0f4f8;padding:12px;margin-bottom:12px;border-radius:4px">
+					<p class="small" style="margin:0;color:#555">Deuda con: <strong id="abono-contact-name">--</strong></p>
+					<p class="small" style="margin:0;color:#555">Saldo pendiente: <strong id="abono-current-balance">$0</strong></p>
+				</div>
+				<div class="form-row">
+					<input type="number" id="abono-amount" placeholder="Monto del abono" required style="flex:1;padding:10px;border:1px solid #ddd">
+				</div>
+				<div class="form-row">
+					<input type="date" id="abono-date" required style="flex:1;padding:10px;border:1px solid #ddd">
+				</div>
+				<div class="form-row">
+					<input type="text" id="abono-notes" placeholder="Nota del pago (opcional)" style="flex:1;padding:10px;border:1px solid #ddd">
+				</div>
+				<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+					<button type="button" class="btn" id="btn-close-abono" style="background:#64707a">Cancelar</button>
+					<button type="submit" class="btn" style="background:#2e7d32">Registrar Pago</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modal Visualización de QR Profesional -->
 	<div class="modal-qr-overlay" id="modal-qr-display" onclick="if(event.target === this) this.classList.remove('show')">
 		<div class="qr-card-premium">
 			<button class="qr-close-btn" onclick="document.getElementById('modal-qr-display').classList.remove('show')">✕</button>
@@ -3738,6 +3853,223 @@
 			}
 		}
 
+		// --- MÓDULO DE DEUDAS Y ABONOS ---
+
+		async function loadDebts() {
+			try {
+				const res = await fetch(`${API_URL}/debts`);
+				if (!res.ok) throw new Error("Error cargando deudas");
+				return await res.json();
+			} catch (err) {
+				console.error(err);
+				return [];
+			}
+		}
+
+		async function renderDebts() {
+			const tbody = $('#debts-table-body');
+			const cardsContainer = $('#debts-cards-container');
+			const typeFilter = $('#debt-type-filter').value;
+			const statusFilter = $('#debt-status-filter').value;
+			
+			const all = await loadDebts();
+			
+			// Ordenar por fecha desc
+			all.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+			const filtered = all.filter(d => {
+				if (typeFilter !== 'all' && d.type !== typeFilter) return false;
+				if (statusFilter !== 'all' && (d.status || 'pending') !== statusFilter) return false;
+				return true;
+			});
+
+			// Actualizar totales de resumen
+			const totalPayable = all.filter(d => d.type === 'payable' && d.status !== 'paid')
+								  .reduce((s, d) => s + (Number(d.remainingAmount || 0)), 0);
+			const totalReceivable = all.filter(d => d.type === 'receivable' && d.status !== 'paid')
+									.reduce((s, d) => s + (Number(d.remainingAmount || 0)), 0);
+			
+			$('#debt-total-payable').textContent = formatCurrency(totalPayable);
+			$('#debt-total-receivable').textContent = formatCurrency(totalReceivable);
+
+			tbody.innerHTML = '';
+			cardsContainer.innerHTML = '';
+
+			filtered.forEach(d => {
+				const total = Number(d.totalAmount || 0);
+				const remaining = Number(d.remainingAmount || 0);
+				const paid = total - remaining;
+				const progress = Math.min(100, Math.round((paid / total) * 100)) || 0;
+				const isPaid = (d.status === 'paid' || remaining <= 0);
+				
+				const statusClass = isPaid ? 'status-entregado' : 'status-en_reparacion';
+				const statusLabel = isPaid ? 'PAGADO' : 'PENDIENTE';
+				const typeLabel = d.type === 'payable' ? 'POR PAGAR' : 'POR COBRAR';
+				const typeColor = d.type === 'payable' ? '#ef5350' : '#43a047';
+
+				// Fila de tabla
+				const tr = document.createElement('tr');
+				tr.innerHTML = `
+					<td><span class="small">${d.id.substring(0,6)}</span></td>
+					<td><strong>${d.contactName}</strong></td>
+					<td class="small">${d.date}</td>
+					<td>${formatCurrency(total)}</td>
+					<td style="color:${remaining > 0 ? '#d32f2f' : '#388e3c'};font-weight:700">${formatCurrency(remaining)}</td>
+					<td>
+						<div style="width:100px;height:8px;background:#eee;border-radius:4px;overflow:hidden">
+							<div style="width:${progress}%;height:100%;background:${isPaid ? '#4caf50' : '#2196f3'}"></div>
+						</div>
+						<span style="font-size:10px;color:#888">${progress}% pagado</span>
+					</td>
+					<td><span class="status-tag" style="background:${typeColor};color:#fff">${typeLabel}</span></td>
+					<td>
+						<div style="display:flex;gap:4px">
+							<button class="btn small" onclick="openAbonoModal('${d.id}')" style="padding:4px 8px;background:#E0F2F1;color:#00695c" ${isPaid ? 'disabled' : ''}>Abonar</button>
+							<button class="btn small" onclick="deleteDebt('${d.id}')" style="padding:4px 8px;background:#FFCDD2;color:#C62828">🗑️</button>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(tr);
+
+				// Tarjeta móvil
+				const card = document.createElement('div');
+				card.className = 'data-card';
+				card.innerHTML = `
+					<div class="data-card-header">
+						<strong>${d.contactName}</strong>
+						<span class="status-tag" style="background:${typeColor};color:#fff">${typeLabel}</span>
+					</div>
+					<div style="margin:8px 0;font-size:14px">
+						<div style="display:flex;justify-content:space-between"><span>Total:</span> <span>${formatCurrency(total)}</span></div>
+						<div style="display:flex;justify-content:space-between;font-weight:700"><span>Pendiente:</span> <span style="color:#d32f2f">${formatCurrency(remaining)}</span></div>
+					</div>
+					<div style="width:100%;height:6px;background:#eee;border-radius:3px;margin:8px 0;overflow:hidden">
+						<div style="width:${progress}%;height:100%;background:#2196f3"></div>
+					</div>
+					<div style="display:flex;gap:8px;margin-top:12px">
+						<button class="btn" onclick="openAbonoModal('${d.id}')" style="flex:1" ${isPaid ? 'disabled' : ''}>Abonar</button>
+						<button class="btn" onclick="deleteDebt('${d.id}')" style="background:#FFCDD2;color:#C62828;padding:8px">🗑️</button>
+					</div>
+				`;
+				cardsContainer.appendChild(card);
+			});
+		}
+
+		window.openDebtModal = () => {
+			$('#form-debt').reset();
+			$('#debt-id').value = '';
+			$('#debt-date').value = new Date().toISOString().split('T')[0];
+			$('#modal-debt-title').textContent = "Nueva Deuda";
+			$('#modal-debt').style.display = 'flex';
+		};
+
+		window.openAbonoModal = async (id) => {
+			const all = await loadDebts();
+			const d = all.find(x => x.id === id);
+			if(!d) return;
+
+			$('#abono-debt-id').value = d.id;
+			$('#abono-contact-name').textContent = d.contactName;
+			$('#abono-current-balance').textContent = formatCurrency(d.remainingAmount);
+			$('#abono-amount').value = d.remainingAmount;
+			$('#abono-date').value = new Date().toISOString().split('T')[0];
+			$('#modal-abono').style.display = 'flex';
+		};
+
+		$('#form-debt').onsubmit = async (e) => {
+			e.preventDefault();
+			const id = $('#debt-id').value || 'debt_' + Date.now();
+			const total = Number($('#debt-amount').value);
+			
+			const debt = {
+				id,
+				type: $('#debt-type').value,
+				contactName: $('#debt-contact').value,
+				totalAmount: total,
+				remainingAmount: total, // Inicialmente el total
+				date: $('#debt-date').value,
+				notes: $('#debt-notes').value,
+				status: 'pending',
+				payments: []
+			};
+
+			showLoading("Guardando deuda...");
+			try {
+				const res = await fetch(`${API_URL}/debts/${id}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(debt)
+				});
+				if(res.ok) {
+					$('#modal-debt').style.display = 'none';
+					renderDebts();
+				}
+			} catch(err) { alert(err.message); }
+			hideLoading();
+		};
+
+		$('#form-abono').onsubmit = async (e) => {
+			e.preventDefault();
+			const id = $('#abono-debt-id').value;
+			const amount = Number($('#abono-amount').value);
+			const date = $('#abono-date').value;
+			const notes = $('#abono-notes').value;
+
+			const all = await loadDebts();
+			const d = all.find(x => x.id === id);
+			if(!d) return;
+
+			if(amount > d.remainingAmount) {
+				if(!confirm("El abono es mayor al saldo pendiente. ¿Deseas continuar?")) return;
+			}
+
+			// Actualizar deuda
+			d.payments.push({ amount, date, notes });
+			d.remainingAmount = Math.max(0, d.remainingAmount - amount);
+			if(d.remainingAmount === 0) d.status = 'paid';
+
+			showLoading("Registrando abono...");
+			try {
+				// 1. Guardar deuda actualizada
+				await fetch(`${API_URL}/debts/${id}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(d)
+				});
+
+				// 2. Opcional: Registrar en Finanzas como transaccion
+				const txId = 'tx_' + Date.now();
+				const transaction = {
+					id: txId,
+					type: d.type === 'receivable' ? 'income' : 'expense',
+					amount: amount,
+					category: 'Abono/Deuda',
+					date: date,
+					notes: `Abono de ${d.contactName}. ${notes}`
+				};
+				await fetch(`${API_URL}/transactions/${txId}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(transaction)
+				});
+
+				$('#modal-abono').style.display = 'none';
+				renderDebts();
+			} catch(err) { alert(err.message); }
+			hideLoading();
+		};
+
+		window.deleteDebt = async (id) => {
+			if(!confirm("¿Seguro que deseas eliminar esta deuda? No se borrarán las transacciones de finanzas asociadas.")) return;
+			try {
+				await fetch(`${API_URL}/debts/${id}`, { method: 'DELETE' });
+				renderDebts();
+			} catch(err) { console.error(err); }
+		};
+
+		$('#btn-close-debt').onclick = () => $('#modal-debt').style.display = 'none';
+		$('#btn-close-abono').onclick = () => $('#modal-abono').style.display = 'none';
+
 		async function renderView(view) {
 			currentView = view; // guardar vista actual
 			const titles = { dashboard: 'Dashboard', orders: 'Órdenes', clients: 'Clientes', invoices: 'Facturas', finance: 'Finanzas', inventory: 'Inventario / Catálogo', assistant: 'Asistente IA', settings: 'Configuración' };
@@ -3748,6 +4080,7 @@
 			$('#invoices-section').style.display = view === 'invoices' ? 'block' : 'none';
 			$('#finance-section').style.display = view === 'finance' ? 'block' : 'none';
 			$('#inventory-section').style.display = view === 'inventory' ? 'block' : 'none';
+			$('#debts-section').style.display = view === 'debts' ? 'block' : 'none';
 			$('#assistant-section').style.display = view === 'assistant' ? 'block' : 'none';
 			$('#settings-section').style.display = view === 'settings' ? 'block' : 'none';
 			$('#btn-add-client').style.display = view === 'clients' ? 'inline-block' : 'none';
@@ -3761,6 +4094,9 @@
 			// Cargar dashboard cuando se selecciona
 			if (view === 'dashboard') {
 				await renderDashboard();
+			}
+			if (view === 'debts') {
+				renderDebts();
 			}
 			// Auto-focus chat input
 			if (view === 'assistant') {
