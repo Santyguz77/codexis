@@ -1,32 +1,78 @@
 {
-  "name": "Control de Suscripciones",
-  "short_name": "Suscripciones",
-  "description": "Sistema de gestión de suscripciones, cobros y recordatorios",
-  "start_url": "index.html",
-  "scope": ".",
+  "name": "Codexis Computadores - Sistema de Gestión",
+  "short_name": "Codexis Taller",
+  "description": "Sistema completo de gestión para taller: órdenes, facturas, inventario y finanzas",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#6366f1",
+  "background_color": "#0f1720",
+  "theme_color": "#c7ff00",
   "orientation": "any",
-  "categories": ["business", "finance"],
+  "scope": "/",
   "icons": [
     {
-      "src": "icon-192.svg",
+      "src": "/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
+      "src": "/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.svg",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Nueva Orden",
+      "short_name": "Nueva Orden",
+      "description": "Crear una nueva orden de reparación",
+      "url": "/index.html?action=new-order",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ver Órdenes",
+      "short_name": "Órdenes",
+      "description": "Ver todas las órdenes",
+      "url": "/orden.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

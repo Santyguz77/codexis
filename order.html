@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- PWA Meta Tags -->
+	<meta name="theme-color" content="#c7ff00">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<link rel="manifest" href="/manifest.json">
+	<link rel="icon" type="image/png" href="/icon-192.png">
+
+	<title>Detalle de Orden - Codexis</title>
+	<style>
+		:root {
+			--bg: #0f1720;
+			--panel: #0f2430;
+			--accent: #c7ff00;
+			--muted: #9aa5b1;
+			--text: #ffffff;
+			--card: #0b1720;
+		}
+
+		body {
+			margin: 0;
+			font-family: Arial, Helvetica, sans-serif;
+			background: var(--bg);
+			color: #e6eef3;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			background: linear-gradient(180deg, #071722, #06121a);
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+		}
+
+		.header {
+			text-align: center;
+			margin-bottom: 30px;
+			border-bottom: 2px solid rgba(199, 255, 0, .2);
+			padding-bottom: 20px;
+		}
+
+		.brand {
+			font-size: 28px;
+			font-weight: 700;
+			color: var(--accent);
+			margin-bottom: 8px;
+		}
+
+		.order-id {
+			font-size: 16px;
+			color: var(--muted);
+		}
+
+		.section {
+			margin-bottom: 24px;
+			padding: 16px;
+			background: rgba(255, 255, 255, .02);
+			border-radius: 8px;
+			border-left: 4px solid var(--accent);
+		}
+
+		.section-title {
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 12px;
+		}
+
+		.info-row {
+			display: flex;
+			margin-bottom: 8px;
+			padding: 6px 0;
+		}
+
+		.info-label {
+			font-weight: 600;
+			color: var(--muted);
+			min-width: 140px;
+		}
+
+		.info-value {
+			color: #e6eef3;
+			flex: 1;
+		}
+
+		.status-badge {
+			display: inline-block;
+			padding: 6px 12px;
+			border-radius: 16px;
+			font-size: 13px;
+			font-weight: 600;
+		}
+
+		.status-ingresado {
+			background: #c7ff00;
+			color: #06121a
+		}
+
+		.status-en_reparacion {
+			background: #3bb4ff;
+			color: #fff
+		}
+
+		.status-espera_entrega {
+			background: #ffcc33;
+			color: #07121a
+		}
+
+		.status-entregado {
+			background: #7af0a5;
+			color: #07121a
+		}
+
+		.payment-badge {
+			display: inline-block;
+			padding: 6px 12px;
+			border-radius: 16px;
+			font-size: 13px;
+			font-weight: 600;
+		}
+
+		.payment-paid {
+			background: #7af0a5;
+			color: #07121a
+		}
+
+		.payment-unpaid {
+			background: #ff5b6b;
+			color: #fff
+		}
+
+		.images-gallery {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-top: 12px;
+		}
+
+		.image-item {
+			width: 150px;
+			height: 150px;
+			border-radius: 8px;
+			overflow: hidden;
+			border: 2px solid rgba(255, 255, 255, .1);
+			cursor: pointer;
+			transition: transform .2s;
+		}
+
+		.image-item:hover {
+			transform: scale(1.05);
+		}
+
+		.image-item img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 40px;
+			color: var(--muted);
+		}
+
+		.error {
+			text-align: center;
+			padding: 40px;
+			color: #ff5b6b;
+			font-size: 18px;
+		}
+
+		.footer {
+			text-align: center;
+			margin-top: 30px;
+			padding-top: 20px;
+			border-top: 1px solid rgba(255, 255, 255, .1);
+			color: var(--muted);
+			font-size: 14px;
+		}
+
+		.security-note {
+			background: rgba(255, 255, 0, .05);
+			border: 1px solid rgba(199, 255, 0, .2);
+			border-radius: 8px;
+			padding: 12px;
+			margin-bottom: 20px;
+			font-size: 13px;
+			color: var(--muted);
+			text-align: center;
+		}
+
+		.security-note strong {
+			color: var(--accent);
+		}
+
+		@media(max-width:600px) {
+			.container {
+				padding: 20px
+			}
+
+			.info-row {
+				flex-direction: column
+			}
+
+			.info-label {
+				margin-bottom: 4px
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="header">
+			<div class="brand">Codexis</div>
+			<div class="order-id" id="order-id-display">Orden #</div>
+		</div>
+
+		<div id="content-loading" class="loading">
+			🔐 Cargando información de tu orden...
+		</div>
+
+		<div id="content-error" class="error" style="display:none">
+			❌ Orden no encontrada.<br><br>
+			<small style="font-size:14px;color:var(--muted)">
+				Por favor contacta con Codexis si necesitas acceder a tu orden.
+			</small>
+		</div>
+
+		<div id="content-order" style="display:none">
+			<div class="security-note">
+				🔒 <strong>Enlace privado y seguro</strong> - Este enlace es único para tu orden y no debe ser
+				compartido.
+			</div>
+
+			<!-- Información del cliente -->
+			<div class="section">
+				<div class="section-title">👤 Información del Cliente</div>
+				<div class="info-row">
+					<div class="info-label">Nombre:</div>
+					<div class="info-value" id="info-client-name"></div>
+				</div>
+				<div class="info-row">
+					<div class="info-label">Teléfono:</div>
+					<div class="info-value" id="info-client-phone"></div>
+				</div>
+			</div>
+
+			<!-- Información del equipo -->
+			<div class="section">
+				<div class="section-title">📱 Información del Equipo</div>
+				<div class="info-row">
+					<div class="info-label">Marca:</div>
+					<div class="info-value" id="info-brand"></div>
+				</div>
+				<div class="info-row">
+					<div class="info-label">Modelo:</div>
+					<div class="info-value" id="info-model"></div>
+				</div>
+				<div class="info-row">
+					<div class="info-label">Número de serie:</div>
+					<div class="info-value" id="info-serial"></div>
+				</div>
+				<div class="info-row">
+					<div class="info-label">Accesorios:</div>
+					<div class="info-value" id="info-accessories"></div>
+				</div>
+			</div>
+
+			<!-- Estado y fechas -->
+			<div class="section">
+				<div class="section-title">📋 Estado del Servicio</div>
+				<div class="info-row">
+					<div class="info-label">Estado actual:</div>
+					<div class="info-value" id="info-status"></div>
+				</div>
+				<div class="info-row">
+					<div class="info-label">Fecha de ingreso:</div>
+					<div class="info-value" id="info-date"></div>
+				</div>
+				<div class="info-row">
+					<div class="info-label">Técnico asignado:</div>
+					<div class="info-value" id="info-technician"></div>
+				</div>
+			</div>
+
+			<!-- Detalles del servicio -->
+			<div class="section">
+				<div class="section-title">🔧 Detalles del Servicio</div>
+				<div class="info-row">
+					<div class="info-label">Falla reportada:</div>
+					<div class="info-value" id="info-failure"></div>
+				</div>
+				<div class="info-row" id="row-price" style="display:none">
+					<div class="info-label">Precio:</div>
+					<div class="info-value" id="info-price"></div>
+				</div>
+				<div class="info-row" id="row-payment" style="display:none">
+					<div class="info-label">Estado de pago:</div>
+					<div class="info-value" id="info-payment"></div>
+				</div>
+			</div>
+
+			<!-- Imágenes del equipo -->
+			<div class="section" id="section-images" style="display:none">
+				<div class="section-title">📷 Imágenes del Equipo</div>
+				<div class="images-gallery" id="images-gallery"></div>
+			</div>
+		</div>
+
+		<div class="footer">
+			© 2024 Codexis - Servicio técnico especializado<br>
+			<small>¿Tienes dudas? Contáctanos</small>
+		</div>
+	</div>
+
+	<script>
+		const API_URL = "https://casinos-bunny-edited-officers.trycloudflare.com/api";
+
+		const ORDER_STATUSES = {
+			ingresado: 'Ingresado',
+			en_reparacion: 'En reparación',
+			espera_entrega: 'En espera de entrega',
+			entregado: 'Entregado'
+		};
+
+		async function loadOrders() {
+			try {
+				const res = await fetch(`${API_URL}/orders`);
+				if (!res.ok) throw new Error('Error al cargar datos');
+				return await res.json();
+			} catch (err) {
+				console.error('❌ Error:', err);
+				return [];
+			}
+		}
+
+		async function loadClients() {
+			try {
+				const res = await fetch(`${API_URL}/clients`);
+				if (!res.ok) throw new Error('Error al cargar datos');
+				return await res.json();
+			} catch (err) {
+				console.error('Error:', err);
+				return [];
+			}
+		}
+
+		function formatCurrency(v) {
+			try {
+				return new Intl.NumberFormat('es-CO', {
+					style: 'currency',
+					currency: 'COP',
+					maximumFractionDigits: 0
+				}).format(v);
+			} catch (e) {
+				return '$' + (v || 0).toFixed(0);
+			}
+		}
+
+		async function displayOrder(orderId) {
+			console.log('Buscando orden:', orderId);
+
+			const orders = await loadOrders();
+			const order = orders.find(o => o.id === orderId);
+
+			if (!order) {
+				console.error('Orden no encontrada');
+				document.getElementById('content-loading').style.display = 'none';
+				document.getElementById('content-error').style.display = 'block';
+				return;
+			}
+
+			console.log('✅ Orden encontrada');
+
+			document.getElementById('content-loading').style.display = 'none';
+			document.getElementById('content-order').style.display = 'block';
+
+			const clients = await loadClients();
+			const client = clients.find(c => c.id === order.clientId) || { name: '--', phone: '' };
+
+			document.getElementById('order-id-display').textContent = `Orden #${order.id}`;
+			document.getElementById('info-client-name').textContent = client.name || 'No especificado';
+			document.getElementById('info-client-phone').textContent = client.phone || 'No especificado';
+			document.getElementById('info-brand').textContent = order.brand || 'No especificado';
+			document.getElementById('info-model').textContent = order.model || 'No especificado';
+			document.getElementById('info-serial').textContent = order.serial || 'No especificado';
+			document.getElementById('info-accessories').textContent = order.accessories || 'Ninguno';
+
+			const statusKey = order.status || 'ingresado';
+			const statusLabel = ORDER_STATUSES[statusKey] || statusKey;
+			const statusClass = `status-${statusKey}`;
+			document.getElementById('info-status').innerHTML =
+				`<span class="status-badge ${statusClass}">${statusLabel}</span>`;
+
+			const date = order.date ? new Date(order.date).toLocaleString('es-CO', {
+				year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+			}) : 'No especificada';
+			document.getElementById('info-date').textContent = date;
+			document.getElementById('info-technician').textContent = order.technician || 'Por asignar';
+			document.getElementById('info-failure').textContent = order.failure || 'No especificada';
+
+			if (order.price) {
+				document.getElementById('row-price').style.display = 'flex';
+				document.getElementById('info-price').textContent = formatCurrency(Number(order.price));
+			}
+
+			if (order.price) {
+				document.getElementById('row-payment').style.display = 'flex';
+				const isPaid = order.paid === true;
+				const paymentBadge = isPaid
+					? '<span class="payment-badge payment-paid">✅ Pagado</span>'
+					: '<span class="payment-badge payment-unpaid">⏳ Pendiente</span>';
+				document.getElementById('info-payment').innerHTML = paymentBadge;
+			}
+
+			if (order.images && order.images.length > 0) {
+				document.getElementById('section-images').style.display = 'block';
+				const gallery = document.getElementById('images-gallery');
+				gallery.innerHTML = '';
+				order.images.forEach((img, index) => {
+					const div = document.createElement('div');
+					div.className = 'image-item';
+					div.innerHTML = `<img src="${img.data}" alt="Imagen ${index + 1}">`;
+					div.onclick = () => window.open(img.data, '_blank');
+					gallery.appendChild(div);
+				});
+			}
+		}
+
+		document.addEventListener('DOCodexisontentLoaded', () => {
+			const urlParams = new URLSearchParams(window.location.search);
+			const orderId = urlParams.get('id');
+
+			console.log('Order ID:', orderId);
+
+			if (!orderId) {
+				console.error('❌ No hay ID');
+				document.getElementById('content-loading').style.display = 'none';
+				document.getElementById('content-error').style.display = 'block';
+				return;
+			}
+
+			displayOrder(orderId);
+		});
+	</script>
+</body>
+
+</html>

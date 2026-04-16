@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<title>CODEXIS CO</title>
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Estado de Orden - Codexis</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#b2dfdb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#b2dfdb",
+                        "on-primary": "#1b1b1b",
+                        "surface": "#f9f9f9",
+                        "on-surface": "#1b1b1b",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                    },
+                    borderRadius: {
+                        DEFAULT: "0rem",
+                        lg: "0rem",
+                        xl: "0rem",
+                        full: "9999px"
+                    },
+                    fontFamily: {
+                        headline: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .custom-blur {
+            backdrop-filter: blur(20px);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @media print {
+
+            nav,
+            footer,
+            .no-print {
+                display: none !important;
+            }
+
+            main {
+                padding-top: 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen">
+    <!-- TopAppBar -->
+    <nav
+        class="fixed top-0 w-full z-50 bg-[#f9f9f9]/80 dark:bg-black/80 custom-blur shadow-[0_30px_60px_rgba(0,0,0,0.05)] no-print">
+        <div class="flex justify-between items-center w-full px-6 md:px-10 h-20 max-w-full">
+            <div class="text-2xl font-black tracking-tighter text-black dark:text-white">CODEXIS</div>
+            <div class="hidden md:flex gap-12 items-center">
+                <a class="font-['Inter'] tracking-[-0.02em] uppercase text-[0.6875rem] font-medium text-black dark:text-white border-b-2 border-black dark:border-white pb-1 transition-colors duration-200"
+                    href="#">ESTADO DE MI ORDEN</a>
+            </div>
+            <div class="flex items-center gap-6">
+                <span class="material-symbols-outlined text-black dark:text-white cursor-pointer"
+                    onclick="shareLink()">share</span>
+                <span class="material-symbols-outlined text-black dark:text-white cursor-pointer"
+                    onclick="window.print()">download</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-40 pb-32 max-w-7xl mx-auto px-6 md:px-10" id="main-content">
+        <div class="flex flex-col items-center justify-center py-20 space-y-4">
+            <div class="spinner"></div>
+            <p class="text-[0.6875rem] tracking-[0.2em] uppercase text-on-surface-variant">Buscando tu orden en el
+                sistema...</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#f3f3f3] dark:bg-black w-full py-16 px-10 border-t border-outline-variant/10">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8 w-full max-w-7xl mx-auto">
+            <div class="text-lg font-black tracking-tighter uppercase">CODEXIS SOPORTE</div>
+            <div class="flex flex-wrap justify-center gap-10">
+                <a class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-[#777777] dark:text-[#474747] hover:text-black dark:hover:text-white underline decoration-1 underline-offset-4 transition-colors"
+                    href="https://wa.me/573174190562">CONTACTO</a>
+            </div>
+            <div class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-[#777777] dark:text-[#474747]">
+                © 2024 CODEXIS PRECISION. TODOS LOS DERECHOS RESERVADOS.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay" id="image-modal">
+        <button onclick="closeImageModal()" class="absolute top-8 right-8 text-white">
+            <span class="material-symbols-outlined text-4xl">close</span>
+        </button>
+        <img id="modal-image" src="" alt="Imagen ampliada" class="max-w-[90%] max-h-[90%] object-contain shadow-2xl">
+    </div>
+
+    <script>
+        const API_URL = "https://casinos-bunny-edited-officers.trycloudflare.com/api";
+
+        const ORDER_STATUSES = {
+            ingresado: { label: 'Ingresado', icon: 'check', color: '#D1FAE5', text: '#065F46' },
+            en_reparacion: { label: 'En reparación', icon: 'handyman', color: '#DBEAFE', text: '#1E40AF' },
+            espera_entrega: { label: 'Espera entrega', icon: 'hourglass_empty', color: '#FEF3C7', text: '#92400E' },
+            entregado: { label: 'Entregado', icon: 'package_2', color: '#D1FAE5', text: '#065F46' }
+        };
+
+        const STATUS_STEPS = ['ingresado', 'en_reparacion', 'espera_entrega', 'entregado'];
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return s.toString().replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+        }
+
+        function formatCurrency(v) {
+            try {
+                return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
+            } catch (e) {
+                return '$' + (v || 0).toFixed(0);
+            }
+        }
+
+        function formatDate(d) {
+            if (!d) return '--';
+            const date = new Date(d);
+            return date.toLocaleDateString('es-CO', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+        }
+
+        function formatTime(d) {
+            if (!d) return '';
+            const date = new Date(d);
+            return date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function loadOrderByToken(token) {
+            try {
+                const res = await fetch(`${API_URL}/orders`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const orders = await res.json();
+                return Array.isArray(orders) ? orders.find(o => o.accessToken === token) : null;
+            } catch (err) {
+                console.error("Error al cargar orden:", err);
+                return null;
+            }
+        }
+
+        async function loadClient(clientId) {
+            try {
+                const res = await fetch(`${API_URL}/clients`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const raw = await res.json();
+                const clients = Array.isArray(raw) ? raw : (raw.data || []);
+                return clients.find(c => c.id === clientId);
+            } catch (err) {
+                console.error("Error al cargar cliente:", err);
+                return null;
+            }
+        }
+
+        function buildStatusTracker(currentStatus, date) {
+            const currentIdx = STATUS_STEPS.indexOf(currentStatus);
+            let html = `
+                <section class="bg-surface-container-low p-10 md:p-16 mb-20 relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative">
+                        <div class="hidden md:block absolute top-1/2 left-0 w-full h-[1px] bg-outline-variant/30 -translate-y-1/2 z-0"></div>`;
+
+            STATUS_STEPS.forEach((step, i) => {
+                const isActive = i === currentIdx;
+                const isCompleted = i < currentIdx;
+                const status = ORDER_STATUSES[step];
+
+                let stateClass = "";
+                let iconBg = "";
+                let iconColor = "";
+                let ringClass = "";
+
+                if (isActive) {
+                    stateClass = "font-black opacity-100";
+                    iconBg = "bg-primary";
+                    iconColor = "text-on-primary";
+                    ringClass = "ring-8 ring-surface-container-low";
+                } else if (isCompleted) {
+                    stateClass = "font-bold opacity-100";
+                    iconBg = "bg-[#D1FAE5]";
+                    iconColor = "text-[#065F46]";
+                } else {
+                    stateClass = "font-medium opacity-40";
+                    iconBg = "bg-surface-container-highest";
+                    iconColor = "text-on-surface-variant";
+                }
+
+                html += `
+                    <div class="relative z-10 flex flex-row md:flex-col items-center gap-4 group">
+                        <div class="w-10 h-10 flex items-center justify-center ${iconBg} ${iconColor} ${ringClass} transition-all duration-300">
+                            <span class="material-symbols-outlined text-lg">${status.icon}</span>
+                        </div>
+                        <div class="flex flex-col md:items-center">
+                            <span class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase ${stateClass}">${status.label}</span>
+                            <span class="text-[10px] text-on-surface-variant uppercase tracking-widest">${isActive ? 'En progreso' : (isCompleted ? 'Completado' : 'Pendiente')}</span>
+                        </div>
+                    </div>`;
+            });
+
+            html += `</div></section>`;
+            return html;
+        }
+
+        async function renderOrder() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const main = document.getElementById('main-content');
+
+            if (!token) {
+                main.innerHTML = `
+                    <header class="mb-20 text-center">
+                        <p class="font-['Inter'] text-[0.6875rem] tracking-[0.2em] uppercase text-red-500 mb-4">ERROR — TOKEN NO VÁLIDO</p>
+                        <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-6">ENLACE EXPIRADO O INCORRECTO</h1>
+                    </header>`;
+                return;
+            }
+
+            const order = await loadOrderByToken(token);
+
+            if (!order) {
+                main.innerHTML = `
+                    <header class="mb-20 text-center">
+                        <p class="font-['Inter'] text-[0.6875rem] tracking-[0.2em] uppercase text-on-surface-variant mb-4">NOT FOUND — ACCESS DENIED</p>
+                        <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-6">ORDEN NO ENCONTRADA</h1>
+                        <div class="h-1 w-24 bg-primary mx-auto mt-8"></div>
+                        <p class="mt-12 text-on-surface-variant max-w-xl mx-auto">No pudimos localizar la orden con el identificador proporcionado. Por favor, solicita un nuevo enlace a soporte.</p>
+                    </header>`;
+                return;
+            }
+
+            const client = await loadClient(order.clientId) || { name: 'CLIENTE', phone: '' };
+            const brand = (order.brand || 'EQUIPO').toUpperCase();
+            const model = (order.model || 'GENÉRICO').toUpperCase();
+            const statusKey = order.status || 'ingresado';
+            const techInitial = order.technician ? order.technician.charAt(0).toUpperCase() : '?';
+            const isPaid = order.paid === true;
+
+            let html = `
+                <!-- Hero Header -->
+                <header class="mb-20 text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <p class="font-['Inter'] text-[0.6875rem] tracking-[0.2em] uppercase text-on-surface-variant mb-4">ORDEN DE SERVICIO #${order.id} — ${formatDate(order.date)}</p>
+                    <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-6">${brand} <span class="text-outline-variant/30">${model}</span></h1>
+                    <div class="h-1 w-24 bg-primary mx-auto md:mx-0"></div>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 space-y-10">
+                        <!-- Status Tracker -->
+                        ${buildStatusTracker(statusKey, order.date)}
+
+                        <!-- Payment & Price Section -->
+                        <section class="flex flex-col md:flex-row gap-px bg-outline-variant/10 overflow-hidden border border-outline-variant/10">
+                            <div class="flex-1 bg-surface-container-low p-10 flex flex-col justify-between">
+                                <label class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-on-surface-variant mb-6">Total del Servicio</label>
+                                <p class="text-4xl font-black tracking-tighter">${order.price ? formatCurrency(order.price) : '--'}</p>
+                            </div>
+                            <div class="flex-1 p-10 flex flex-col justify-between ${isPaid ? 'bg-emerald-50 text-emerald-900' : 'bg-red-50 text-red-900'}">
+                                <label class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase opacity-60 mb-6">Estado de Pago</label>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-3xl">${isPaid ? 'verified' : 'pending'}</span>
+                                    <p class="text-2xl font-black tracking-tighter uppercase">${isPaid ? 'Pagado' : 'Pendiente'}</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Technical Details Bento Grid -->
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/10 overflow-hidden border border-outline-variant/10">
+                            <div class="bg-surface-container-low p-10 flex flex-col justify-between hover:bg-surface-container-lowest transition-all">
+                                <label class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-on-surface-variant mb-6">Cliente</label>
+                                <p class="text-xl font-medium tracking-tight uppercase">${escapeHtml(client.name)}</p>
+                            </div>
+                            <div class="bg-surface-container-low p-10 flex flex-col justify-between hover:bg-surface-container-lowest transition-all">
+                                <label class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-on-surface-variant mb-6">Número de Serie</label>
+                                <p class="text-xl font-medium tracking-tight font-mono">${(order.serial || '--').toUpperCase()}</p>
+                            </div>
+                            <div class="bg-surface-container-low p-10 flex flex-col justify-between hover:bg-surface-container-lowest transition-all">
+                                <label class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-on-surface-variant mb-6">Falla Reportada</label>
+                                <p class="text-xl font-medium tracking-tight">${escapeHtml(order.failure || 'NO ESPECIFICADO')}</p>
+                            </div>
+                            <div class="bg-surface-container-low p-10 flex flex-col justify-between hover:bg-surface-container-lowest transition-all">
+                                <label class="font-['Inter'] text-[0.6875rem] tracking-[0.1em] uppercase text-on-surface-variant mb-6">Técnico Asignado</label>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-8 h-8 bg-surface-container-highest flex items-center justify-center">
+                                        <span class="font-black text-xs">${techInitial}</span>
+                                    </div>
+                                    <p class="text-xl font-medium tracking-tight">${(order.technician || 'POR ASIGNAR').toUpperCase()}</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        ${order.notes ? `
+                        <section class="p-10 bg-surface-container-lowest border border-outline-variant/10 italic">
+                            <label class="font-['Inter'] text-[0.5rem] tracking-[0.2em] uppercase text-outline-variant block mb-4">Notas Adicionales del Laboratorio</label>
+                            <p class="text-on-surface-variant text-sm leading-relaxed">"${escapeHtml(order.notes)}"</p>
+                        </section>` : ''}
+                    </div>
+
+                    <!-- Sidebar -->
+                    <aside class="lg:col-span-4 space-y-10">
+                        <div class="bg-surface-container-lowest p-10 shadow-[0_30px_60px_rgba(0,0,0,0.05)] h-full flex flex-col border border-outline-variant/10">
+                            <h3 class="text-3xl font-black tracking-tighter mb-8 uppercase">Gestión de Orden</h3>
+                            <p class="text-on-surface-variant leading-relaxed mb-6">Monitorea el progreso técnico y los hitos de tu reparación en tiempo real.</p>
+                            
+                            <!-- Images Gallery -->
+                            <div id="gallery-container" class="mb-12">
+                                ${buildImagesGallery(order.images)}
+                            </div>
+
+                            <div class="mt-auto space-y-4 no-print">
+                                <a class="group flex items-center justify-between w-full p-6 bg-[#D1FAE5] text-[#065F46] font-bold tracking-tight transition-all duration-200 active:scale-95" href="https://wa.me/573174190562" target="_blank">
+                                    <span class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined">chat</span>
+                                        SOPORTE WHATSAPP
+                                    </span>
+                                    <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                                </a>
+                                <a class="group flex items-center justify-between w-full p-6 bg-[#DBEAFE] text-[#1E40AF] font-bold tracking-tight transition-all duration-200 active:scale-95" href="tel:+573174190562">
+                                    <span class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined">call</span>
+                                        LLAMAR TÉCNICO
+                                    </span>
+                                    <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </aside>
+                </div>`;
+
+            main.innerHTML = html;
+            document.title = `Orden #${order.id} | ${brand} | Codexis`;
+        }
+
+        function buildImagesGallery(images) {
+            if (!images || images.length === 0) return '';
+
+            let html = `
+                <div class="space-y-4">
+                    <label class="font-['Inter'] text-[0.5rem] tracking-[0.2em] uppercase text-outline-variant">Documentación Fotográfica (${images.length})</label>
+                    <div class="grid grid-cols-3 gap-2">`;
+
+            images.forEach((img, i) => {
+                html += `
+                    <div class="aspect-square bg-surface-container-low border border-outline-variant/10 overflow-hidden cursor-pointer hover:opacity-80 transition-all" onclick="openImageModal('${escapeHtml(img.data)}')">
+                        <img src="${escapeHtml(img.data)}" alt="Equipo ${i + 1}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500">
+                    </div>`;
+            });
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        function openImageModal(src) {
+            const modal = document.getElementById('image-modal');
+            document.getElementById('modal-image').src = src;
+            modal.classList.add('show');
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('show');
+        }
+
+        document.getElementById('image-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'image-modal' || e.target.closest('button')) closeImageModal();
+        });
+
+        function shareLink() {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({ title: document.title, url }).catch(() => { });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    const btn = document.querySelector('[onclick="shareLink()"]');
+                    const originalIcon = btn.textContent;
+                    btn.textContent = 'check';
+                    setTimeout(() => { btn.textContent = originalIcon; }, 2000);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderOrder);
+    </script>
+</body>
+
+</html>

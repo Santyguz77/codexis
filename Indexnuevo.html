@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AETHER | Management Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#d4d4d4",
+                        "tertiary-fixed": "#5e5e5e",
+                        "surface-bright": "#f9f9f9",
+                        "inverse-primary": "#c6c6c6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#5e5e5e",
+                        "primary-container": "#3b3b3b",
+                        "on-error-container": "#410002",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "secondary": "#5e5e5e",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "tertiary": "#3b3b3b",
+                        "surface-variant": "#e2e2e2",
+                        "on-surface-variant": "#474747",
+                        "on-primary-fixed": "#ffffff",
+                        "on-primary-container": "#ffffff",
+                        "on-surface": "#1b1b1b",
+                        "surface-tint": "#5e5e5e",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-dim": "#dadada",
+                        "tertiary-fixed-dim": "#474747",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#e2e2e2",
+                        "outline": "#777777",
+                        "primary": "#000000",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#747474",
+                        "primary-fixed-dim": "#474747",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-secondary-container": "#1b1b1b",
+                        "outline-variant": "#c6c6c6",
+                        "on-tertiary": "#e2e2e2",
+                        "secondary-fixed-dim": "#ababab",
+                        "secondary-fixed": "#c6c6c6",
+                        "background": "#f9f9f9",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container": "#eeeeee",
+                        "surface": "#f9f9f9",
+                        "on-background": "#1b1b1b",
+                        "inverse-on-surface": "#f1f1f1",
+                        "pastel-mint": "#E0F2F1",
+                        "pastel-lavender": "#F3E5F5",
+                        "pastel-peach": "#FFF3E0",
+                        "pastel-blue": "#E3F2FD",
+                        "pastel-mint-dark": "#b2dfdb",
+                        "pastel-lavender-dark": "#e1bee7",
+                        "pastel-peach-dark": "#ffe0b2",
+                        "pastel-blue-dark": "#bbdefb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pastel-gradient {
+            background: linear-gradient(135deg, #E0F2F1 0%, #E3F2FD 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-8 px-4 bg-[#f9f9f9] dark:bg-zinc-950 h-screen w-64 border-r border-pastel-blue/20 z-50">
+<div class="mb-12 px-4">
+<h1 class="text-2xl font-black tracking-tighter text-black dark:text-white uppercase">AETHER</h1>
+<p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 mt-1 uppercase">Management Portal</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-black dark:text-white font-bold border-l-4 border-pastel-mint-dark bg-pastel-mint/30 dark:bg-zinc-900 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-emerald-600" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] font-medium tracking-tight">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-pastel-blue/20 dark:hover:bg-zinc-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-blue-500" data-icon="inventory_2">inventory_2</span>
+<span class="font-['Inter'] font-medium tracking-tight">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-pastel-peach/20 dark:hover:bg-zinc-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-orange-500" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-['Inter'] font-medium tracking-tight">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-pastel-lavender/20 dark:hover:bg-zinc-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-purple-500" data-icon="insights">insights</span>
+<span class="font-['Inter'] font-medium tracking-tight">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-pastel-mint/20 dark:hover:bg-zinc-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-emerald-500" data-icon="group">group</span>
+<span class="font-['Inter'] font-medium tracking-tight">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] font-medium tracking-tight">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-4 space-y-4">
+<button class="w-full py-3 bg-pastel-mint-dark text-emerald-950 font-bold text-xs uppercase tracking-widest scale-98 hover:brightness-105 active:opacity-80 transition-all duration-200">
+                New Product
+            </button>
+<div class="pt-6 border-t border-pastel-lavender/30 dark:border-zinc-800/50">
+<a class="flex items-center gap-3 py-2 text-zinc-500 dark:text-zinc-400 hover:text-black transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="text-xs font-bold uppercase tracking-widest">Support</span>
+</a>
+<a class="flex items-center gap-3 py-2 text-zinc-500 dark:text-zinc-400 hover:text-black transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-xs font-bold uppercase tracking-widest">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center ml-64 px-10 py-6 w-[calc(100%-16rem)] fixed top-0 bg-[#f9f9f9]/80 dark:bg-zinc-950/80 backdrop-blur-xl z-40 border-b border-pastel-blue/10">
+<div class="flex items-center gap-8">
+<h2 class="font-['Inter'] uppercase tracking-[0.2em] text-[0.75rem] font-black text-black">Executive Dashboard</h2>
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-400 text-sm">search</span>
+<input class="bg-transparent border-none border-b border-outline/20 focus:ring-0 focus:border-pastel-blue-dark text-[0.6875rem] tracking-[0.1em] pl-10 w-64 uppercase font-medium" placeholder="SEARCH SYSTEM..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-zinc-400 hover:text-pastel-lavender-dark transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-zinc-400 hover:text-black transition-colors" data-icon="dark_mode">dark_mode</button>
+<div class="flex items-center gap-3 pl-4 border-l border-zinc-200">
+<div class="text-right">
+<p class="text-[0.6875rem] font-bold uppercase tracking-tighter">Alexander Vane</p>
+<p class="text-[0.5rem] font-bold text-zinc-400 uppercase tracking-widest">Administrator</p>
+</div>
+<img class="w-10 h-10 object-cover grayscale hover:grayscale-0 transition-all duration-300" data-alt="Close-up portrait of a professional male administrator with a sharp, clean aesthetic in a minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLanptSRK1Og6tKuGELQ-3F5Zd8vXYZFIDyb-hfCfnG74JOdsF_oPXYNLkmMwch5-EuIDz23tUPygU5vrVrgYSbP71zqqv0_HmnRtpEPFUZi4cpJYV_wbR7JiBWMiCJv1wXCH8BO7TThkuODQrnCKW5WjyCX3ILw91dKs3QQipS34lwkDKR9C9UrsxcJnBX36CB-jO121zTRvIDTKYFU3ZuZotIWg4B6SBp6hxbYYvhwNm8XbvK-AeAYim1Tflx2XoYIrtStkNIik"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-[88px] p-10 min-h-screen bg-surface-container-low/30">
+<!-- Metrics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-0">
+<div class="bg-pastel-mint/10 p-8 border-r border-b border-white dark:border-zinc-800 group hover:bg-pastel-mint/20 transition-colors">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Total Orders</p>
+<h3 class="text-3xl font-black tracking-tighter">1,284</h3>
+<p class="text-[0.625rem] text-zinc-400 mt-2 font-bold tracking-widest px-2 py-0.5 bg-pastel-mint inline-block text-emerald-800">+12% vs LY</p>
+</div>
+<div class="bg-pastel-peach/10 p-8 border-r border-b border-white dark:border-zinc-800 group hover:bg-pastel-peach/20 transition-colors">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Active Orders</p>
+<h3 class="text-3xl font-black tracking-tighter">42</h3>
+<p class="text-[0.625rem] text-zinc-400 mt-2 font-bold tracking-widest px-2 py-0.5 bg-pastel-peach inline-block text-orange-800">18 Priority</p>
+</div>
+<div class="bg-pastel-blue/10 p-8 border-r border-b border-white dark:border-zinc-800 group hover:bg-pastel-blue/20 transition-colors">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Monthly Income</p>
+<h3 class="text-3xl font-black tracking-tighter">$84.2k</h3>
+<p class="text-[0.625rem] text-zinc-400 mt-2 font-bold tracking-widest px-2 py-0.5 bg-pastel-blue inline-block text-blue-800">On Target</p>
+</div>
+<div class="bg-pastel-lavender/10 p-8 border-r border-b border-white dark:border-zinc-800 group hover:bg-pastel-lavender/20 transition-colors">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Inventory Value</p>
+<h3 class="text-3xl font-black tracking-tighter">$1.4M</h3>
+<p class="text-[0.625rem] text-zinc-400 mt-2 font-bold tracking-widest px-2 py-0.5 bg-pastel-lavender inline-block text-purple-800">Asset Heavy</p>
+</div>
+<div class="bg-surface-container-low p-8 border-r border-b border-white dark:border-zinc-800">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Monthly Profit</p>
+<h3 class="text-3xl font-black tracking-tighter">$21.5k</h3>
+<div class="h-1 bg-zinc-200 mt-4 overflow-hidden">
+<div class="h-full bg-pastel-mint-dark w-[65%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 border-b border-white dark:border-zinc-800">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Total Customers</p>
+<h3 class="text-3xl font-black tracking-tighter">8.9k</h3>
+<div class="flex -space-x-2 mt-4">
+<img class="w-6 h-6 grayscale border border-white" data-alt="Portrait of a diverse woman with professional look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx_LO5RX6lj0ql-rH1HIANFAQLa8kaiOOLqc3cYNyrxViXexfWX2YcRaD4OY_jud1W1Q0V7Pa5IUmE9XcTAYq3iidnDkdMfAHKEOJYyo6QxEGK0RHLX1twg3xi2PU4khnpJzBCMmX6MLyGCmN3HaCjhUiHB3BYMsukr1wCdX6yRnVaelvCeB09W3aFWw91j1Csy6j_wq6jHrsrC6BbS-pasPYGoQ7bKryoJZQ8Sxaq0m9_B-pDw_XZrk_VXS7NmADAUIlCMmrkGTc"/>
+<img class="w-6 h-6 grayscale border border-white" data-alt="Portrait of a smiling young man in minimalist attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5v83TBaJl8vN-CaWQvsCtp6iJavuuvaxyTcKlJr1H_jOuDh1C2yXIbfOwgfxlMB_juOMdAyMvweC9ArXnXWyUzQUmgBaC58WBTp42q8nKAAz06Cdd7F8o_-CsEXoDEBAbId29djrJyehhuqXab7hf7SgfDmuxgtif-hOMcxse8K__gcO3ckVc2hSu9Ig8qbkxy8h_W3NOTHrvuH0DRtEOD8e7MvV1g4PAfDQaDzy2PmJ7GEj65VsAkOCEcLByLUslMlKgf74PgMo"/>
+<img class="w-6 h-6 grayscale border border-white" data-alt="Portrait of a young woman with a clean editorial aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2D47317cJ6L5o-7t_HLwqaKnXIJ9uqdGPEWuUWnPs-SG87AShDmk4m2LfzyMh6UKPO9g3-axMSbeFkJw3RGJF2FSUAmjtNKpM_MaFnD9WDqikgBr4CHZimKVGf8wHLbXf7YSjQU_PAQXZZKq7HrkqPWNJMz6KHGOb4Z3-B5UimJpidDdyNTEBA5ypFu-_A-5BiW2RDvriwjE9KuDmeg5xfuqqwIHJdtnFC4pizGj0qoHpUrey0D8otcDT9chibXZk6gXfD4A95k0"/>
+</div>
+</div>
+</section>
+<!-- Charts & Visuals -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-10 mt-16">
+<!-- Income vs Expenses Area Chart (Mockup) -->
+<div class="lg:col-span-8 bg-surface-container-lowest p-10 border border-pastel-mint/10">
+<div class="flex justify-between items-end mb-12">
+<div>
+<p class="text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-zinc-400">Financial Performance</p>
+<h4 class="text-2xl font-black tracking-tighter mt-1">Income vs Expenses</h4>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-pastel-mint-dark"></span>
+<span class="text-[0.625rem] font-bold uppercase tracking-widest">Income</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-pastel-lavender-dark"></span>
+<span class="text-[0.625rem] font-bold uppercase tracking-widest">Expenses</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-4 border-b border-zinc-100">
+<!-- Pastel architectural chart columns -->
+<div class="flex-1 bg-zinc-50/50 relative group h-full">
+<div class="absolute bottom-0 w-full bg-pastel-lavender-dark h-[60%] transition-all"></div>
+<div class="absolute bottom-0 w-full bg-pastel-mint-dark h-[75%] opacity-80 transition-all"></div>
+</div>
+<div class="flex-1 bg-zinc-50/50 relative group h-full">
+<div class="absolute bottom-0 w-full bg-pastel-lavender-dark h-[55%]"></div>
+<div class="absolute bottom-0 w-full bg-pastel-mint-dark h-[82%] opacity-80"></div>
+</div>
+<div class="flex-1 bg-zinc-50/50 relative group h-full">
+<div class="absolute bottom-0 w-full bg-pastel-lavender-dark h-[70%]"></div>
+<div class="absolute bottom-0 w-full bg-pastel-mint-dark h-[65%] opacity-80"></div>
+</div>
+<div class="flex-1 bg-zinc-50/50 relative group h-full">
+<div class="absolute bottom-0 w-full bg-pastel-lavender-dark h-[40%]"></div>
+<div class="absolute bottom-0 w-full bg-pastel-mint-dark h-[90%] opacity-80"></div>
+</div>
+<div class="flex-1 bg-zinc-50/50 relative group h-full">
+<div class="absolute bottom-0 w-full bg-pastel-lavender-dark h-[50%]"></div>
+<div class="absolute bottom-0 w-full bg-pastel-mint-dark h-[78%] opacity-80"></div>
+</div>
+<div class="flex-1 bg-zinc-50/50 relative group h-full">
+<div class="absolute bottom-0 w-full bg-pastel-lavender-dark h-[65%]"></div>
+<div class="absolute bottom-0 w-full bg-pastel-mint-dark h-[85%] opacity-80"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4">
+<span class="text-[0.625rem] font-bold text-zinc-400 uppercase tracking-widest">JAN</span>
+<span class="text-[0.625rem] font-bold text-zinc-400 uppercase tracking-widest">FEB</span>
+<span class="text-[0.625rem] font-bold text-zinc-400 uppercase tracking-widest">MAR</span>
+<span class="text-[0.625rem] font-bold text-zinc-400 uppercase tracking-widest">APR</span>
+<span class="text-[0.625rem] font-bold text-zinc-400 uppercase tracking-widest">MAY</span>
+<span class="text-[0.625rem] font-bold text-zinc-400 uppercase tracking-widest">JUN</span>
+</div>
+</div>
+<!-- Orders by Status Donut (Mockup) -->
+<div class="lg:col-span-4 bg-surface-container-low p-10 flex flex-col border border-pastel-blue/10">
+<p class="text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-8">Operational Status</p>
+<div class="relative flex-1 flex items-center justify-center">
+<!-- SVG Donut -->
+<svg class="w-48 h-48 -rotate-90">
+<circle class="text-pastel-peach-dark" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-pastel-mint-dark" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="150" stroke-width="12"></circle>
+<circle class="text-pastel-blue-dark" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="400" stroke-width="12"></circle>
+</svg>
+<div class="absolute text-center">
+<p class="text-2xl font-black">100%</p>
+<p class="text-[0.5rem] font-bold text-zinc-500 tracking-widest uppercase">Coverage</p>
+</div>
+</div>
+<div class="mt-8 space-y-3">
+<div class="flex justify-between items-center text-[0.6875rem]">
+<span class="font-bold tracking-widest uppercase flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-pastel-mint-dark"></span> Shipped
+                        </span>
+<span class="font-black">642</span>
+</div>
+<div class="flex justify-between items-center text-[0.6875rem]">
+<span class="font-bold tracking-widest uppercase flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-pastel-blue-dark"></span> Pending
+                        </span>
+<span class="font-black">412</span>
+</div>
+<div class="flex justify-between items-center text-[0.6875rem]">
+<span class="font-bold tracking-widest uppercase flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-pastel-peach-dark"></span> Returned
+                        </span>
+<span class="font-black">230</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Preview / Inventory Context -->
+<section class="mt-16">
+<div class="flex justify-between items-end mb-10">
+<div>
+<p class="text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-zinc-400">Inventory Highlight</p>
+<h4 class="text-3xl font-black tracking-tighter mt-1">High-Velocity Stock</h4>
+</div>
+<a class="text-[0.6875rem] font-black uppercase tracking-widest border-b-2 border-pastel-blue-dark pb-1 hover:opacity-50 transition-opacity" href="#">Full Inventory Report</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-zinc-100">
+<div class="group relative overflow-hidden bg-white aspect-[4/5] border-r border-zinc-100">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="High-end red basketball sneaker on white background with minimalist studio lighting and sharp shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgJ1FTUm7WQ4SM4gSazfeyFWT6XZ8KKVk2ALZnkJ6E_wfX5G8QCtkRcccZ3yHj-U0JVztSSua5uRngA6WNFx5hwT3gDiArD7WA1yAHLOmbapJTYjSUgn7aBAoETXH2JjiqxmlYVtQMMRHf0P_quBIo2SuHZqKy6vgWEM4MNZE6SOpNa8ApC63bHLZI5BY46GIEKhCUGxnu62pcWij2iTX-fKsieAPCCk5UQ2O6mK7ByU0Twz2qifiQufx-Qt18W4GtK0VLXbwc1b0"/>
+<div class="absolute inset-0 bg-pastel-mint/5 group-hover:bg-transparent transition-all"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">SKU-8219</p>
+<div class="flex justify-between items-end">
+<h5 class="text-sm font-black uppercase">Ignite V1</h5>
+<span class="text-sm font-bold">$185.00</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden bg-white aspect-[4/5] border-r border-zinc-100">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Modern minimalist luxury watch on a white background with precise engineering details and clean reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrSRX0TavEavqxN2JgJnH0J8RXyrxugXFlKzrlaACP86XCCPNZXcSI1MnxfD4q2wXkYik6zcKhbkfclwHls7XWERON_JN5Jq13AcZ0oqUJnSQycwAbdcwrBIRMtpCsHsLEo3LVvjYsg6ulnEB4hEGc-oH9JYbdy3QPS9oz4pz6uJjh6t92PsPZLIBXqOklAhKhDokM4-MpR_LjEN92vb1D9oFcSrzhXmziPkZJXFd0-d6rFYf1BJPNSGWuw9W7GVfSjdLWaaQwU_s"/>
+<div class="absolute inset-0 bg-pastel-lavender/5 group-hover:bg-transparent transition-all"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">SKU-4402</p>
+<div class="flex justify-between items-end">
+<h5 class="text-sm font-black uppercase">Onyx Chrono</h5>
+<span class="text-sm font-bold">$420.00</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden bg-white aspect-[4/5] border-r border-zinc-100">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Professional over-ear wireless headphones in black on white background showing premium material texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwJbrBUzwOXb7AfY6dviCu5ax1elfCkoaqcTr2OjUtGtkP3oWRC-qqEdWeljQkxofIavdEyk6EiDmJZp2IJhd4mhMTKvW2PvmvsB8VhGCgoDJ94POeo2xT9uFCscehBFyFC3frkBd06YTr9l8yzcGFWKYvbmaVl06q1FnIPp0RPH-ixBSGtGcVJBNP3tfZzD0Eto-XnrHWNiJzvKdwtqJ8A4hNLLQ3lPP-fwHBQKtJCSOWKRnZpDXr9BjcGe_d3sdMMTQLVxp9oT4"/>
+<div class="absolute inset-0 bg-pastel-blue/5 group-hover:bg-transparent transition-all"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">SKU-3195</p>
+<div class="flex justify-between items-end">
+<h5 class="text-sm font-black uppercase">Studio-X</h5>
+<span class="text-sm font-bold">$295.00</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden bg-white aspect-[4/5]">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Vintage style analog camera in black and silver on a stark white background with architectural precision" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC943-_d8rnlTyzcOF8fylgjfzpJpkkalPfPjChTD9Ovei1m3XyOSjWVKWnJ9S39AUHOQqoCcpZZOYxdUaisIHLWz7oU6yGGMOiDOUsnriP-aJ9JaV7mg0_m0b2b6Ie1RrSB1j_XgUtil0BOhEAQnI2N23j1uRIJrH6mhHH5ZhuqPRpfqA0cI4Ee46BVLdmJUlGuRu8nstq386slJcL1ooLs8RVRKS9qTDsOW316JrqCg6MM61_ipRZ1bTxW7lnFmZtpNANWqIddmo"/>
+<div class="absolute inset-0 bg-pastel-peach/5 group-hover:bg-transparent transition-all"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-[0.625rem] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">SKU-9904</p>
+<div class="flex justify-between items-end">
+<h5 class="text-sm font-black uppercase">Lumix Retro</h5>
+<span class="text-sm font-bold">$1,250.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB: AI Assistant (Contextual) -->
+<button class="fixed bottom-10 right-10 flex items-center gap-3 px-6 py-4 bg-pastel-blue-dark text-blue-950 font-bold text-xs uppercase tracking-widest shadow-xl hover:brightness-105 transition-all active:scale-95 z-50 border border-white/50">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+        AI Assistant
+    </button>
+</body></html>

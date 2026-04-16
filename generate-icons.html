@@ -1,94 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Generar Iconos</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    canvas { border: 1px solid #ccc; margin: 10px; }
-    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Generador de Íconos MIPC</title>
 </head>
 <body>
-  <h1>Generador de Iconos PWA - Suscripciones</h1>
-  
-  <div>
-    <canvas id="icon192" width="192" height="192"></canvas>
-    <canvas id="icon512" width="512" height="512"></canvas>
-  </div>
-  
-  <button onclick="downloadIcon('icon192', 'icon-192.png')">Descargar 192x192</button>
-  <button onclick="downloadIcon('icon512', 'icon-512.png')">Descargar 512x512</button>
-  
-  <script>
-    function drawIcon(canvasId, size) {
-      const canvas = document.getElementById(canvasId);
-      const ctx = canvas.getContext('2d');
-      
-      // Fondo con gradiente
-      const gradient = ctx.createLinearGradient(0, 0, size, size);
-      gradient.addColorStop(0, '#6366f1');
-      gradient.addColorStop(1, '#8b5cf6');
-      
-      // Dibujar fondo redondeado
-      const radius = size * 0.2;
-      ctx.beginPath();
-      ctx.roundRect(0, 0, size, size, radius);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-      
-      // Icono central (símbolo de suscripción/refresh)
-      ctx.strokeStyle = 'white';
-      ctx.fillStyle = 'white';
-      ctx.lineWidth = size * 0.04;
-      ctx.lineCap = 'round';
-      
-      const centerX = size / 2;
-      const centerY = size / 2;
-      const iconRadius = size * 0.25;
-      
-      // Dibujar círculo con flechas (símbolo de recurrente)
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, iconRadius, 0.5, Math.PI * 1.5);
-      ctx.stroke();
-      
-      // Flecha superior
-      const arrowSize = size * 0.08;
-      ctx.beginPath();
-      ctx.moveTo(centerX - arrowSize, centerY - iconRadius - arrowSize);
-      ctx.lineTo(centerX, centerY - iconRadius);
-      ctx.lineTo(centerX + arrowSize, centerY - iconRadius - arrowSize);
-      ctx.stroke();
-      
-      // Segunda parte del círculo
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, iconRadius, Math.PI * 1.5 + 0.5, Math.PI * 0.5);
-      ctx.stroke();
-      
-      // Flecha inferior
-      ctx.beginPath();
-      ctx.moveTo(centerX - arrowSize, centerY + iconRadius + arrowSize);
-      ctx.lineTo(centerX, centerY + iconRadius);
-      ctx.lineTo(centerX + arrowSize, centerY + iconRadius + arrowSize);
-      ctx.stroke();
-      
-      // Símbolo de peso ($) en el centro
-      ctx.font = `bold ${size * 0.2}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('$', centerX, centerY);
-    }
+    <h1>Generador de Íconos PWA para MIPC</h1>
+    <canvas id="canvas" width="512" height="512" style="border:1px solid #ccc"></canvas>
     
-    function downloadIcon(canvasId, filename) {
-      const canvas = document.getElementById(canvasId);
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-    
-    // Generar iconos al cargar
-    drawIcon('icon192', 192);
-    drawIcon('icon512', 512);
-  </script>
+    <div style="margin-top:20px">
+        <button onclick="downloadIcon(72)">Descargar 72x72</button>
+        <button onclick="downloadIcon(96)">Descargar 96x96</button>
+        <button onclick="downloadIcon(128)">Descargar 128x128</button>
+        <button onclick="downloadIcon(144)">Descargar 144x144</button>
+        <button onclick="downloadIcon(152)">Descargar 152x152</button>
+        <button onclick="downloadIcon(192)">Descargar 192x192</button>
+        <button onclick="downloadIcon(384)">Descargar 384x384</button>
+        <button onclick="downloadIcon(512)">Descargar 512x512</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let logoImage = null;
+
+        // Cargar el logo
+        const img = new Image();
+        img.onload = function() {
+            logoImage = img;
+            drawIcon();
+        };
+        img.onerror = function() {
+            console.error('No se pudo cargar image.png');
+            drawIconWithoutLogo();
+        };
+        img.src = './image.png';
+
+        // Dibujar solo tu logo, sin agregar nada más
+        function drawIcon() {
+            // Limpiar canvas
+            ctx.clearRect(0, 0, 512, 512);
+            
+            // Dibujar solo tu logo ocupando todo el canvas
+            if (logoImage) {
+                ctx.drawImage(logoImage, 0, 0, 512, 512);
+            }
+        }
+
+        // Fallback si no se carga el logo
+        function drawIconWithoutLogo() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+            gradient.addColorStop(0, '#07121a');
+            gradient.addColorStop(1, '#0b1a22');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+
+            ctx.strokeStyle = '#c7ff00';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.roundRect(20, 20, 472, 472, 60);
+            ctx.stroke();
+
+            ctx.fillStyle = '#c7ff00';
+            ctx.font = 'bold 280px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🔧', 256, 256);
+
+            ctx.fillStyle = '#c7ff00';
+            ctx.font = 'bold 60px Arial';
+            ctx.fillText('MIPC', 256, 420);
+        }
+
+        function downloadIcon(size) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Escalar el ícono
+            tempCtx.drawImage(canvas, 0, 0, 512, 512, 0, 0, size, size);
+            
+            // Descargar
+            tempCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `icon-${size}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,2868 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	<!-- PWA Meta Tags -->
-	<meta name="theme-color" content="#c7ff00">
-	<meta name="description" content="Sistema de gestión para Codexis - Órdenes, facturas e inventario">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="CODEXIS">
-	<link rel="manifest" href="/manifest.json">
-	<link rel="icon" type="image/png" href="/icon-192.png">
-	<link rel="apple-touch-icon" href="/icon-192.png">
-
-	<!-- Chart.js para gráficos -->
-	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-	<!-- Tailwind CSS + Fuente Inter + Material Symbols -->
-	<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-	<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
-	<title>CODEXIS CO</title>
-	
-	<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "pastel-mint": "#E0F2F1",
-                        "pastel-lavender": "#F3E5F5",
-                        "pastel-peach": "#FFF3E0",
-                        "pastel-blue": "#E3F2FD",
-                        "pastel-mint-dark": "#b2dfdb",
-                        "pastel-lavender-dark": "#e1bee7",
-                        "pastel-peach-dark": "#ffe0b2",
-                        "pastel-blue-dark": "#bbdefb"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0px",
-                        "lg": "0px",
-                        "xl": "0px",
-                        "full": "9999px"
-                    },
-                    "fontFamily": {
-                        "headline": ["Inter"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    }
-                }
-            }
-        }
-    </script>
-	<style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-	<style>
-		:root {
-			--bg: #f9f9f9;
-			--panel: #ffffff;
-			--accent: #b2dfdb;
-			--muted: #6d6d6d;
-			--card: #ffffff;
-		}
-
-		body {
-			margin: 0;
-			font-family: 'Inter', Arial, Helvetica, sans-serif;
-			background: var(--bg);
-			color: #1b1b1b;
-		}
-
-		.app {
-			display: flex;
-			min-height: 100vh
-		}
-
-		.sidebar {
-			width: 240px;
-			background: #f9f9f9;
-			padding: 18px;
-			box-shadow: 1px 0 2px rgba(0, 0, 0, .05);
-			border-right: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		.brand {
-			font-weight: 700;
-			color: #1b1b1b;
-			margin-bottom: 24px;
-			font-size: 15px;
-			letter-spacing: 0.5px;
-			text-transform: uppercase;
-		}
-
-		.menu {
-			list-style: none;
-			padding: 0;
-			margin: 0
-		}
-
-		.menu li {
-			padding: 10px 12px;
-			border-radius: 0;
-			color: #6d6d6d;
-			cursor: pointer;
-			margin-bottom: 4px;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			font-size: 14px;
-			font-weight: 500;
-			transition: all 0.2s;
-		}
-
-		.menu li:hover {
-			background: #E0F2F1;
-			color: #1b1b1b;
-		}
-
-		.menu li .material-icons-round {
-			font-size: 20px;
-		}
-
-		.menu li.active {
-			background: #E0F2F1;
-			color: #1b1b1b;
-			font-weight: 600;
-			border-left: 4px solid #b2dfdb;
-		}
-
-		.main {
-			flex: 1;
-			padding: 22px
-		}
-
-		.header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 18px
-		}
-
-		.card {
-			background: #ffffff;
-			padding: 14px;
-			border-radius: 0;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
-			border: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		.controls {
-			display: flex;
-			gap: 8px;
-			align-items: center
-		}
-
-		button.btn {
-			background: #b2dfdb;
-			color: #1b1b1b;
-			border: 0;
-			padding: 8px 12px;
-			border-radius: 0;
-			cursor: pointer;
-			font-weight: 600;
-		}
-
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			margin-top: 12px;
-			color: #1b1b1b;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		th {
-			padding: 12px 10px;
-			text-align: left;
-			border-bottom: 2px solid #e8e8e8;
-			font-size: 12px;
-			font-weight: 700;
-			background: #f9f9f9;
-			color: #474747;
-			text-transform: uppercase;
-			letter-spacing: 0.1em;
-		}
-
-		td {
-			padding: 12px 10px;
-			border-bottom: 1px solid rgba(0, 0, 0, .05);
-			color: #1b1b1b;
-			font-size: 14px;
-		}
-
-		.actions button {
-			margin-right: 6px;
-			padding: 6px;
-			border-radius: 6px;
-			border: 0;
-			cursor: pointer
-		}
-
-		.btn-edit {
-			background: #bbdefb;
-			color: #1565c0
-		}
-
-		.btn-delete {
-			background: #ffcdd2;
-			color: #b71c1c
-		}
-
-		.modal {
-			position: fixed;
-			inset: 0;
-			display: none;
-			align-items: center;
-			justify-content: center;
-			background: rgba(0, 0, 0, .1)
-		}
-
-		.modal.show {
-			display: flex
-		}
-
-		.modal .panel {
-			width: 640px;
-			background: #ffffff;
-			padding: 18px;
-			border-radius: 0;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-		}
-
-		.form-row {
-			display: flex;
-			gap: 8px;
-			margin-bottom: 8px
-		}
-
-		input[type="text"],
-		input[type="email"],
-		input[type="password"],
-		input[type="date"],
-		input[type="number"],
-		select,
-		textarea {
-			flex: 1;
-			padding: 8px;
-			border-radius: 0;
-			border: 1px solid rgba(0, 0, 0, 0.12);
-			background: #f9f9f9;
-			color: #1b1b1b;
-			font-size: 14px;
-		}
-
-		.footer-note {
-			margin-top: 12px;
-			color: #6d6d6d;
-			font-size: 13px
-		}
-
-		.small {
-			font-size: 13px;
-			color: #6d6d6d
-		}
-
-		/* estilos para checkbox deshabilitado */
-		input[type="checkbox"]:disabled {
-			opacity: 0.4;
-			cursor: not-allowed
-		}
-
-		input[type="checkbox"]:disabled+span {
-			opacity: 0.5;
-			cursor: not-allowed
-		}
-
-		/* estilos para galería de imágenes */
-		.image-preview-container {
-			display: flex;
-			gap: 8px;
-			flex-wrap: wrap;
-			margin-top: 8px
-		}
-
-		.image-preview {
-			position: relative;
-			width: 100px;
-			height: 100px;
-			border-radius: 6px;
-			overflow: hidden;
-			border: 1px solid rgba(0, 0, 0, .08)
-		}
-
-		.image-preview img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover
-		}
-
-		.image-preview .remove-img {
-			position: absolute;
-			top: 2px;
-			right: 2px;
-			background: #ff5b6b;
-			color: #fff;
-			border: 0;
-			border-radius: 4px;
-			padding: 2px 6px;
-			cursor: pointer;
-			font-size: 11px
-		}
-
-		.image-preview .remove-img:hover {
-			background: #ff3b4b
-		}
-
-		/* nuevo: estilos para badges de estado */
-		.status-badge {
-			display: inline-block;
-			padding: 4px 8px;
-			border-radius: 12px;
-			font-size: 12px;
-			color: #00695c
-		}
-
-		.status-ingresado {
-			background: #E3F2FD;
-			color: #1565c0
-		}
-
-		.status-en_reparacion {
-			background: #E3F2FD;
-			color: #1565c0
-		}
-
-		.status-espera_entrega {
-			background: #FFF3E0;
-			color: #e65100
-		}
-
-		.status-entregado {
-			background: #E0F2F1;
-			color: #00695c
-		}
-
-		/* nuevo: estilos para badges de estado de pago */
-		.payment-badge {
-			display: inline-block;
-			padding: 4px 8px;
-			border-radius: 12px;
-			font-size: 12px;
-			font-weight: 600
-		}
-
-		.payment-paid {
-			background: #E0F2F1;
-			color: #00695c
-		}
-
-		.payment-unpaid {
-			background: #ffcdd2;
-			color: #b71c1c
-		}
-
-		.btn-toggle-payment {
-			background: #ffe0b2;
-			color: #1b1b1b;
-			font-size: 12px;
-			padding: 6px 10px
-		}
-
-		/* pequeño ajuste: botones dentro de tablas también usan .btn para aspecto */
-		button.btn {
-			font-size: 13px;
-			line-height: 1;
-			display: inline-block
-		}
-
-		/* modal historial */
-		.history-list {
-			max-height: 320px;
-			overflow: auto;
-			padding: 8px;
-			border-radius: 0;
-			background: #f9f9f9;
-			color: #1b1b1b;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		/* NUEVO: contenedor para scroll horizontal de tablas */
-		.table-scroll {
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-			border-radius: 8px;
-		}
-
-		/* NUEVO: ancho mínimo para que la tabla pueda desplazarse en móvil */
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			margin-top: 12px;
-			color: #1b1b1b;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		/* NUEVO: Ocultar columnas específicas para evitar scroll horizontal */
-		.col-id {
-			display: none !important;
-		}
-
-		/* NUEVO: filtros en línea que se adaptan en móvil */
-		#orders-section .small.filters {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
-			align-items: center;
-		}
-
-		/* NUEVO: celda de acciones adaptable */
-		td.actions {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 6px;
-		}
-
-		td.actions button,
-		td.actions select {
-			margin-right: 0;
-			/* anula margen previo para usar gap */
-			margin-bottom: 0;
-		}
-
-		/* NUEVO: mejoras modales en pantallas pequeñas/medianas */
-		.modal .panel {
-			/* ...existing code... */
-			max-height: 90vh;
-			overflow: auto;
-		}
-
-		/* NUEVO: mejoras generales responsivas */
-		.header {
-			/* ...existing code... */
-			flex-wrap: wrap;
-			align-items: flex-start;
-			gap: 10px;
-		}
-
-		.controls {
-			/* ...existing code... */
-			flex-wrap: wrap;
-		}
-
-		/* NUEVO: media queries suaves */
-		@media (max-width: 800px) {
-			/* Sidebar ya se oculta con tu regla existente */
-
-			/* Cabecera y botones */
-			.header {
-				flex-direction: column;
-			}
-
-			button.btn {
-				min-height: 40px
-			}
-
-			/* Formularios */
-			.form-row {
-				flex-direction: column
-			}
-
-			.form-row input,
-			.form-row textarea,
-			.form-row select {
-				width: 100%
-			}
-
-			/* Tabla más compacta */
-			table {
-				font-size: 12px
-			}
-
-			th,
-			td {
-				padding: 6px 8px
-			}
-
-			/* Imágenes un poco más pequeñas */
-			.image-preview {
-				width: 80px;
-				height: 80px
-			}
-		}
-
-		@media (max-width: 480px) {
-
-			/* Tabla aún más compacta */
-			table {
-				font-size: 11px;
-				min-width: 700px
-			}
-
-			th,
-			td {
-				padding: 6px
-			}
-
-			/* Botones cómodos al tacto */
-			button.btn {
-				min-height: 44px;
-				font-size: 14px
-			}
-
-			/* Vista previa imágenes en muy pequeño */
-			.image-preview {
-				width: 64px;
-				height: 64px
-			}
-		}
-
-		/* NUEVO: estilos mínimos para inventario */
-		#inventory-section .controls {
-			display: flex;
-			gap: 8px;
-			align-items: center;
-			flex-wrap: wrap
-		}
-
-		#inventory-section .controls input {
-			padding: 6px;
-			border-radius: 0;
-			background: #f9f9f9;
-			border: 1px solid rgba(0, 0, 0, .08);
-			color: #1b1b1b
-		}
-
-		.badge-cat {
-			display: inline-block;
-			padding: 2px 8px;
-			border-radius: 0;
-			background: #F3E5F5;
-			font-size: 12px;
-			color: #6a1b9a
-		}
-
-		/* NUEVO: estilos para facturas */
-		#invoices-section .controls {
-			display: flex;
-			gap: 8px;
-			align-items: center;
-			flex-wrap: wrap
-		}
-
-		.invoice-items-list {
-			margin-top: 12px;
-			padding: 10px;
-			background: #f9f9f9;
-			border-radius: 0;
-			border: 1px solid rgba(0, 0, 0, 0.08)
-		}
-
-		.invoice-item-row {
-			display: flex;
-			gap: 8px;
-			align-items: center;
-			margin-bottom: 8px;
-			padding: 8px;
-			background: #f3f3f3;
-			border-radius: 0
-		}
-
-		.invoice-item-row input,
-		.invoice-item-row select {
-			flex: 1;
-			padding: 6px;
-			border-radius: 0;
-			background: #f9f9f9;
-			border: 1px solid rgba(0, 0, 0, .08);
-			color: #1b1b1b
-		}
-
-		.invoice-item-row .small {
-			flex: 1;
-			color: #6d6d6d
-		}
-
-		.invoice-total {
-			text-align: right;
-			font-size: 16px;
-			font-weight: 700;
-			color: #00695c;
-			margin-top: 12px;
-			padding: 10px;
-			background: #E0F2F1;
-			border-radius: 0
-		}
-
-		.badge-status-paid {
-			background: #E0F2F1;
-			color: #00695c;
-			padding: 4px 8px;
-			border-radius: 0;
-			font-size: 12px;
-			font-weight: 600
-		}
-
-		.badge-status-unpaid {
-			background: #ffcdd2;
-			color: #b71c1c;
-			padding: 4px 8px;
-			border-radius: 0;
-			font-size: 12px;
-			font-weight: 600
-		}
-
-		.badge-status-partial {
-			background: #FFF3E0;
-			color: #e65100;
-			padding: 4px 8px;
-			border-radius: 0;
-			font-size: 12px;
-			font-weight: 600
-		}
-
-		/* NUEVO: indicador de carga (spinner) */
-		.spinner {
-			width: 32px;
-			height: 32px;
-			border: 3px solid rgba(0, 0, 0, .08);
-			border-top-color: #b2dfdb;
-			border-radius: 50%;
-			animation: spin 0.8s linear infinite;
-		}
-
-		@keyframes spin {
-			to {
-				transform: rotate(360deg);
-			}
-		}
-
-		/* NUEVO: estilos para login */
-		#login-screen {
-			position: fixed;
-			inset: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			background: #f9f9f9;
-			z-index: 9999;
-		}
-
-		#login-screen.hidden {
-			display: none;
-		}
-
-		.login-container {
-			background: #ffffff;
-			padding: 48px;
-			border-radius: 0;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 20px 40px rgba(0, 0, 0, 0.02);
-			width: 100%;
-			max-width: 400px;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			text-align: center;
-		}
-
-		.login-logo {
-			margin-bottom: 40px;
-		}
-
-		.login-logo h1 {
-			color: #000000;
-			font-size: 32px;
-			margin: 0;
-			font-weight: 900;
-			letter-spacing: -0.05em;
-			text-transform: uppercase;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 12px;
-		}
-
-		.login-logo p {
-			color: #6d6d6d;
-			font-size: 11px;
-			letter-spacing: 0.2em;
-			text-transform: uppercase;
-			font-weight: 700;
-			margin: 10px 0 0 0;
-		}
-
-		.login-form {
-			display: flex;
-			flex-direction: column;
-			gap: 20px;
-		}
-
-		.login-form input {
-			padding: 14px 18px;
-			border-radius: 0;
-			border: 1px solid rgba(0, 0, 0, 0.1);
-			background: #fbfbfb;
-			color: #1b1b1b;
-			font-size: 15px;
-			transition: all 0.2s;
-			outline: none;
-		}
-
-		.login-form input:focus {
-			border-color: #b2dfdb;
-			background: #ffffff;
-			box-shadow: 0 0 0 4px rgba(178, 223, 219, 0.15);
-		}
-
-		.login-form button {
-			background: #1b1b1b;
-			color: #ffffff;
-			border: 0;
-			padding: 16px;
-			border-radius: 0;
-			cursor: pointer;
-			font-size: 14px;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.1em;
-			transition: all 0.2s;
-			margin-top: 10px;
-		}
-
-		.login-form button:hover {
-			background: #000000;
-			transform: translateY(-1px);
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		}
-
-		.login-form button:active {
-			transform: translateY(0);
-		}
-
-		.login-error {
-			background: #fff5f5;
-			color: #c62828;
-			padding: 12px;
-			font-size: 13px;
-			font-weight: 600;
-			border-left: 4px solid #c62828;
-			display: none;
-			text-align: left;
-		}
-
-		/* Dashboard & Charts Styles */
-		.dashboard-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-			gap: 20px;
-			margin-bottom: 24px;
-		}
-
-		.stat-card {
-			background: linear-gradient(135deg, #ffffff, #ffffff);
-			border-radius: 0;
-			padding: 24px;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			transition: transform 0.2s, box-shadow 0.2s;
-		}
-
-		.stat-card:hover {
-			transform: translateY(-4px);
-			box-shadow: 0 6px 20px rgba(178, 223, 219, 0.15);
-			border-color: rgba(178, 223, 219, 0.3);
-		}
-
-		.stat-card-header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 16px;
-		}
-
-		.stat-card-icon {
-			width: 48px;
-			height: 48px;
-			border-radius: 0;
-			background: #E0F2F1;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			transition: background 0.2s;
-		}
-
-		.stat-card-icon .material-icons-round {
-			font-size: 26px;
-			color: #b2dfdb;
-		}
-
-		.stat-card:hover .stat-card-icon {
-			background: #b2dfdb;
-		}
-
-		.stat-card:hover .stat-card-icon .material-icons-round {
-			color: #ffffff;
-		}
-
-		.stat-card-title {
-			font-size: 13px;
-			color: var(--muted);
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			font-weight: 600;
-		}
-
-		.stat-card-value {
-			font-size: 36px;
-			font-weight: 700;
-			color: var(--accent);
-			margin: 8px 0;
-		}
-
-		.stat-card-subtitle {
-			font-size: 12px;
-			color: var(--muted);
-			margin-top: 8px;
-		}
-
-		.stat-trend {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			font-size: 13px;
-			font-weight: 600;
-			padding: 4px 8px;
-			border-radius: 4px;
-			margin-top: 8px;
-		}
-
-		.stat-trend.up {
-			background: #E0F2F1;
-			color: #00695c;
-		}
-
-		.stat-trend.down {
-			background: #ffcdd2;
-			color: #b71c1c;
-		}
-
-		.chart-container {
-			background: #ffffff;
-			border-radius: 0;
-			padding: 24px;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			margin-bottom: 20px;
-		}
-
-		.chart-container h4 {
-			margin: 0 0 20px 0;
-			color: var(--accent);
-			font-size: 18px;
-			font-weight: 600;
-		}
-
-		.chart-wrapper {
-			position: relative;
-			height: 300px;
-		}
-
-		.charts-row {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-			gap: 20px;
-			margin-top: 24px;
-		}
-
-		.login-error.show {
-			display: block;
-		}
-
-		/* ============================================
-		   ESTILOS PARA VISTA DE TARJETAS EN MÓVIL
-		   ============================================ */
-
-		.orders-cards-container {
-			display: none;
-			/* Oculto por defecto */
-			flex-direction: column;
-			gap: 15px;
-			margin-top: 15px;
-		}
-
-		.order-card {
-			background: linear-gradient(135deg, #ffffff, #f9f9f9);
-			border-radius: 12px;
-			padding: 16px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			position: relative;
-		}
-
-		.order-card-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			margin-bottom: 12px;
-			padding-bottom: 12px;
-			border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		.order-card-id {
-			font-size: 18px;
-			font-weight: bold;
-			color: #1b1b1b;
-		}
-
-		.order-card-status {
-			display: flex;
-			gap: 6px;
-			flex-wrap: wrap;
-			align-items: center;
-		}
-
-		.order-card-body {
-			display: grid;
-			gap: 10px;
-			margin-bottom: 12px;
-		}
-
-		.order-card-row {
-			display: flex;
-			gap: 8px;
-		}
-
-		.order-card-label {
-			font-weight: 600;
-			color: #6d6d6d;
-			min-width: 80px;
-			font-size: 13px;
-		}
-
-		.order-card-value {
-			color: #1b1b1b;
-			flex: 1;
-			font-size: 14px;
-			word-break: break-word;
-		}
-
-		.order-card-actions {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 8px;
-			margin-top: 12px;
-			padding-top: 12px;
-			border-top: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		.order-card-actions button {
-			min-height: 42px;
-			font-size: 13px;
-			padding: 10px;
-		}
-
-		.order-card-actions select {
-			min-height: 42px;
-			font-size: 13px;
-			padding: 8px;
-			border-radius: 0;
-			background: #f9f9f9;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			color: #1b1b1b;
-			grid-column: span 2;
-		}
-
-		/* Estilos para tarjetas genéricas (clientes, facturas, inventario, finanzas) */
-		.cards-container {
-			display: none;
-			flex-direction: column;
-			gap: 15px;
-			margin-top: 15px;
-		}
-
-		.data-card {
-			background: linear-gradient(135deg, #ffffff, #f9f9f9);
-			border-radius: 12px;
-			padding: 16px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			position: relative;
-		}
-
-		.data-card-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			margin-bottom: 12px;
-			padding-bottom: 12px;
-			border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		.data-card-title {
-			font-size: 18px;
-			font-weight: bold;
-			color: #1b1b1b;
-		}
-
-		.data-card-subtitle {
-			font-size: 13px;
-			color: var(--muted);
-			margin-top: 4px;
-		}
-
-		.data-card-body {
-			display: grid;
-			gap: 10px;
-			margin-bottom: 12px;
-		}
-
-		.data-card-row {
-			display: flex;
-			gap: 8px;
-		}
-
-		.data-card-label {
-			font-weight: 600;
-			color: #6d6d6d;
-			min-width: 80px;
-			font-size: 13px;
-		}
-
-		.data-card-value {
-			color: #1b1b1b;
-			flex: 1;
-			font-size: 14px;
-			word-break: break-word;
-		}
-
-		.data-card-actions {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 8px;
-			margin-top: 12px;
-			padding-top: 12px;
-			border-top: 1px solid rgba(0, 0, 0, 0.08);
-		}
-
-		.data-card-actions button {
-			min-height: 42px;
-			font-size: 13px;
-			padding: 10px;
-		}
-
-		/* ============================================
-		   MEJORAS RESPONSIVE PARA MÓVILES
-		   ============================================ */
-
-		/* Ocultar sidebar en móviles y agregar menú hamburguesa */
-		@media (max-width: 768px) {
-
-			/* Mostrar tarjetas y ocultar tablas en móvil para todas las secciones */
-			#orders-section .table-scroll,
-			#clients-section .table-scroll,
-			#invoices-section .table-scroll,
-			#inventory-section .table-scroll,
-			#finance-section .table-scroll {
-				display: none !important;
-			}
-
-			.orders-cards-container,
-			.cards-container {
-				display: flex !important;
-			}
-
-			/* Sidebar oculto por defecto */
-			.sidebar {
-				position: fixed;
-				left: -260px;
-				top: 0;
-				bottom: 0;
-				width: 240px;
-				z-index: 1000;
-				transition: left 0.3s ease;
-			}
-
-			.sidebar.show-mobile {
-				left: 0;
-			}
-
-			/* Overlay para cerrar el menú */
-			.sidebar-overlay {
-				display: none;
-				position: fixed;
-				inset: 0;
-				background: rgba(0, 0, 0, 0.5);
-				z-index: 999;
-			}
-
-			.sidebar-overlay.show {
-				display: block;
-			}
-
-			/* Botón hamburguesa */
-			.mobile-menu-btn {
-				display: block;
-				position: fixed;
-				top: 15px;
-				left: 15px;
-				z-index: 998;
-				background: var(--accent);
-				color: #07121a;
-				border: 0;
-				padding: 10px 14px;
-				border-radius: 8px;
-				cursor: pointer;
-				font-size: 20px;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-			}
-
-			/* Main ocupa todo el ancho */
-			.main {
-				padding: 70px 15px 15px 15px;
-				width: 100%;
-			}
-
-			/* Header más compacto */
-			.header {
-				flex-direction: column;
-				align-items: stretch;
-				gap: 12px;
-			}
-
-			.header h2 {
-				font-size: 20px;
-				margin: 0;
-			}
-
-			/* Controles en columna */
-			.controls {
-				flex-direction: column;
-				align-items: stretch;
-			}
-
-			/* Botones más grandes para facilitar el toque */
-			button.btn {
-				min-height: 48px;
-				font-size: 15px;
-				padding: 12px 16px;
-				width: 100%;
-			}
-
-			/* Tablas con scroll horizontal */
-			.table-scroll {
-				margin: 0 -15px;
-				padding: 0 15px;
-			}
-
-			table {
-				font-size: 13px;
-			}
-
-			th,
-			td {
-				padding: 10px 8px;
-				font-size: 13px;
-			}
-
-			/* Acciones en columna para mejor visualización */
-			td.actions {
-				flex-direction: column;
-				align-items: stretch;
-			}
-
-			td.actions button {
-				width: 100%;
-				margin: 3px 0;
-			}
-
-			/* Modal adaptado */
-			.modal .panel {
-				width: calc(100% - 30px);
-				max-width: 500px;
-				max-height: 85vh;
-				margin: 15px;
-			}
-
-			/* Formularios en columna */
-			.form-row {
-				flex-direction: column;
-			}
-
-			.form-row input,
-			.form-row textarea,
-			.form-row select {
-				width: 100%;
-				font-size: 16px;
-				/* Evita zoom automático en iOS */
-				min-height: 44px;
-			}
-
-			/* Badges más grandes */
-			.status-badge,
-			.payment-badge,
-			.badge-status-paid,
-			.badge-status-unpaid,
-			.badge-status-partial {
-				font-size: 13px;
-				padding: 6px 10px;
-			}
-
-			/* Filtros adaptables */
-			#orders-section .small.filters {
-				flex-direction: column;
-				align-items: stretch;
-			}
-
-			#orders-section .small.filters select,
-			#orders-section .small.filters input {
-				width: 100%;
-				min-height: 44px;
-				font-size: 15px;
-			}
-
-			/* Items de factura adaptables */
-			.invoice-item-row {
-				flex-direction: column;
-				gap: 10px;
-			}
-
-			.invoice-item-row input,
-			.invoice-item-row select {
-				width: 100%;
-				min-height: 44px;
-				font-size: 15px;
-			}
-
-			/* Galería de imágenes más grande en móvil */
-			.image-preview {
-				width: 100px;
-				height: 100px;
-			}
-
-			/* Cards más espaciados */
-			.card {
-				padding: 16px;
-				margin-bottom: 12px;
-			}
-
-			/* Historial modal más alto */
-			.history-list {
-				max-height: 400px;
-			}
-
-			/* Login responsive */
-			.login-container {
-				width: calc(100% - 40px);
-				padding: 30px 20px;
-			}
-
-			/* Dashboard responsive */
-			.dashboard-grid {
-				grid-template-columns: 1fr;
-				gap: 15px;
-			}
-
-			.charts-row {
-				grid-template-columns: 1fr;
-				gap: 15px;
-			}
-
-			.chart-wrapper {
-				height: 250px;
-			}
-
-			.stat-card-value {
-				font-size: 28px;
-			}
-		}
-
-		/* Mejoras adicionales para pantallas muy pequeñas */
-		@media (max-width: 480px) {
-			.main {
-				padding: 65px 10px 10px 10px;
-			}
-
-			table {
-				font-size: 12px;
-				min-width: 650px;
-			}
-
-			th,
-			td {
-				padding: 8px 6px;
-				font-size: 12px;
-			}
-
-			.header h2 {
-				font-size: 18px;
-			}
-
-			.modal .panel {
-				width: calc(100% - 20px);
-				margin: 10px;
-				padding: 15px;
-			}
-
-			/* Textos más pequeños pero legibles */
-			.small {
-				font-size: 12px;
-			}
-
-			/* Botones de acciones más compactos en tablas */
-			td.actions button {
-				font-size: 12px;
-				padding: 8px;
-				min-height: 36px;
-			}
-		}
-
-		/* Mejoras para tablets (pantallas medianas) */
-		@media (min-width: 769px) and (max-width: 1024px) {
-			.sidebar {
-				width: 200px;
-			}
-
-			.main {
-				padding: 18px;
-			}
-
-			table {
-				font-size: 13px;
-			}
-
-			th,
-			td {
-				padding: 8px;
-			}
-
-			.modal .panel {
-				width: 90%;
-				max-width: 700px;
-			}
-		}
-
-		/* Ocultar botón hamburguesa en desktop */
-		@media (min-width: 769px) {
-			.mobile-menu-btn {
-				display: none;
-			}
-		}
-
-		/* ============================================
-	   ESTILOS PARA ASISTENTE IA
-	   ============================================ */
-		#assistant-section {
-			display: none;
-			margin-top: 12px;
-			padding: 0;
-			background: transparent;
-			box-shadow: none;
-		}
-
-		.chat-container {
-			display: flex;
-			flex-direction: column;
-			height: calc(100vh - 160px);
-			max-height: 700px;
-			background: linear-gradient(180deg, #ffffff, #f9f9f9);
-			border-radius: 12px;
-			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-			border: 1px solid rgba(200, 200, 200, 0.3);
-			overflow: hidden;
-		}
-
-		.chat-header {
-			padding: 16px 20px;
-			background: linear-gradient(135deg, rgba(200, 200, 200, 0.1), rgba(200, 200, 200, 0.1));
-			border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 12px;
-		}
-
-		.chat-header-info {
-			display: flex;
-			align-items: center;
-			gap: 12px;
-		}
-
-		.chat-avatar {
-			width: 42px;
-			height: 42px;
-			background: linear-gradient(135deg, #b2dfdb, #E0F2F1);
-			border-radius: 50%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 22px;
-			box-shadow: 0 0 12px rgba(178, 223, 219, 0.2);
-		}
-
-		.chat-header-text h4 {
-			margin: 0;
-			color: #1b1b1b;
-			font-size: 16px;
-			font-weight: 600;
-		}
-
-		.chat-header-text span {
-			font-size: 12px;
-			color: #1565c0;
-		}
-
-		.chat-header-actions {
-			display: flex;
-			gap: 8px;
-		}
-
-		.chat-btn-clear {
-			background: #FFCDD2;
-			color: #C62828;
-			border: 1px solid #EF9A9A;
-			padding: 8px 14px;
-			border-radius: 0;
-			cursor: pointer;
-			font-size: 13px;
-			transition: all 0.2s;
-		}
-
-		.chat-btn-clear:hover {
-			background: #f8a5a5;
-			transform: translateY(-1px);
-		}
-
-		.chat-messages {
-			flex: 1;
-			overflow-y: auto;
-			padding: 20px;
-			display: flex;
-			flex-direction: column;
-			gap: 16px;
-			scroll-behavior: smooth;
-			background: #ffffff;
-
-		.chat-messages::-webkit-scrollbar {
-			width: 6px;
-		}
-
-		.chat-messages::-webkit-scrollbar-track {
-			background: transparent;
-		}
-
-		.chat-messages::-webkit-scrollbar-thumb {
-			background: rgba(180, 180, 180, 0.5);
-			border-radius: 3px;
-		}
-
-		.chat-message {
-			max-width: 80%;
-			padding: 14px 18px;
-			border-radius: 16px;
-			font-size: 14px;
-			line-height: 1.6;
-			word-wrap: break-word;
-			animation: chatFadeIn 0.3s ease;
-		}
-
-		@keyframes chatFadeIn {
-			from {
-				opacity: 0;
-				transform: translateY(10px);
-			}
-
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
-		}
-
-		.chat-message.user {
-			align-self: flex-end;
-			background: #E3F2FD;
-			border: 1px solid #BBDEFB;
-			color: #1565c0;
-			border-bottom-right-radius: 4px;
-		}
-
-		.chat-message.assistant {
-			align-self: flex-start;
-			background: #F3E5F5;
-			border: 1px solid #E1BEE7;
-			color: #6a1b9a;
-			border-bottom-left-radius: 4px;
-		}
-
-		.chat-message.assistant code {
-			background: rgba(0, 0, 0, 0.06);
-			padding: 2px 6px;
-			border-radius: 4px;
-			font-family: 'Courier New', monospace;
-			font-size: 13px;
-			color: #6a1b9a;
-		}
-
-		.chat-message.assistant pre {
-			background: rgba(0, 0, 0, 0.04);
-			padding: 12px;
-			border-radius: 0;
-			overflow-x: auto;
-			margin: 8px 0;
-		}
-
-		.chat-message.assistant pre code {
-			background: transparent;
-			padding: 0;
-		}
-
-		.chat-message.assistant strong {
-			color: #6a1b9a;
-		}
-
-		.chat-message.system {
-			align-self: center;
-			background: rgba(0, 0, 0, 0.05);
-			border: none;
-			color: #666666;
-			font-size: 13px;
-			text-align: center;
-			max-width: 90%;
-		}
-
-		.chat-typing {
-			align-self: flex-start;
-			padding: 14px 18px;
-			background: #F3E5F5;
-			border: 1px solid #E1BEE7;
-			border-radius: 0;
-			border-bottom-left-radius: 4px;
-			display: none;
-			gap: 6px;
-			align-items: center;
-			margin: 0 20px;
-		}
-
-		.chat-typing.show {
-			display: flex;
-		}
-
-		.chat-typing-dot {
-			width: 8px;
-			height: 8px;
-			background: #6a1b9a;
-			border-radius: 50%;
-			animation: typingBounce 1.4s infinite ease-in-out;
-		}
-
-		.chat-typing-dot:nth-child(1) {
-			animation-delay: 0s;
-		}
-
-		.chat-typing-dot:nth-child(2) {
-			animation-delay: 0.2s;
-		}
-
-		.chat-typing-dot:nth-child(3) {
-			animation-delay: 0.4s;
-		}
-
-		@keyframes typingBounce {
-
-			0%,
-			80%,
-			100% {
-				transform: scale(0.6);
-				opacity: 0.4;
-			}
-
-			40% {
-				transform: scale(1);
-				opacity: 1;
-			}
-		}
-
-		.chat-input-area {
-			padding: 16px 20px;
-			background: #f9f9f9;
-			border-top: 1px solid rgba(0, 0, 0, 0.08);
-			display: flex;
-			gap: 10px;
-			align-items: flex-end;
-		}
-
-		.chat-input-area textarea {
-			flex: 1;
-			padding: 12px 16px;
-			border-radius: 0;
-			border: 1px solid rgba(0, 0, 0, 0.08);
-			background: #ffffff;
-			color: #1b1b1b;
-			font-size: 14px;
-			font-family: inherit;
-			resize: none;
-			min-height: 44px;
-			max-height: 120px;
-			line-height: 1.4;
-			transition: border-color 0.2s;
-		}
-
-		.chat-input-area textarea:focus {
-			outline: none;
-			border-color: #b2dfdb;
-		}
-
-		.chat-input-area textarea::placeholder {
-			color: rgba(100, 100, 100, 0.6);
-		}
-
-		.chat-send-btn {
-			width: 48px;
-			height: 48px;
-			background: #b2dfdb;
-			color: #1b1b1b;
-			border: 0;
-			border-radius: 0;
-			cursor: pointer;
-			font-size: 20px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			transition: all 0.2s;
-			box-shadow: 0 2px 8px rgba(199, 255, 0, 0.2);
-			flex-shrink: 0;
-		}
-
-		.chat-send-btn:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 16px rgba(199, 255, 0, 0.3);
-		}
-
-		.chat-send-btn:active {
-			transform: translateY(0);
-		}
-
-		.chat-send-btn:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-			transform: none;
-			box-shadow: none;
-		}
-
-		/* Chat welcome message */
-		.chat-welcome {
-			text-align: center;
-			padding: 40px 20px;
-			color: var(--muted);
-		}
-
-		.chat-welcome-icon {
-			font-size: 64px;
-			margin-bottom: 16px;
-			filter: drop-shadow(0 0 20px rgba(178, 223, 219, 0.2));
-		}
-
-		.chat-welcome h3 {
-			color: #1b1b1b;
-			font-size: 20px;
-			margin: 0 0 8px 0;
-		}
-
-		.chat-welcome p {
-			font-size: 14px;
-			max-width: 400px;
-			margin: 0 auto 20px;
-			line-height: 1.5;
-		}
-
-		.chat-suggestions {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
-			justify-content: center;
-		}
-
-		.chat-suggestion {
-			background: rgba(178, 223, 219, 0.1);
-			border: 1px solid rgba(178, 223, 219, 0.3);
-			color: #00695c;
-			padding: 8px 16px;
-			border-radius: 20px;
-			font-size: 13px;
-			cursor: pointer;
-			transition: all 0.2s;
-		}
-
-		.chat-suggestion:hover {
-			background: rgba(199, 255, 0, 0.15);
-			transform: translateY(-1px);
-		}
-
-		/* Responsive para chat */
-		@media (max-width: 768px) {
-			.chat-container {
-				height: calc(100vh - 140px);
-				max-height: none;
-				border-radius: 8px;
-			}
-
-			.chat-message {
-				max-width: 90%;
-			}
-
-			.chat-header {
-				padding: 12px 16px;
-			}
-
-			.chat-messages {
-				padding: 15px;
-			}
-
-			.chat-input-area {
-				padding: 12px;
-			}
-
-			.chat-suggestions {
-				flex-direction: column;
-				align-items: center;
-			}
-		}
-
-		/* Botón flotante IA (FAB) */
-		.fab-ai {
-			position: fixed;
-			bottom: 28px;
-			right: 28px;
-			width: 60px;
-			height: 60px;
-			border-radius: 50%;
-			background: linear-gradient(135deg, #b2dfdb, #E0F2F1);
-			color: #1b1b1b;
-			border: none;
-			cursor: pointer;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			box-shadow: 0 4px 20px rgba(163, 230, 53, 0.35);
-			z-index: 100;
-			transition: all 0.3s;
-			animation: fabPulse 2s infinite;
-		}
-
-		.fab-ai:hover {
-			transform: scale(1.1);
-			box-shadow: 0 6px 30px rgba(163, 230, 53, 0.5);
-		}
-
-		.fab-ai .material-icons-round {
-			font-size: 28px;
-		}
-
-		@keyframes fabPulse {
-
-			0%,
-			100% {
-				box-shadow: 0 4px 20px rgba(178, 223, 219, 0.3);
-			}
-
-			50% {
-				box-shadow: 0 4px 30px rgba(178, 223, 219, 0.5);
-			}
-		}
-
-		@media (max-width: 768px) {
-			.fab-ai {
-				bottom: 20px;
-				right: 20px;
-				width: 54px;
-				height: 54px;
-			}
-		}
-
-		/* Botón de micrófono */
-		.chat-mic-btn {
-			background: none;
-			border: none;
-			color: var(--muted);
-			cursor: pointer;
-			padding: 8px;
-			border-radius: 50%;
-			transition: all 0.2s;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin-right: 4px;
-		}
-
-		.chat-mic-btn:hover {
-			background: rgba(255, 255, 255, 0.1);
-			color: #e2e8f0;
-		}
-
-		.chat-mic-btn.listening {
-			color: #ff5b6b;
-			animation: micPulse 1.5s infinite;
-			background: rgba(255, 91, 107, 0.1);
-		}
-
-		.chat-mic-btn.speaking {
-			color: #7af0a5;
-			background: rgba(122, 240, 165, 0.1);
-		}
-
-		@keyframes micPulse {
-			0% {
-				transform: scale(1);
-				box-shadow: 0 0 0 0 rgba(255, 91, 107, 0.4);
-			}
-
-			70% {
-				transform: scale(1.1);
-				box-shadow: 0 0 0 10px rgba(255, 91, 107, 0);
-			}
-
-			100% {
-				transform: scale(1);
-				box-shadow: 0 0 0 0 rgba(255, 91, 107, 0);
-			}
-		}
-	</style>
-</head>
-
-<body>
-	<!-- NUEVO: pantalla de login -->
-	<div id="login-screen">
-		<div class="login-container">
-			<div class="login-logo">
-				<h1>CODEXIS</h1>
-				<p>Portal Administrativo</p>
-			</div>
-			<form class="login-form" id="login-form">
-				<input type="text" id="login-username" placeholder="Usuario" autocomplete="username" required>
-				<input type="password" id="login-password" placeholder="Contraseña" autocomplete="current-password"
-					required>
-				<div class="login-error" id="login-error">Credenciales incorrectas</div>
-				<button type="submit">Iniciar Sesión</button>
-			</form>
-		</div>
-	</div>
-
-	<!-- Botón menú móvil -->
-	<button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
-
-	<!-- Overlay para cerrar menú móvil -->
-	<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-	<div class="app">
-		<aside class="sidebar card" id="sidebar">
-			<h1 class="text-2xl font-black tracking-tighter text-black dark:text-white uppercase">CODEXIS</h1>
-			<p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 mt-1 uppercase">Portal Administrativo</p>
-			
-			<ul class="menu">
-				<li class="active" data-view="dashboard"><span class="material-icons-round">dashboard</span> Dashboard
-				</li>
-				<li data-view="orders"><span class="material-icons-round">receipt_long</span> Órdenes</li>
-				<li data-view="clients"><span class="material-icons-round">people</span> Clientes</li>
-				<li data-view="invoices"><span class="material-icons-round">description</span> Facturas</li>
-				<li data-view="finance"><span class="material-icons-round">payments</span> Finanzas</li>
-				<li data-view="inventory"><span class="material-icons-round">inventory_2</span> Inventario / Catálogo
-				</li>
-				<li data-view="assistant"><span class="material-icons-round">smart_toy</span> Asistente IA</li>
-				<li data-view="settings"><span class="material-icons-round">settings</span> Configuración</li>
-			</ul>
-			<button id="btn-logout"
-				style="margin-top:20px;width:100%;background:#ffcdd2;color:#b71c1c;border:0;padding:10px;border-radius:0;cursor:pointer;font-size:14px">Cerrar
-				Sesión</button>
-		</aside>
-
-		<main class="main">
-			<div class="header">
-				<h2 id="view-title" class="font-['Inter'] uppercase tracking-[0.2em] text-[0.75rem] font-black text-black">Dashboard</h2>
-				<div class="controls">
-					<button class="btn" id="btn-add-order">+ Nueva orden</button>
-					<button class="btn" id="btn-add-client" style="display:none;background:#bbdefb;color:#1565c0">+
-						Nuevo cliente</button>
-					<span id="conn-status" class="small" style="margin-left:8px">Conectando…</span>
-				</div>
-			</div>
-
-			<!-- SECCIÓN DASHBOARD -->
-			<section id="dashboard-section" class="card">
-				<div class="dashboard-grid">
-					<!-- Tarjeta 1: Total de Órdenes -->
-					<div class="stat-card">
-						<div class="stat-card-header">
-							<div>
-								<div class="stat-card-title">Total Órdenes</div>
-								<div class="stat-card-value" id="stat-total-orders">0</div>
-								<div class="stat-card-subtitle">Órdenes registradas</div>
-							</div>
-							<div class="stat-card-icon"><span class="material-icons-round">assignment</span></div>
-						</div>
-						<div class="stat-trend up" id="stat-orders-trend">
-							<span>↑ 0%</span> vs. mes anterior
-						</div>
-					</div>
-
-					<!-- Tarjeta 2: Órdenes Pendientes -->
-					<div class="stat-card">
-						<div class="stat-card-header">
-							<div>
-								<div class="stat-card-title">Órdenes Activas</div>
-								<div class="stat-card-value" id="stat-active-orders" style="color:#1565c0">0</div>
-								<div class="stat-card-subtitle">En proceso</div>
-							</div>
-							<div class="stat-card-icon"><span class="material-icons-round">engineering</span></div>
-						</div>
-						<div class="stat-card-subtitle" id="stat-active-breakdown">
-							0 ingresadas • 0 en reparación • 0 en espera
-						</div>
-					</div>
-
-					<!-- Tarjeta 3: Ingresos Totales -->
-					<div class="stat-card">
-						<div class="stat-card-header">
-							<div>
-								<div class="stat-card-title">Ingresos del Mes</div>
-								<div class="stat-card-value" id="stat-income" style="color:#00695c">$0</div>
-								<div class="stat-card-subtitle">Balance positivo</div>
-							</div>
-							<div class="stat-card-icon"><span class="material-icons-round">account_balance_wallet</span>
-							</div>
-						</div>
-						<div class="stat-trend up" id="stat-income-trend">
-							<span>↑ 0%</span> vs. mes anterior
-						</div>
-					</div>
-
-					<!-- Tarjeta 4: Inventario -->
-					<div class="stat-card">
-						<div class="stat-card-header">
-							<div>
-								<div class="stat-card-title">Valor Inventario</div>
-								<div class="stat-card-value" id="stat-inventory" style="color:#e65100">$0</div>
-								<div class="stat-card-subtitle">En stock</div>
-							</div>
-							<div class="stat-card-icon"><span class="material-icons-round">inventory_2</span></div>
-						</div>
-						<div class="stat-card-subtitle" id="stat-inventory-items">
-							0 ítems • 0 unidades
-						</div>
-					</div>
-
-					<!-- Tarjeta 5: Ganancia del Mes -->
-					<div class="stat-card">
-						<div class="stat-card-header">
-							<div>
-								<div class="stat-card-title">Ganancia del Mes</div>
-								<div class="stat-card-value" id="stat-profit" style="color:#00695c">$0</div>
-								<div class="stat-card-subtitle">Ingresos - Gastos</div>
-							</div>
-							<div class="stat-card-icon"><span class="material-icons-round">trending_up</span></div>
-						</div>
-						<div class="stat-trend up" id="stat-profit-trend">
-							<span>Neto del mes</span>
-						</div>
-					</div>
-
-					<!-- Tarjeta 6: Total Clientes -->
-					<div class="stat-card">
-						<div class="stat-card-header">
-							<div>
-								<div class="stat-card-title">Total Clientes</div>
-								<div class="stat-card-value" id="stat-clients" style="color:#6a1b9a">0</div>
-								<div class="stat-card-subtitle">Registrados</div>
-							</div>
-							<div class="stat-card-icon"><span class="material-icons-round">people</span></div>
-						</div>
-						<div class="stat-card-subtitle" id="stat-clients-new">0 nuevos este mes</div>
-					</div>
-				</div>
-
-				<!-- Gráficos - Layout Mejorado -->
-			<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:24px">
-				
-				<!-- Gráfico Completo: Income vs Expenses (2 columnas) -->
-				<div style="grid-column:1/-1;background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
-						<div>
-							<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d">Financial Performance</p>
-							<h4 style="font-size:20px;font-weight:700;margin:8px 0 0 0;color:#1b1b1b">Ingresos vs Gastos</h4>
-						</div>
-						<div style="display:flex;gap:16px">
-							<div style="display:flex;align-items:center;gap:8px">
-								<span style="width:8px;height:8px;background:#00897b;display:block"></span>
-								<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d">Ingresos</span>
-							</div>
-							<div style="display:flex;align-items:center;gap:8px">
-								<span style="width:8px;height:8px;background:#7e57c2;display:block"></span>
-								<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d">Gastos</span>
-							</div>
-						</div>
-					</div>
-					<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;height:240px;border-bottom:1px solid #f0f0f0;padding-bottom:12px">
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:60%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:15%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:55%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:27%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:70%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:5%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:40%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:50%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:50%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:28%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:65%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:20%;background:#00897b;opacity:0.8"></div>
-						</div>
-					</div>
-					<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:12px">
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">ENE</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">FEB</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">MAR</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">ABR</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">MAY</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">JUN</span>
-					</div>
-				</div>
-
-				<!-- Orders by Status Donut (1 columna) -->
-				<div style="background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03);display:flex;flex-direction:column">
-					<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d;margin-bottom:24px">Estado Operacional</p>
-					<div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:240px">
-						<svg style="width:200px;height:200px;transform:rotate(-90deg)">
-							<circle cx="100" cy="100" fill="none" r="75" stroke="#ffc1a3" stroke-width="14"></circle>
-							<circle cx="100" cy="100" fill="none" r="75" stroke="#80deea" stroke-dasharray="470" stroke-dashoffset="120" stroke-width="14" opacity="0.9"></circle>
-							<circle cx="100" cy="100" fill="none" r="75" stroke="#a5d6a7" stroke-dasharray="470" stroke-dashoffset="320" stroke-width="14" opacity="0.8"></circle>
-						</svg>
-						<div style="position:absolute;text-align:center">
-							<p style="font-size:24px;font-weight:700;color:#1b1b1b;margin:0">100%</p>
-							<p style="font-size:11px;font-weight:700;color:#999;text-transform:uppercase;margin:4px 0 0 0">Cobertura</p>
-						</div>
-					</div>
-					<div style="margin-top:24px;display:flex;flex-direction:column;gap:12px">
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9">
-							<span style="font-size:11px;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#1b1b1b">
-								<span style="width:8px;height:8px;background:#a5d6a7;display:block"></span> Entregado
-							</span>
-							<span style="font-weight:700;color:#1b1b1b">642</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9">
-							<span style="font-size:11px;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#1b1b1b">
-								<span style="width:8px;height:8px;background:#80deea;display:block"></span> Pendiente
-							</span>
-							<span style="font-weight:700;color:#1b1b1b">412</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9">
-							<span style="font-size:11px;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#1b1b1b">
-								<span style="width:8px;height:8px;background:#ffc1a3;display:block"></span> Retornado
-							</span>
-							<span style="font-weight:700;color:#1b1b1b">230</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Top 5 Clientes (1 columna) -->
-				<div style="background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<h4 style="font-size:16px;font-weight:600;margin:0 0 16px 0;color:#1b1b1b;display:flex;align-items:center">
-						<span class="material-icons-round" style="vertical-align:middle;margin-right:8px;font-size:20px">emoji_events</span> Top 5 Clientes
-					</h4>
-					<div style="display:flex;flex-direction:column;gap:12px">
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9;border-radius:0">
-							<div style="display:flex;flex-direction:column">
-								<span style="font-weight:600;color:#1b1b1b;font-size:14px">Cliente Premium</span>
-								<span style="font-size:12px;color:#6d6d6d">Monto total</span>
-							</div>
-							<span style="font-weight:700;color:#00695c;font-size:16px">$14,250</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9;border-radius:0">
-							<div style="display:flex;flex-direction:column">
-								<span style="font-weight:600;color:#1b1b1b;font-size:14px">Carlos Mendez</span>
-								<span style="font-size:12px;color:#6d6d6d">Monto total</span>
-							</div>
-							<span style="font-weight:700;color:#00695c;font-size:16px">$12,800</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9;border-radius:0">
-							<div style="display:flex;flex-direction:column">
-								<span style="font-weight:600;color:#1b1b1b;font-size:14px">María López</span>
-								<span style="font-size:12px;color:#6d6d6d">Monto total</span>
-							</div>
-							<span style="font-weight:700;color:#00695c;font-size:16px">$11,500</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Órdenes Recientes (1 columna) -->
-				<div style="background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<h4 style="font-size:16px;font-weight:600;margin:0 0 16px 0;color:#1b1b1b;display:flex;align-items:center">
-						<span class="material-icons-round" style="vertical-align:middle;margin-right:8px;font-size:20px">schedule</span> Órdenes Recientes
-					</h4>
-					<div id="recent-orders-list" style="max-height:280px;overflow:auto"></div>
-				</div>
-
-				<!-- Alertas de Inventario (2 columnas) -->
-				<div style="grid-column:1/-1;background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<h4 style="font-size:16px;font-weight:600;margin:0 0 16px 0;color:#1b1b1b;display:flex;align-items:center">
-						<span class="material-icons-round" style="vertical-align:middle;margin-right:8px;font-size:20px">warning</span> Alertas de Inventario
-					</h4>
-					<div id="inventory-alerts" style="max-height:300px;overflow:auto"></div>
-				</div>
-
-			</div>
-			</section>
-
-			<section id="orders-section" class="card" style="display:none">
-				<div class="small filters">
-					Filtrar:
-					<input id="filter-input" placeholder="buscar por cliente, serie o modelo"
-						style="margin-left:8px;padding:6px;border-radius:0;background:#f9f9f9;border:1px solid rgba(0,0,0,.08);color:#1b1b1b">
-					<!-- nuevo: filtro por estado -->
-					<select id="status-filter"
-						style="margin-left:8px;padding:6px;border-radius:0;background:#f9f9f9;border:1px solid rgba(0,0,0,.08);color:#1b1b1b">
-						<option value="">Todos los estados</option>
-						<option value="ingresado">Ingresado</option>
-						<option value="en_reparacion">En reparación</option>
-						<option value="espera_entrega">En espera de entrega</option>
-						<option value="entregado">Entregado</option>
-					</select>
-					<!-- nuevo: filtro por estado de pago -->
-					<select id="payment-filter"
-						style="margin-left:8px;padding:6px;border-radius:0;background:#f9f9f9;border:1px solid rgba(0,0,0,.08);color:#1b1b1b">
-						<option value="">Todos (pagos)</option>
-						<option value="paid">Pagadas</option>
-						<option value="unpaid">No pagadas</option>
-					</select>
-				</div>
-
-				<!-- NUEVO: envoltorio con scroll horizontal -->
-				<div class="table-scroll">
-					<table id="orders-table" aria-label="Órdenes">
-						<thead>
-							<tr>
-								<th class="col-id">ID</th>
-								<th>Cliente</th>
-								<th>Marca</th>
-								<th>Modelo</th>
-								<th>Serie</th>
-								<th>Accesorios</th>
-								<th>Falla</th>
-								<th>Estado</th>
-								<th>Precio</th>
-								<th>Pago</th>
-								<th>Imágenes</th>
-								<th>Técnico</th>
-								<th>Fecha</th>
-								<th>Acciones</th>
-							</tr>
-						</thead>
-						<tbody>
-							<!-- filas generadas por JS -->
-						</tbody>
-					</table>
-				</div>
-
-				<!-- NUEVO: Vista de tarjetas para móvil -->
-				<div class="orders-cards-container" id="orders-cards-container">
-					<!-- Tarjetas generadas por JS -->
-				</div>
-
-				<div class="footer-note" id="orders-count"></div>
-			</section>
-			<section id="clients-section" class="card" style="display:none;margin-top:12px">
-				<h3>Clientes</h3>
-				<button class="btn" id="btn-new-client-inline" style="margin-bottom:8px">+ Nuevo cliente</button>
-				<!-- NUEVO: envoltorio con scroll horizontal -->
-				<div class="table-scroll">
-					<table id="clients-table">
-						<thead>
-							<tr>
-								<th class="col-id">ID</th>
-								<th>Nombre</th>
-								<th>Cédula</th>
-								<th>Teléfono</th>
-								<th>Email</th>
-								<th>Acciones</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-
-				<!-- Vista de tarjetas para móvil -->
-				<div class="cards-container" id="clients-cards-container">
-					<!-- Tarjetas generadas por JS -->
-				</div>
-			</section> <!-- Nueva sección: Finanzas -->
-			<section id="finance-section" class="card" style="display:none;margin-top:12px">
-				<h3>Finanzas</h3>
-				<!-- Panel métricas -->
-				<div id="finance-metrics" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-					<!-- contenido poblado por JS -->
-				</div>
-				<!-- pequeño ajuste: permitir wrap en controles -->
-				<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-					<button class="btn" id="btn-new-transaction">+ Nueva transacción</button>
-					<div id="finance-summary" class="small" style="margin-left:12px">Cargando...</div>
-					<!-- filtros: tipo y categoría -->
-					<select id="type-filter"
-						style="margin-left:12px;padding:6px;border-radius:0;background:#f9f9f9;border:1px solid rgba(0,0,0,.08);color:#1b1b1b">
-						<option value="">Todos</option>
-						<option value="income">Ingresos</option>
-						<option value="expense">Gastos</option>
-					</select>
-					<select id="category-filter"
-						style="margin-left:8px;padding:6px;border-radius:0;background:#f9f9f9;border:1px solid rgba(0,0,0,.08);color:#1b1b1b">
-						<option value="">Todas las categorías</option>
-						<!-- opciones pobladas por JS -->
-					</select>
-				</div>
-				<!-- Formulario inline para nueva transacción -->
-				<form id="form-transaction" style="display:block;margin-bottom:8px;gap:8px">
-					<div class="form-row">
-						<select name="type" required>
-							<option value="income">Ingreso</option>
-							<option value="expense">Gasto</option>
-						</select>
-						<input name="amount" type="number" step="0.01" placeholder="Monto" required>
-					</div>
-					<div class="form-row">
-						<select name="category" id="tx-category" required>
-							<!-- opciones pobladas por JS -->
-						</select>
-						<input name="date" type="date" value="">
-					</div>
-					<div class="form-row">
-						<input name="notes" placeholder="Notas" style="flex:2">
-						<button class="btn" type="submit">Guardar</button>
-					</div>
-				</form>
-
-				<!-- NUEVO: envoltorio con scroll horizontal -->
-				<div class="table-scroll">
-					<table id="transactions-table">
-						<thead>
-							<tr>
-								<th class="col-id">ID</th>
-								<th>Tipo</th>
-								<th>Monto</th>
-								<th>Categoría</th>
-								<th>Fecha</th>
-								<th>Notas</th>
-								<th>Acciones</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-
-				<!-- Vista de tarjetas para móvil -->
-				<div class="cards-container" id="transactions-cards-container">
-					<!-- Tarjetas generadas por JS -->
-				</div>
-			</section> <!-- NUEVO: Sección Inventario / Catálogo -->
-			<section id="inventory-section" class="card" style="display:none;margin-top:12px">
-				<!-- Subtabs -->
-				<div
-					style="display:flex;gap:8px;margin-bottom:16px;border-bottom:2px solid #e2e8f0;padding-bottom:10px">
-					<button class="btn" id="subtab-inventory" onclick="switchInventorySubtab('inv')"
-						style="background:#E0F2F1;color:#00695c">📦 Inventario</button>
-					<button class="btn" id="subtab-catalog" onclick="switchInventorySubtab('cat')"
-						style="background:#6d6d6d;color:#fff">🛍️ Catálogo</button>
-				</div>
-				<!-- Inventario subtab -->
-				<div id="inv-subtab-content">
-					<h3>Inventario</h3>
-					<div class="controls">
-						<button class="btn" id="btn-new-item">+ Nuevo ítem</button>
-						<input id="inv-filter" placeholder="Buscar por nombre o categoría">
-						<div class="small" id="inventory-summary">Cargando...</div>
-					</div>
-					<div class="table-scroll">
-						<table id="inventory-table">
-							<thead>
-								<tr>
-									<th class="col-id">ID</th>
-									<th>Nombre</th>
-									<th>Categoría</th>
-									<th>Stock</th>
-									<th>Costo u.</th>
-									<th>Precio u.</th>
-									<th>Proveedor</th>
-									<th>Actualizado</th>
-									<th>Acciones</th>
-								</tr>
-							</thead>
-							<tbody></tbody>
-						</table>
-					</div>
-					<!-- Vista de tarjetas para móvil -->
-					<div class="cards-container" id="inventory-cards-container">
-						<!-- Tarjetas generadas por JS -->
-					</div>
-				</div>
-				<!-- Catálogo subtab -->
-				<div id="cat-subtab-content" style="display:none">
-					<div style="margin-bottom:24px">
-						<div
-							style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:12px">
-							<div>
-								<h1 style="font-size:24px;font-weight:700;color:var(--accent);margin:0 0 4px 0">Catálogo
-									de Productos</h1>
-								<p style="color:var(--muted);font-size:13px;margin:0">Gestiona los productos visibles en
-									<a href="/catalogo.html" target="_blank"
-										style="color:#7af0a5;text-decoration:underline">catalogo.html</a>
-								</p>
-							</div>
-							<button class="btn" onclick="openCatalogModal()"
-								style="background:#b2dfdb;color:#1b1b1b;padding:10px 20px;border-radius:0;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px">
-								<span class="material-icons-round" style="font-size:18px">add_circle</span> Nuevo
-								Producto
-							</button>
-						</div>
-					</div>
-					<!-- Filtros -->
-					<div class="card" style="margin-bottom:16px">
-						<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-							<div style="flex:1;min-width:200px;position:relative">
-								<span class="material-icons-round"
-									style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px">search</span>
-								<input type="text" id="cat-filter" placeholder="Buscar productos..."
-									oninput="renderCatalogItems()"
-									style="width:100%;padding:8px 8px 8px 36px;border-radius:0;border:1px solid rgba(0,0,0,.08);background:#f9f9f9;color:#1b1b1b;font-size:14px">
-							</div>
-							<select id="cat-category-filter" onchange="renderCatalogItems()">
-								<option value="all">Todas las categorías</option>
-							</select>
-							<select id="cat-availability-filter" onchange="renderCatalogItems()">
-								<option value="all">Todos</option>
-								<option value="visible">Visibles</option>
-								<option value="hidden">Ocultos</option>
-							</select>
-							<div class="small" id="catalog-summary">Cargando...</div>
-						</div>
-					</div>
-					<!-- Tabla desktop -->
-					<div class="table-scroll">
-						<div class="card" style="padding:0;overflow:hidden">
-							<table id="catalog-table">
-								<thead>
-									<tr>
-										<th>Imagen</th>
-										<th>Nombre</th>
-										<th>Descripción</th>
-										<th>Categoría</th>
-										<th>Precio</th>
-										<th>Visible</th>
-										<th>Acciones</th>
-									</tr>
-								</thead>
-								<tbody id="catalog-table-body"></tbody>
-							</table>
-						</div>
-					</div>
-					<!-- Tarjetas mobile -->
-					<div class="cards-container" id="catalog-cards-container" style="display:none"></div>
-				</div>
-			</section>
-
-			<!-- NUEVO: Sección Facturas -->
-			<section id="invoices-section" class="card" style="display:none;margin-top:12px">
-				<h3>Facturas</h3>
-				<div class="controls">
-					<button class="btn" id="btn-new-invoice">+ Nueva factura</button>
-					<input id="invoice-filter" placeholder="Buscar por cliente o número..."
-						style="padding:10px 15px;border-radius:0;border:1px solid rgba(0,0,0,.08);background:#f9f9f9;color:#1b1b1b;font-size:14px;width:100%;max-width:300px">
-					<div class="small" id="invoices-summary">Cargando...</div>
-				</div>
-				<div class="table-scroll">
-					<table id="invoices-table">
-						<thead>
-							<tr>
-								<th>Número</th>
-								<th>Cliente</th>
-								<th>Fecha</th>
-								<th>Subtotal</th>
-								<th>IVA</th>
-								<th>Total</th>
-								<th>Estado</th>
-								<th>Acciones</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-
-				<!-- Vista de tarjetas para móvil -->
-				<div class="cards-container" id="invoices-cards-container">
-					<!-- Tarjetas generadas por JS -->
-				</div>
-			</section>
-
-			<section id="settings-section" class="card" style="display:none;margin-top:12px">
-				<h3>Configuración</h3>
-				<button class="btn" id="export-data">Exportar datos (.json)</button>
-				<button class="btn" id="import-data" style="background:#bbdefb;color:#1565c0">Importar</button>
-				<!-- nuevo: exportar PDF de órdenes -->
-				<button class="btn" id="export-pdf" style="margin-left:8px;background:#E0F2F1;color:#00695c">Exportar
-					PDF (Órdenes)</button>
-				<input type="file" id="import-file" accept="application/json" style="display:none">
-
-				<!-- Copia de seguridad completa -->
-				<div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)">
-					<h4 style="margin:0 0 8px 0;color:var(--accent);font-size:15px">
-						<span class="material-icons-round"
-							style="font-size:18px;vertical-align:middle;margin-right:6px">backup</span>
-						Copia de Seguridad Completa
-					</h4>
-					<p style="font-size:13px;color:var(--muted);margin:0 0 12px 0">Descarga un archivo con TODOS los
-						datos del negocio (órdenes, clientes, finanzas, inventario y facturas). Úsalo para restaurar en
-						caso de emergencia.</p>
-					<button class="btn" id="btn-full-backup"
-						style="background:linear-gradient(135deg,var(--accent),#65a30d);color:#1b1b1b;font-weight:600;padding:10px 18px">
-						<span class="material-icons-round"
-							style="font-size:16px;vertical-align:middle;margin-right:6px">cloud_download</span>
-						Descargar Copia de Seguridad
-					</button>
-					<button class="btn" id="btn-restore-backup"
-						style="background:#3bb4ff;color:#1b1b1b;font-weight:600;padding:10px 18px;margin-left:8px">
-						<span class="material-icons-round"
-							style="font-size:16px;vertical-align:middle;margin-right:6px">cloud_upload</span>
-						Restaurar Copia
-					</button>
-					<input type="file" id="restore-backup-file" accept="application/json" style="display:none">
-					<div id="backup-status" style="margin-top:10px;font-size:13px;display:none"></div>
-				</div>
-
-				<div class="footer-note" style="margin-top:12px">Equipos guardados en hoja de vida por número de serie.
-				</div>
-			</section>
-
-			<!-- SECCIÓN ASISTENTE IA -->
-			<section id="assistant-section">
-				<div class="chat-container">
-					<div class="chat-header">
-						<div class="chat-header-info">
-							<div class="chat-avatar"><span class="material-icons-round">smart_toy</span></div>
-							<div class="chat-header-text">
-								<h4>Codexis Asistente IA</h4>
-								<span id="chat-status"><span class="material-icons-round"
-										style="font-size:10px;vertical-align:middle;margin-right:3px">circle</span> En
-									línea</span>
-							</div>
-						</div>
-						<div class="chat-header-actions">
-							<button class="chat-btn-clear" id="btn-clear-chat" title="Limpiar conversación"><span
-									class="material-icons-round"
-									style="font-size:16px;vertical-align:middle;margin-right:4px">delete</span>
-								Limpiar</button>
-						</div>
-					</div>
-					<div class="chat-messages" id="chat-messages">
-						<div class="chat-welcome" id="chat-welcome">
-							<div class="chat-welcome-icon"><span class="material-icons-round"
-									style="font-size:64px">smart_toy</span></div>
-							<h3>¡Hola! Soy tu asistente de IA</h3>
-							<p>Puedo ayudarte con diagnósticos técnicos, recomendaciones de repuestos, presupuestos y
-								mucho más. ¿En qué puedo ayudarte?</p>
-							<div class="chat-suggestions">
-								<button class="chat-suggestion"
-									onclick="useSuggestion('Mi laptop no enciende, ¿qué puede ser?')"><span
-										class="material-icons-round"
-										style="font-size:16px;vertical-align:middle;margin-right:3px">laptop</span>
-									Laptop no
-									enciende</button>
-								<button class="chat-suggestion"
-									onclick="useSuggestion('¿Qué mantenimiento preventivo recomiendas?')"><span
-										class="material-icons-round"
-										style="font-size:16px;vertical-align:middle;margin-right:3px">build</span>
-									Mantenimiento preventivo</button>
-								<button class="chat-suggestion"
-									onclick="useSuggestion('¿Cuánto puede costar cambiar la pantalla de un portátil?')"><span
-										class="material-icons-round"
-										style="font-size:16px;vertical-align:middle;margin-right:3px">request_quote</span>
-									Presupuesto pantalla</button>
-								<button class="chat-suggestion"
-									onclick="useSuggestion('Mi computador está muy lento, ¿qué hago?')"><span
-										class="material-icons-round"
-										style="font-size:16px;vertical-align:middle;margin-right:3px">speed</span> PC
-									lento</button>
-							</div>
-						</div>
-					</div>
-					<div class="chat-typing" id="chat-typing">
-						<div class="chat-typing-dot"></div>
-						<div class="chat-typing-dot"></div>
-						<div class="chat-typing-dot"></div>
-					</div>
-					<div class="chat-input-area">
-						<textarea id="chat-input" placeholder="Escribe tu pregunta..." rows="1"></textarea>
-						<button class="chat-mic-btn" id="btn-mic-chat" title="Hablar"><span
-								class="material-icons-round">mic</span></button>
-						<button class="chat-send-btn" id="btn-send-chat" title="Enviar"><span
-								class="material-icons-round">send</span></button>
-					</div>
-				</div>
-			</section>
-
-		</main>
-	</div>
-
-	<!-- BOTÓN FLOTANTE IA -->
-	<button class="fab-ai" id="fab-ai" title="Abrir Asistente IA"
-		onclick="document.querySelectorAll('.menu li').forEach(l=>l.classList.remove('active'));document.querySelector('[data-view=assistant]').classList.add('active');renderView('assistant');this.style.display='none';">
-		<span class="material-icons-round">smart_toy</span>
-	</button>
-
-	<!-- Modal: agregar/editar orden -->
-	<div class="modal" id="modal-order">
-		<div class="panel">
-			<h3 id="modal-order-title">Nueva orden</h3>
-			<form id="form-order">
-				<div class="form-row">
-					<select name="clientId" required>
-						<option value="">-- Seleccionar cliente --</option>
-					</select>
-					<button type="button" class="btn" id="btn-order-new-client" style="background:#6d6d6d;color:#fff">Nuevo
-						cliente</button>
-				</div>
-
-				<!-- nuevo: selector de estado -->
-				<div class="form-row">
-					<select name="status" required>
-						<option value="ingresado">Ingresado</option>
-						<option value="en_reparacion">En reparación</option>
-						<option value="espera_entrega">En espera de entrega</option>
-						<option value="entregado">Entregado</option>
-					</select>
-					<!-- espacio para futuro -->
-					<input name="brand" placeholder="Marca" required>
-				</div>
-
-				<div class="form-row">
-					<input name="serial" placeholder="Número de serie (único)" required>
-					<input name="model" placeholder="Modelo">
-				</div>
-				<div class="form-row">
-					<input name="accessories" placeholder="Accesorios (ej: cargador, funda)">
-					<textarea name="failure" placeholder="Falla reportada" rows="1" required style="flex:2"></textarea>
-				</div>
-
-				<div class="form-row">
-					<input name="technician" placeholder="Técnico asignado">
-					<input name="price" type="number" step="0.01" placeholder="Precio" style="flex:1">
-					<!-- nuevo: selector de estado de pago -->
-					<select name="paid" style="flex:1">
-						<option value="false">No pagado</option>
-						<option value="true">Pagado</option>
-					</select>
-				</div>
-
-				<div class="form-row">
-					<input name="notes" placeholder="Notas internas" style="flex:1">
-				</div>
-
-				<!-- nuevo: campo para imágenes -->
-				<div class="form-row" style="flex-direction:column;align-items:flex-start">
-					<label style="color:var(--muted);font-size:13px;margin-bottom:4px">
-						Imágenes del equipo:
-						<span id="image-count" style="color:var(--accent);font-weight:600">(0 imágenes)</span>
-					</label>
-					<div style="display:flex;gap:8px;flex-wrap:wrap;width:100%">
-						<button type="button" id="btn-take-photo" class="btn"
-							style="background:#3bb4ff;color:#1b1b1b;flex:1;min-width:150px">
-							📷 Tomar Foto
-						</button>
-						<button type="button" id="btn-choose-gallery" class="btn"
-							style="background:#9c27b0;color:#fff;flex:1;min-width:150px">
-							🖼️ Galería
-						</button>
-					</div>
-					<input type="file" id="order-images-camera" accept="image/*" capture="environment" multiple
-						style="display:none">
-					<input type="file" id="order-images-gallery" accept="image/*" multiple style="display:none">
-					<div id="image-preview-container" class="image-preview-container"></div>
-				</div>
-				<div style="display:flex;gap:8px;justify-content:flex-end">
-					<button type="button" class="btn" id="btn-close-order" style="background:#6d6d6d;color:#fff">Cancelar</button>
-					<button type="submit" class="btn">Guardar orden</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
-	<!-- Modal: cliente -->
-	<div class="modal" id="modal-client">
-		<div class="panel">
-			<h3 id="modal-client-title">Nuevo cliente</h3>
-			<form id="form-client">
-				<!-- cambiado: ahora se pide la cédula -->
-				<div class="form-row">
-					<input name="name" placeholder="Nombre" required>
-					<input name="cedula" placeholder="Cédula" required>
-				</div>
-				<div class="form-row">
-					<input name="phone" placeholder="Teléfono">
-					<input name="email" placeholder="Email">
-				</div>
-				<div class="form-row">
-					<input name="address" placeholder="Dirección">
-				</div>
-				<div style="display:flex;gap:8px;justify-content:flex-end">
-					<button type="button" class="btn" id="btn-close-client" style="background:#6d6d6d;color:#fff">Cancelar</button>
-					<button type="submit" class="btn" style="background:#bbdefb;color:#1565c0">Guardar</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
-	<!-- Modal: equipo / hoja de vida -->
-	<div class="modal" id="modal-equipment">
-		<div class="panel" style="max-width:700px;width:92%">
-			<h3 id="modal-equipment-title">Hoja de vida - Equipo</h3>
-			<div id="equipment-qr-area"
-				style="display:none;text-align:center;margin-bottom:12px;padding:16px;background:rgba(163,230,53,0.06);border-radius:10px;border:1px solid rgba(163,230,53,0.15)">
-				<img id="equipment-qr-img" src="" alt="QR del equipo"
-					style="width:160px;height:160px;border-radius:8px;background:#fff;padding:8px">
-				<div style="margin-top:8px;font-size:12px;color:#9aa5b1">Escanea para ver el historial completo</div>
-			</div>
-			<div class="history-list" id="equipment-history" style="max-height:400px;overflow-y:auto"></div>
-			<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
-				<button type="button" class="btn" id="btn-eq-print-qr" style="background:#e040fb;color:#fff">📱 Imprimir
-					QR</button>
-				<button type="button" class="btn" id="btn-eq-copy-link" style="background:#9c27b0;color:#fff">🔗 Copiar
-					Link</button>
-				<button type="button" class="btn" id="btn-close-equipment" style="background:#64707a">Cerrar</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- NUEVO: Modal ítem de inventario -->
-	<div class="modal" id="modal-inventory-item">
-		<div class="panel">
-			<h3 id="modal-inventory-title">Nuevo ítem</h3>
-			<form id="form-inventory-item">
-				<div class="form-row">
-					<input name="name" placeholder="Nombre" required>
-					<input name="category" placeholder="Categoría">
-				</div>
-				<div class="form-row">
-					<input name="stock" type="number" step="1" min="0" placeholder="Stock inicial" value="0">
-					<input name="unitCost" type="number" step="0.01" placeholder="Costo unitario">
-					<input name="unitPrice" type="number" step="0.01" placeholder="Precio unitario">
-				</div>
-				<div class="form-row">
-					<input name="supplier" placeholder="Proveedor">
-					<input name="notes" placeholder="Notas" style="flex:2">
-				</div>
-				<div style="display:flex;gap:8px;justify-content:flex-end">
-					<button type="button" class="btn" id="btn-close-inventory-item"
-						style="background:#64707a">Cancelar</button>
-					<button type="submit" class="btn">Guardar</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
-	<!-- NUEVO: Modal movimiento (entrada/salida) -->
-	<div class="modal" id="modal-movement">
-		<div class="panel">
-			<h3 id="modal-movement-title">Registrar movimiento</h3>
-			<form id="form-movement">
-				<input type="hidden" name="itemId">
-				<input type="hidden" name="type"> <!-- in | out -->
-				<div class="form-row">
-					<input name="qty" type="number" step="1" min="1" placeholder="Cantidad" required>
-					<input name="unitValue" type="number" step="0.01" placeholder="Valor unitario">
-				</div>
-				<div class="form-row">
-					<input name="notes" placeholder="Notas">
-					<input name="date" type="date">
-				</div>
-				<div style="display:flex;gap:8px;justify-content:flex-end">
-					<button type="button" class="btn" id="btn-close-movement"
-						style="background:#64707a">Cancelar</button>
-					<button type="submit" class="btn">Registrar</button>
-				</div>
-				<div class="small" id="movement-hint" style="margin-top:6px;color:#9aa5b1"></div>
-			</form>
-		</div>
-	</div>
-
-	<!-- NUEVO: Modal historial de movimientos -->
-	<div class="modal" id="modal-movements-history">
-		<div class="panel">
-			<h3 id="modal-movements-title">Historial de movimientos</h3>
-			<div class="history-list" id="movements-history"></div>
-			<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-				<button type="button" class="btn" id="btn-close-movements" style="background:#64707a">Cerrar</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal Catálogo: crear/editar producto (estilo Lazos) -->
-	<!-- Modal Catálogo: crear/editar producto -->
-	<div class="modal" id="modal-catalog-item">
-		<div class="panel">
-			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-				<h3 id="modal-catalog-title"
-					style="color:var(--accent);margin:0;display:flex;align-items:center;gap:8px"><span
-						class="material-icons-round">shopping_bag</span> Nuevo Producto</h3>
-				<button onclick="closeModal('#modal-catalog-item')"
-					style="background:transparent;border:1px solid rgba(255,255,255,.1);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--muted)">✕</button>
-			</div>
-			<div class="form-row">
-				<input type="text" id="cat-item-name" placeholder="Nombre del producto *"
-					style="flex:1;padding:8px;border-radius:0;border:1px solid rgba(0,0,0,.08);background:#f9f9f9;color:#1b1b1b">
-			</div>
-			<div class="form-row">
-				<textarea id="cat-item-description" placeholder="Descripción del producto" rows="3"
-					style="flex:1;padding:8px;border-radius:0;border:1px solid rgba(0,0,0,.08);background:#f9f9f9;color:#1b1b1b;font-family:Inter,sans-serif;resize:vertical"></textarea>
-			</div>
-			<div class="form-row">
-				<div style="flex:1">
-					<input type="text" id="cat-item-category" list="cat-categories-list" placeholder="Categoría"
-						autocomplete="off"
-						style="width:100%;padding:8px;border-radius:0;border:1px solid rgba(0,0,0,.08);background:#f9f9f9;color:#1b1b1b">
-					<datalist id="cat-categories-list"></datalist>
-					<small style="color:var(--muted);display:block;margin-top:4px">Selecciona o escribe una
-						nueva</small>
-				</div>
-				<div style="flex:1">
-					<input type="number" id="cat-item-price" placeholder="Precio (COP)" step="100"
-						style="width:100%;padding:8px;border-radius:0;border:1px solid rgba(0,0,0,.08);background:#f9f9f9;color:#1b1b1b">
-					<small style="color:var(--muted);display:block;margin-top:4px">Precio de venta</small>
-				</div>
-			</div>
-			<div style="margin-bottom:10px">
-				<label style="color:#e2e8f0;font-size:13px;margin-bottom:6px;display:block">Imágenes del producto (hasta
-					10)</label>
-				<input type="file" id="cat-image-input" accept="image/*" multiple
-					onchange="handleCatalogImageUpload(this)"
-					style="padding:8px;border:2px dashed rgba(0,0,0,.08);border-radius:0;width:100%;cursor:pointer;background:#f9f9f9;color:#1b1b1b">
-				<small style="color:var(--muted);display:block;margin-top:4px">La primera imagen será la
-					principal</small>
-				<div id="cat-images-preview" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap"></div>
-				<input type="hidden" id="cat-item-images" value="[]">
-			</div>
-			<div class="form-row" style="align-items:center;gap:16px;margin-bottom:12px">
-				<label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#e2e8f0;font-size:13px">
-					<input type="checkbox" id="cat-item-featured"
-						style="width:16px;height:16px;accent-color:var(--accent)"> ⭐ Destacado
-				</label>
-				<label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#e2e8f0;font-size:13px">
-					<input type="checkbox" id="cat-item-available" checked
-						style="width:16px;height:16px;accent-color:var(--accent)"> Disponible
-				</label>
-			</div>
-			<div style="display:flex;gap:8px;justify-content:flex-end">
-				<button class="btn" onclick="closeModal('#modal-catalog-item')"
-					style="background:#64707a">Cancelar</button>
-				<button class="btn" onclick="saveCatalogItem()">💾 Guardar</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- NUEVO: Modal crear/editar factura -->
-	<div class="modal" id="modal-invoice">
-		<div class="panel" style="max-width:800px;width:90%">
-			<h3 id="modal-invoice-title">Nueva factura</h3>
-			<form id="form-invoice">
-				<div class="form-row">
-					<select name="clientId" required>
-						<option value="">-- Seleccionar cliente --</option>
-					</select>
-					<input name="invoiceNumber" placeholder="Número de factura (auto)" readonly
-						style="background:#031419">
-				</div>
-				<div class="form-row">
-					<input name="date" type="date" required>
-					<select name="paymentStatus">
-						<option value="unpaid">No pagada</option>
-						<option value="partial">Pago parcial</option>
-						<option value="paid">Pagada</option>
-					</select>
-				</div>
-				<div class="form-row"
-					style="align-items:center;background:rgba(59,180,255,.05);padding:10px;border-radius:6px;border:1px solid rgba(59,180,255,.15)">
-					<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;user-select:none">
-						<input type="checkbox" name="registerInFinance" id="registerInFinance" checked
-							style="width:auto;cursor:pointer;transform:scale(1.2)">
-						<span style="font-size:13px">💰 Registrar como ingreso en Finanzas <span class="small">(solo si
-								está pagada)</span></span>
-					</label>
-				</div>
-				<div class="form-row">
-					<textarea name="notes" placeholder="Notas (opcional)" rows="2"></textarea>
-				</div>
-
-				<!-- Ítems de la factura -->
-				<div style="margin-top:12px">
-					<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-						<strong>Ítems de la factura</strong>
-						<button type="button" class="btn" id="btn-add-invoice-item"
-							style="background:#3bb4ff;color:#1b1b1b;font-size:12px;padding:6px 10px">+ Agregar
-							ítem</button>
-					</div>
-					<div class="invoice-items-list" id="invoice-items-list">
-						<!-- ítems dinámicos -->
-					</div>
-				</div>
-
-				<!-- Totales -->
-				<div style="margin-top:12px;padding:10px;background:#f9f9f9;border-radius:0">
-					<div style="display:flex;justify-content:space-between;margin-bottom:4px">
-						<span>Subtotal:</span>
-						<span id="invoice-subtotal">$0.00</span>
-					</div>
-					<div
-						style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:var(--accent);padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">
-						<span>Total:</span>
-						<span id="invoice-total">$0.00</span>
-					</div>
-				</div>
-
-				<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-					<button type="button" class="btn" id="btn-close-invoice"
-						style="background:#64707a">Cancelar</button>
-					<button type="submit" class="btn">Guardar factura</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
-	<!-- NUEVO: Modal de carga (Guardando...) -->
-	<div class="modal" id="modal-loading" style="z-index: 99999;">
-		<div class="panel" style="width: 200px; text-align: center; background: #071b22;">
-			<div class="spinner" style="margin: 0 auto 12px;"></div>
-			<p id="loading-text" style="margin: 0; font-weight: 600; color: #1b1b1b;">Guardando...</p>
-		</div>
-	</div>
-
-	<!-- incluir jsPDF desde CDN -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
-	<script>
 		// NUEVO: Sistema de autenticación
 		const AUTH_USERS = {
 			'admin': 'admin12354',
-			'codexisco': 'MillosDavid77'
+			'codexis': 'MiPc2024.'
 		};
 
 		function checkAuth() {
@@ -2885,24 +24,8 @@
 			location.reload();
 		}
 
-		// NUEVO: Funciones de carga
-		function showLoading(text) {
-			const modal = document.getElementById('modal-loading');
-			const textEl = document.getElementById('loading-text');
-			if (modal) {
-				if (textEl) textEl.textContent = text || 'Guardando...';
-				modal.classList.add('show');
-			}
-		}
-
-		function hideLoading() {
-			const modal = document.getElementById('modal-loading');
-			if (modal) modal.classList.remove('show');
-		}
-
 		// Configuración de API - solo Cloudflare
 		const API_BASE = "https://casinos-bunny-edited-officers.trycloudflare.com/api";
-		const API_URL = API_BASE;
 		let API_TIMEOUT_MS = 10000; // 10 segundos timeout por defecto
 		let API_SAVE_TIMEOUT_MS = 30000; // 30 segundos para guardar (imágenes)
 		let MAX_RETRIES = 2; // solo 2 intentos
@@ -3281,17 +404,11 @@
 		}
 
 		function bindUI() {
-			console.log('✅ bindUI() inicializado');
 			// menu
-			const menuItems = $$('.menu li');
-			console.log('✅ Elementos del menú encontrados:', menuItems.length);
-			
-			menuItems.forEach(li => {
+			$$('.menu li').forEach(li => {
 				li.addEventListener('click', e => {
-					console.log('🔷 Clic en menú:', li.dataset.view);
 					$$('.menu li').forEach(x => x.classList.remove('active'));
 					li.classList.add('active');
-					console.log('📢 Llamando renderView(' + li.dataset.view + ')');
 					renderView(li.dataset.view);
 				});
 			});
@@ -3460,7 +577,7 @@
 
 		async function renderView(view) {
 			currentView = view; // guardar vista actual
-			const titles = { dashboard: 'Dashboard', orders: 'Órdenes', clients: 'Clientes', invoices: 'Facturas', finance: 'Finanzas', inventory: 'Inventario / Catálogo', assistant: 'Asistente IA', settings: 'Configuración' };
+			const titles = { dashboard: 'Dashboard', orders: 'Órdenes', clients: 'Clientes', invoices: 'Facturas', finance: 'Finanzas', inventory: 'Inventario', assistant: 'Asistente IA', settings: 'Configuración' };
 			$('#view-title').textContent = titles[view] || view;
 			$('#dashboard-section').style.display = view === 'dashboard' ? 'block' : 'none';
 			$('#orders-section').style.display = view === 'orders' ? 'block' : 'none';
@@ -3539,7 +656,7 @@
 					: '<span class="payment-badge payment-unpaid">No pagado</span>';
 				const tr = document.createElement('tr');
 				tr.innerHTML = `
-					<td class="col-id">${o.id}</td>
+					<td>${o.id}</td>
 					<td>${escapeHtml(client.name)}</td>
 					<td>${escapeHtml(o.brand || '')}</td>
 					<td>${escapeHtml(o.model || '')}</td>
@@ -3564,8 +681,8 @@
 						<button class="btn btn-edit" data-id="${o.id}">Editar</button>
 						<button class="btn btn-delete" data-id="${o.id}">Eliminar</button>
 						<button class="btn" style="background:#071a2a;color:#7af0a5" data-id="${o.id}" class="btn-pdf">PDF</button>
-						<button class="btn btn-whatsapp" data-id="${o.id}" style="background:#25D366;color:#1b1b1b">WhatsApp</button>
-						${o.serial ? `<button class="btn btn-print-qr" data-serial="${escapeHtml(o.serial)}" data-brand="${escapeHtml(o.brand || '')}" data-model="${escapeHtml(o.model || '')}" style="background:#e040fb;color:#fff" title="Imprimir QR del equipo">📱 QR</button>` : ''}
+						<button class="btn btn-qr" data-id="${o.id}" style="background:#fff;color:#000" title="Imprimir QR">🏁 QR</button>
+						<button class="btn btn-whatsapp" data-id="${o.id}" style="background:#25D366;color:#06121a">WhatsApp</button>
 					</td>
 				`;
 				tbody.appendChild(tr);
@@ -3584,14 +701,14 @@
 			$$('button[data-id]').filter(b => b.classList.contains('btn') && b.textContent === 'PDF')
 				.forEach(b => b.onclick = () => exportOrderPDF(b.dataset.id));
 
+			// botón QR por orden
+			$$('.btn-qr').forEach(b => b.onclick = () => printOrderQR(b.dataset.id));
+
 			// botón WhatsApp por orden
 			$$('.btn-whatsapp').forEach(b => b.onclick = () => openWhatsApp(b.dataset.id));
 
 			// nuevo: copiar enlace público
 			$$('.btn-copy-link').forEach(b => b.onclick = async () => await copyPublicLink(b.dataset.id));
-
-			// imprimir QR del equipo
-			$$('.btn-print-qr').forEach(b => b.onclick = () => printEquipmentQR(b.dataset.serial, b.dataset.brand, b.dataset.model));
 
 			// abrir hoja de vida
 			$$('.btn-view-eq').forEach(b => b.onclick = () => {
@@ -3617,7 +734,7 @@
 					card.className = 'order-card';
 					card.innerHTML = `
 						<div class="order-card-header">
-							<div class="order-card-id" style="display:none">#${o.id}</div>
+							<div class="order-card-id">#${o.id}</div>
 							<div class="order-card-status">
 								<span class="status-badge ${statusClass}">${statusLabel}</span>
 								<span class="payment-badge ${isPaid ? 'payment-paid' : 'payment-unpaid'}">${isPaid ? 'Pagado' : 'No pagado'}</span>
@@ -3675,11 +792,11 @@
 								<option value="entregado"${statusKey === 'entregado' ? ' selected' : ''}>Entregado</option>
 							</select>
 							<button class="btn btn-toggle-payment-card" data-id="${o.id}" style="background:#ffa726;color:#07121a">${isPaid ? '💰 Pagado' : '💳 Pagar'}</button>
-							<button class="btn btn-edit-card" data-id="${o.id}" style="background:#3bb4ff;color:#1b1b1b">✏️ Editar</button>
+							<button class="btn btn-edit-card" data-id="${o.id}" style="background:#3bb4ff;color:#05121a">✏️ Editar</button>
 							<button class="btn btn-pdf-card" data-id="${o.id}" style="background:#071a2a;color:#7af0a5">📄 PDF</button>
-							<button class="btn btn-whatsapp-card" data-id="${o.id}" style="background:#25D366;color:#1b1b1b">📱 WhatsApp</button>
+							<button class="btn btn-qr-card" data-id="${o.id}" style="background:#fff;color:#000">🏁 QR</button>
+							<button class="btn btn-whatsapp-card" data-id="${o.id}" style="background:#25D366;color:#06121a">📱 WhatsApp</button>
 							<button class="btn btn-copy-link-card" data-id="${o.id}" style="background:#9c27b0;color:#fff">🔗 Link</button>
-							${o.serial ? `<button class="btn btn-print-qr-card" data-serial="${escapeHtml(o.serial)}" data-brand="${escapeHtml(o.brand || '')}" data-model="${escapeHtml(o.model || '')}" style="background:#e040fb;color:#fff">📱 QR Equipo</button>` : ''}
 							<button class="btn btn-delete-card" data-id="${o.id}" style="background:#ff5b6b;color:#fff">🗑️ Eliminar</button>
 						</div>
 					`;
@@ -3694,9 +811,9 @@
 				});
 				$$('.btn-toggle-payment-card').forEach(b => b.onclick = async () => await toggleOrderPayment(b.dataset.id));
 				$$('.btn-pdf-card').forEach(b => b.onclick = () => exportOrderPDF(b.dataset.id));
+				$$('.btn-qr-card').forEach(b => b.onclick = () => printOrderQR(b.dataset.id));
 				$$('.btn-whatsapp-card').forEach(b => b.onclick = () => openWhatsApp(b.dataset.id));
 				$$('.btn-copy-link-card').forEach(b => b.onclick = async () => await copyPublicLink(b.dataset.id));
-				$$('.btn-print-qr-card').forEach(b => b.onclick = () => printEquipmentQR(b.dataset.serial, b.dataset.brand, b.dataset.model));
 			}
 
 			$('#orders-count').textContent = `Mostrando ${filtered.length} registros`;
@@ -3726,7 +843,9 @@
 			}
 
 			const client = (await loadClients()).find(c => c.id == order.clientId) || { name: '--', phone: '', email: '' };
-			const publicLink = getPublicOrderLink(order);
+			// function getPublicOrderLink(order) { ... } // se asume existente o se define aquí si no
+			// Para asegurar que apunte a orden.html:
+			const publicLink = `${window.location.protocol}//${window.location.host}/orden.html?id=${order.id}`;
 
 			const { jsPDF } = window.jspdf;
 			const doc = new jsPDF({ unit: 'pt', format: 'letter' });
@@ -3747,8 +866,8 @@
 				// Fallback al logo tipográfico si no se puede cargar la imagen
 				doc.setFontSize(20);
 				doc.setFont(undefined, 'bold');
-				const titleWidth = doc.getTextWidth('CODEXIS');
-				doc.text('CODEXIS', centerX - titleWidth / 2, y);
+				const titleWidth = doc.getTextWidth('Codexis COMPUTADORES');
+				doc.text('Codexis COMPUTADORES', centerX - titleWidth / 2, y);
 				y += 30;
 			}
 
@@ -3782,6 +901,7 @@
 			doc.setFont(undefined, 'normal');
 
 			const orderInfo = [
+				`ID: ${order.id}`,
 				`Fecha: ${order.date ? new Date(order.date).toLocaleString() : ''}`,
 				`Estado: ${ORDER_STATUSES[order.status || 'ingresado'] || order.status}`,
 				`Pago: ${order.paid ? 'Pagado' : 'No pagado'}`,
@@ -3931,32 +1051,74 @@
 			y = pageHeight - margin;
 			doc.setFontSize(8);
 			doc.setFont(undefined, 'italic');
-			const footerText = 'Codexis - Servicio Técnico Especializado';
+			const footerText = 'Mipc Computadores - Servicio Técnico Especializado';
 			const footerWidth = doc.getTextWidth(footerText);
 			doc.text(footerText, centerX - footerWidth / 2, y);
 
 			// Abrir PDF en nueva pestaña para previsualización
 			const pdfBlob = doc.output('bloburl');
-			window.open(pdfBlob, '_blank'); function wrapText(text, maxChars) {
-				if (!text) return '';
-				if (text.length <= maxChars) return text;
-				const words = text.split(' ');
-				const lines = [];
-				let currentLine = '';
-
-				words.forEach(word => {
-					if ((currentLine + word).length <= maxChars) {
-						currentLine += (currentLine ? ' ' : '') + word;
-					} else {
-						if (currentLine) lines.push(currentLine);
-						currentLine = word;
-					}
-				});
-
-				if (currentLine) lines.push(currentLine);
-				return lines;
-			}
+			window.open(pdfBlob, '_blank');
 		}
+
+		// NUEVO: Función para imprimir solo el QR
+		async function printOrderQR(id) {
+			const orders = await loadOrders();
+			const order = orders.find(o => o.id == id);
+			if (!order) return alert('Orden no encontrada');
+
+			const publicLink = `${window.location.protocol}//${window.location.host}/orden.html?id=${order.id}`;
+			const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(publicLink)}`;
+			const client = (await loadClients()).find(c => c.id == order.clientId) || { name: 'Cliente' };
+
+			const printWindow = window.open('', '_blank', 'width=400,height=600');
+			printWindow.document.write(`
+				<html>
+				<head>
+					<title>QR Orden #${order.id}</title>
+					<style>
+						body { font-family: sans-serif; text-align: center; padding: 20px; }
+						.qr-container { margin: 20px auto; }
+						img { max-width: 100%; height: auto; }
+						.btn { background: #333; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; margin-top: 20px;}
+						@media print { .btn { display: none; } }
+					</style>
+				</head>
+				<body>
+					<h2>Codexis Computadores</h2>
+					<h3>Orden #${order.id}</h3>
+					<p><strong>${client.name}</strong></p>
+					<div class="qr-container">
+						<img src="${qrUrl}" onload="window.print()" alt="QR Code">
+					</div>
+					<p style="font-size: 12px; color: #555;">Escanea para ver el estado</p>
+					<div style="font-size: 10px; color: #999;">${publicLink}</div>
+					<button class="btn" onclick="window.print()">Imprimir</button>
+				</body>
+				</html>
+			`);
+			printWindow.document.close();
+		}
+
+		function wrapText(text, maxChars) {
+			if (!text) return '';
+			if (text.length <= maxChars) return text;
+			const words = text.split(' ');
+			const lines = [];
+			let currentLine = '';
+
+			words.forEach(word => {
+				if ((currentLine + word).length <= maxChars) {
+					currentLine += (currentLine ? ' ' : '') + word;
+				} else {
+					if (currentLine) lines.push(currentLine);
+					currentLine = word;
+				}
+			});
+
+			if (currentLine) lines.push(currentLine);
+			return lines;
+		}
+
 
 		// Función helper para cargar imagen desde URL
 		function loadImageFromUrl(url) {
@@ -4234,7 +1396,7 @@
 			items.forEach(c => {
 				const tr = document.createElement('tr');
 				tr.innerHTML = `
-					<td class="col-id">${c.id}</td>
+					<td>${c.id}</td>
 					<td>${escapeHtml(c.name)}</td>
 					<td>${escapeHtml(c.cedula || '')}</td>
 					<td>${escapeHtml(c.phone || '')}</td>
@@ -4259,7 +1421,7 @@
 					card.innerHTML = `
 						<div class="data-card-header">
 							<h4>👤 ${escapeHtml(c.name)}</h4>
-							<span class="badge" style="background:#3bb4ff;display:none">ID: ${c.id}</span>
+							<span class="badge" style="background:#3bb4ff">ID: ${c.id}</span>
 						</div>
 						<div class="data-card-body">
 							${c.cedula ? `<div class="data-card-row"><span class="label">🪪 Cédula:</span><span class="value">${escapeHtml(c.cedula)}</span></div>` : ''}
@@ -4469,7 +1631,7 @@
 				const a = document.createElement('a');
 				const date = new Date().toISOString().slice(0, 10);
 				a.href = url;
-				a.download = `CODEXIS_Backup_${date}.json`;
+				a.download = `Codexis_Backup_${date}.json`;
 				a.click();
 				URL.revokeObjectURL(url);
 
@@ -4491,8 +1653,8 @@
 					const data = JSON.parse(ev.target.result);
 
 					// Verificar que es un backup válido
-					if (!data._mipcBackup || !data.tables) {
-						alert('Este archivo no es una copia de seguridad válida de MIPC.');
+					if (!data._codexisBackup || !data.tables) {
+						alert('Este archivo no es una copia de seguridad válida de Codexis.');
 						return;
 					}
 
@@ -4554,12 +1716,12 @@
 			const pageWidth = doc.internal.pageSize.width;
 
 			doc.setFontSize(14);
-			doc.text('Órdenes - Codexis', margin, y);
+			doc.text('Órdenes - Mipc Computadores', margin, y);
 			y += 20;
 			doc.setFontSize(10);
 
-			const cols = ['Cliente', 'Marca', 'Modelo', 'Serie', 'Estado', 'Pago', 'Técnico', 'Fecha'];
-			const colWidths = [140, 60, 60, 80, 70, 50, 80, 80];
+			const cols = ['ID', 'Cliente', 'Marca', 'Modelo', 'Serie', 'Estado', 'Pago', 'Técnico', 'Fecha'];
+			const colWidths = [40, 100, 60, 60, 80, 70, 50, 80, 80];
 			const startX = margin;
 
 			function printRow(values) {
@@ -4581,6 +1743,7 @@
 				const statusLabel = ORDER_STATUSES[o.status || 'ingresado'] || (o.status || '');
 				const paymentLabel = o.paid ? 'Sí' : 'No';
 				const row = [
+					o.id,
 					client.name,
 					o.brand || '',
 					o.model || '',
@@ -4734,12 +1897,12 @@
 			// Información de la empresa (izquierda)
 			doc.setFontSize(10);
 			doc.setFont(undefined, 'bold');
-			doc.text('CODEXIS', margin, y);
+			doc.text('Codexis COMPUTADORES', margin, y);
 			y += 15;
 			doc.setFont(undefined, 'normal');
 			doc.text('Cel: 3174190562', margin, y);
 			y += 12;
-			doc.text('Email: soporte@codexis.com', margin, y);
+			doc.text('Email: codexisbarbosa@hotmail.com', margin, y);
 
 			// Información del cliente (derecha)
 			y = 110;
@@ -4825,7 +1988,7 @@
 			y = 750;
 			doc.setFontSize(8);
 			doc.setFont(undefined, 'italic');
-			const footerText = 'Gracias por su compra - Codexis';
+			const footerText = 'Gracias por su compra - Mipc Computadores';
 			const footerWidth = doc.getTextWidth(footerText);
 			doc.text(footerText, centerX - footerWidth / 2, y);
 
@@ -4841,27 +2004,12 @@
 			const container = $('#equipment-history');
 			container.innerHTML = '<div class="small" style="padding:10px">Cargando historial...</div>';
 
-			// Mostrar QR del equipo
-			const qrArea = $('#equipment-qr-area');
-			const qrImg = $('#equipment-qr-img');
-			const eqLink = getEquipmentLink(serial);
-			qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(eqLink)}`;
-			qrArea.style.display = 'block';
-
-			// Guardar serial actual para botones
-			const btnPrintQR = document.getElementById('btn-eq-print-qr');
-			const btnCopyLink = document.getElementById('btn-eq-copy-link');
-
 			const list = await loadEquipments();
-			const clients = await loadClients();
+			const clients = await loadClients(); // Cargar clientes una sola vez
+
 			const eq = list.find(e => e.serial && e.serial.toLowerCase() === serial.toLowerCase());
-			const brand = eq?.brand || '';
-			const model = eq?.model || '';
 
-			btnPrintQR.onclick = () => printEquipmentQR(serial, brand, model);
-			btnCopyLink.onclick = () => copyEquipmentLink(serial);
-
-			container.innerHTML = '';
+			container.innerHTML = ''; // Limpiar mensaje de carga
 
 			if (!eq) {
 				container.innerHTML = '<div class="history-item" style="padding:10px">No hay historial para este número de serie.</div>';
@@ -4873,20 +2021,10 @@
 				} else {
 					eq.history.forEach(h => {
 						const client = clients.find(c => c.id === h.clientId) || { name: '--' };
-						const statusKey = h.status || 'ingresado';
-						const statusLabel = ORDER_STATUSES[statusKey] || statusKey;
 						const div = document.createElement('div');
 						div.className = 'history-item';
-						div.style.cssText = 'padding:12px;margin-bottom:8px;background:#f9f9f9;border-radius:0;border-left:3px solid var(--accent)';
-						div.innerHTML = `
-							<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-								<strong style="color:var(--accent);font-size:13px">${new Date(h.date).toLocaleString()}</strong>
-								<span class="status-badge status-${statusKey}" style="font-size:11px;padding:3px 8px">${statusLabel}</span>
-							</div>
-							<div style="font-size:13px;margin-bottom:4px">⚠️ ${escapeHtml(h.failure || 'Sin falla reportada')}</div>
-							<div class="small" style="font-size:12px">👤 ${escapeHtml(client.name)} · 🔧 ${escapeHtml(h.technician || 'Sin técnico')}</div>
-							${h.notes ? `<div class="small" style="font-size:12px;margin-top:4px;color:#7af0a5">📝 ${escapeHtml(h.notes)}</div>` : ''}
-						`;
+						div.style.cssText = 'padding:10px;margin-bottom:8px;background:#051820;border-radius:4px;border-left:3px solid var(--accent)';
+						div.innerHTML = `<strong>${new Date(h.date).toLocaleString()}</strong> — ${escapeHtml(h.status || '')} — ${escapeHtml(h.failure || '')}<br><span class="small">Cliente: ${escapeHtml(client.name)} — Técnico: ${escapeHtml(h.technician || '')}</span>`;
 						container.appendChild(div);
 					});
 				}
@@ -4925,7 +2063,7 @@
 					msg = `Hola ${name}, tu equipo (${brand} ${model}, S/N: ${serial}) ya está listo y en espera de entrega en nuestro taller. Por favor pasa a recogerlo. Si necesitas coordinar la entrega, responde este mensaje.\n\nVer detalles: ${publicLink}`;
 					break;
 				case 'entregado':
-					msg = `Hola ${name}, confirmamos que tu equipo (${brand} ${model}, S/N: ${serial}) ha sido entregado. Muchas gracias por confiar en Codexis. Si tienes alguna inquietud, contáctanos.\n\nVer detalles: ${publicLink}`;
+					msg = `Hola ${name}, confirmamos que tu equipo (${brand} ${model}, S/N: ${serial}) ha sido entregado. Muchas gracias por confiar en Mipc Computadores. Si tienes alguna inquietud, contáctanos.\n\nVer detalles: ${publicLink}`;
 					break;
 				case 'ingresado':
 				default:
@@ -4933,7 +2071,7 @@
 					break;
 			}
 
-msg = `${msg}\n\n— Codexis`;
+			msg = `${msg}\n\n— Mipc Computadores`;
 
 			return `https://api.whatsapp.com/send?phone=${normalized}&text=${encodeURIComponent(msg)}&type=phone_number&app_absent=0`;
 		}
@@ -4967,7 +2105,7 @@ msg = `${msg}\n\n— Codexis`;
 				else totalExpense += Number(t.amount || 0);
 				const tr = document.createElement('tr');
 				tr.innerHTML = `
-					<td class="col-id">${t.id}</td>
+					<td>${t.id}</td>
 					<td>${t.type === 'income' ? 'Ingreso' : 'Gasto'}</td>
 					<td>${formatCurrency(Number(t.amount || 0))}</td>
 					<td>${escapeHtml(t.category || '')}</td>
@@ -4995,7 +2133,7 @@ msg = `${msg}\n\n— Codexis`;
 					card.innerHTML = `
 						<div class="data-card-header">
 							<h4>${typeIcon} ${formatCurrency(Number(t.amount || 0))}</h4>
-							<span class="badge" style="background:${typeColor};color:#1b1b1b">${typeText}</span>
+							<span class="badge" style="background:${typeColor};color:#04121a">${typeText}</span>
 						</div>
 						<div class="data-card-body">
 							<div class="data-card-row"><span class="label">🏷️ Categoría:</span><span class="value">${escapeHtml(t.category || '')}</span></div>
@@ -5069,7 +2207,7 @@ msg = `${msg}\n\n— Codexis`;
 				totalValue += stock * unitCost;
 				const tr = document.createElement('tr');
 				tr.innerHTML = `
-					<td class="col-id">${item.id}</td>
+					<td>${item.id}</td>
 					<td>${escapeHtml(item.name || '')}</td>
 					<td><span class="badge-cat">${escapeHtml(item.category || '')}</span></td>
 					<td>${stock}</td>
@@ -5078,11 +2216,11 @@ msg = `${msg}\n\n— Codexis`;
 					<td>${escapeHtml(item.supplier || '')}</td>
 					<td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : ''}</td>
 					<td class="actions">
-						<button class="btn" data-id="${item.id}" data-act="in" title="Entrada" style="background:#7af0a5;color:#1b1b1b">Entrada</button>
-						<button class="btn" data-id="${item.id}" data-act="out" title="Salida" style="background:#ffcc33;color:#1b1b1b">Salida</button>
+						<button class="btn" data-id="${item.id}" data-act="in" title="Entrada" style="background:#7af0a5;color:#04121a">Entrada</button>
+						<button class="btn" data-id="${item.id}" data-act="out" title="Salida" style="background:#ffcc33;color:#04121a">Salida</button>
 						<button class="btn btn-edit" data-id="${item.id}" data-act="edit">Editar</button>
 						<button class="btn btn-delete" data-id="${item.id}" data-act="del">Eliminar</button>
-						<button class="btn" data-id="${item.id}" data-act="hist" style="background:#3bb4ff;color:#1b1b1b">Historial</button>
+						<button class="btn" data-id="${item.id}" data-act="hist" style="background:#3bb4ff;color:#04121a">Historial</button>
 					</td>
 				`;
 				tbody.appendChild(tr);
@@ -5123,11 +2261,11 @@ msg = `${msg}\n\n— Codexis`;
 							${item.updatedAt ? `<div class="data-card-row"><span class="label">🕐 Actualizado:</span><span class="value">${new Date(item.updatedAt).toLocaleString()}</span></div>` : ''}
 						</div>
 						<div class="data-card-actions">
-							<button class="btn card-btn-in" data-id="${item.id}" style="background:#7af0a5;color:#1b1b1b">⬆️ Entrada</button>
-							<button class="btn card-btn-out" data-id="${item.id}" style="background:#ffcc33;color:#1b1b1b">⬇️ Salida</button>
+							<button class="btn card-btn-in" data-id="${item.id}" style="background:#7af0a5;color:#04121a">⬆️ Entrada</button>
+							<button class="btn card-btn-out" data-id="${item.id}" style="background:#ffcc33;color:#04121a">⬇️ Salida</button>
 							<button class="btn btn-edit card-btn-edit" data-id="${item.id}">✏️ Editar</button>
 							<button class="btn btn-delete card-btn-del" data-id="${item.id}">🗑️ Eliminar</button>
-							<button class="btn card-btn-hist" data-id="${item.id}" style="background:#3bb4ff;color:#1b1b1b">📜 Historial</button>
+							<button class="btn card-btn-hist" data-id="${item.id}" style="background:#3bb4ff;color:#04121a">📜 Historial</button>
 						</div>
 					`;
 					cardsContainer.appendChild(card);
@@ -5385,7 +2523,7 @@ msg = `${msg}\n\n— Codexis`;
 					amount: Number(order.price),
 					category: 'Servicios',
 					date: new Date().toISOString().slice(0, 10),
-					notes: `Pago orden — ${client.name}`,
+					notes: `Pago orden ${order.id} — ${client.name}`,
 					orderId: order.id
 				};
 
@@ -5431,72 +2569,6 @@ msg = `${msg}\n\n— Codexis`;
 			}
 			const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
 			return `${baseUrl}orden.html?token=${order.accessToken}`;
-		}
-
-		// === FUNCIONES QR DE EQUIPO ===
-
-		// Obtener enlace público del historial del equipo
-		function getEquipmentLink(serial) {
-			const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-			return `${baseUrl}equipo.html?serial=${encodeURIComponent(serial)}`;
-		}
-
-		// Imprimir QR del equipo como sticker compacto con logo
-		async function printEquipmentQR(serial, brand, model) {
-			if (!serial) return alert('No hay número de serie para este equipo');
-
-			const link = getEquipmentLink(serial);
-			const qrSize = 120;
-			const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(link)}`;
-			const logoUrl = window.location.origin + window.location.pathname.replace('index.html', '') + 'icon-192.png';
-
-			const printWindow = window.open('', '_blank', 'width=816,height=1056');
-			const doc = printWindow.document;
-			doc.open();
-			doc.write('<!DOCTYPE html><html><head>');
-			doc.write('<title>QR - ' + serial + '<' + '/title>');
-			doc.write('<style>');
-			doc.write('@page { size: letter; margin: 0; }');
-			doc.write('body { margin: 0; padding: 5mm; font-family: Arial, Helvetica, sans-serif; }');
-			doc.write('.sticker { width: 60mm; height: 30mm; border: 1px dashed #999; border-radius: 6px; display: inline-flex; align-items: center; padding: 4px 8px; gap: 8px; box-sizing: border-box; margin: 2mm; vertical-align: top; overflow: hidden; }');
-			doc.write('.sticker-qr img { width: ' + qrSize + 'px; height: ' + qrSize + 'px; display: block; }');
-			doc.write('.sticker-info { flex: 1; min-width: 0; text-align: center; }');
-			doc.write('.sticker-logo { width: 28px; height: 28px; margin: 0 auto 3px; display: block; }');
-			doc.write('.sticker-brand { font-weight: 700; font-size: 9px; margin-bottom: 2px; }');
-			doc.write('.sticker-model { font-size: 8px; color: #555; margin-bottom: 2px; }');
-			doc.write('.sticker-serial { font-size: 7px; color: #333; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }');
-			doc.write('.sticker-footer { font-size: 6px; color: #888; margin-top: 2px; }');
-			doc.write('<' + '/style><' + '/head><body>');
-			doc.write('<div class="sticker">');
-			doc.write('<div class="sticker-qr"><img src="' + qrUrl + '" alt="QR" onload="setTimeout(function(){window.print()},500)"><' + '/div>');
-			doc.write('<div class="sticker-info">');
-			doc.write('<img class="sticker-logo" src="' + logoUrl + '" alt="Logo">');
-			doc.write('<div class="sticker-brand">Codexis<' + '/div>');
-			doc.write('<div class="sticker-model">' + (brand || '') + ' ' + (model || '') + '<' + '/div>');
-			doc.write('<div class="sticker-serial">S/N: ' + serial + '<' + '/div>');
-			doc.write('<div class="sticker-footer">Escanea el QR<' + '/div>');
-			doc.write('<' + '/div><' + '/div>');
-			doc.write('<' + '/body><' + '/html>');
-			doc.close();
-		}
-
-		// Copiar enlace del equipo al portapapeles
-		async function copyEquipmentLink(serial) {
-			if (!serial) return alert('No hay número de serie');
-			const link = getEquipmentLink(serial);
-			try {
-				await navigator.clipboard.writeText(link);
-				alert('Enlace del equipo copiado:\n' + link);
-			} catch (err) {
-				const ta = document.createElement('textarea');
-				ta.value = link;
-				ta.style.cssText = 'position:fixed;opacity:0';
-				document.body.appendChild(ta);
-				ta.select();
-				document.execCommand('copy');
-				document.body.removeChild(ta);
-				alert('Enlace del equipo copiado:\n' + link);
-			}
 		}
 
 		// nueva función: copiar enlace público al portapapeles
@@ -5600,7 +2672,7 @@ msg = `${msg}\n\n— Codexis`;
 					<td><strong>${formatCurrency(total)}</strong></td>
 					<td>${statusBadge}</td>
 					<td class="actions">
-						<button class="btn" data-id="${inv.id}" data-act="pdf" style="background:#7af0a5;color:#1b1b1b">PDF</button>
+						<button class="btn" data-id="${inv.id}" data-act="pdf" style="background:#7af0a5;color:#04121a">PDF</button>
 						<button class="btn btn-edit" data-id="${inv.id}" data-act="edit">Editar</button>
 						<button class="btn btn-delete" data-id="${inv.id}" data-act="del">Eliminar</button>
 					</td>
@@ -5647,7 +2719,7 @@ msg = `${msg}\n\n— Codexis`;
 					card.innerHTML = `
 						<div class="data-card-header">
 							<h4>🧾 ${escapeHtml(inv.invoiceNumber || '')}</h4>
-							<span class="badge" style="background:${statusColor};color:#1b1b1b">${statusIcon} ${statusBadge}</span>
+							<span class="badge" style="background:${statusColor};color:#04121a">${statusIcon} ${statusBadge}</span>
 						</div>
 						<div class="data-card-body">
 							<div class="data-card-row"><span class="label">👤 Cliente:</span><span class="value">${escapeHtml(client.name)}</span></div>
@@ -5657,7 +2729,7 @@ msg = `${msg}\n\n— Codexis`;
 							<div class="data-card-row"><span class="label">💰 Total:</span><span class="value" style="font-weight:bold;font-size:1.1em;color:#7af0a5">${formatCurrency(total)}</span></div>
 						</div>
 						<div class="data-card-actions">
-							<button class="btn card-btn-pdf" data-id="${inv.id}" style="background:#7af0a5;color:#1b1b1b">📄 PDF</button>
+							<button class="btn card-btn-pdf" data-id="${inv.id}" style="background:#7af0a5;color:#04121a">📄 PDF</button>
 							<button class="btn btn-edit card-btn-edit" data-id="${inv.id}">✏️ Editar</button>
 							<button class="btn btn-delete card-btn-del" data-id="${inv.id}">🗑️ Eliminar</button>
 						</div>
@@ -5942,12 +3014,12 @@ msg = `${msg}\n\n— Codexis`;
 			// Información de la empresa (izquierda)
 			doc.setFontSize(10);
 			doc.setFont(undefined, 'bold');
-			doc.text('CODEXIS', margin, y);
+			doc.text('Codexis COMPUTADORES', margin, y);
 			y += 15;
 			doc.setFont(undefined, 'normal');
 			doc.text('Cel: 3174190562', margin, y);
 			y += 12;
-			doc.text('Email: soporte@codexis.com', margin, y);
+			doc.text('Email: codexisbarbosa@hotmail.com', margin, y);
 
 			// Información del cliente (derecha)
 			y = 110;
@@ -6033,7 +3105,7 @@ msg = `${msg}\n\n— Codexis`;
 			y = 750;
 			doc.setFontSize(8);
 			doc.setFont(undefined, 'italic');
-			const footerText = 'Gracias por su compra - Codexis';
+			const footerText = 'Gracias por su compra - Mipc Computadores';
 			const footerWidth = doc.getTextWidth(footerText);
 			doc.text(footerText, centerX - footerWidth / 2, y);
 
@@ -6501,7 +3573,7 @@ msg = `${msg}\n\n— Codexis`;
 						label: 'Órdenes',
 						data: data,
 						backgroundColor: ['#a78bfa', '#818cf8', '#6366f1', '#4f46e5', '#4338ca'],
-						borderColor: '#1b1b1b',
+						borderColor: '#0f172a',
 						borderWidth: 2
 					}]
 				},
@@ -6917,7 +3989,7 @@ msg = `${msg}\n\n— Codexis`;
 			`}).join('');
 
 			return `
-				<div class="card" style="background:#ffffff;border:1px solid rgba(200,200,200,0.3);padding:15px;margin-top:10px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+				<div class="card" style="background:#0f172a;border:1px solid #3bb4ff;padding:15px;margin-top:10px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.3)">
 					<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid #334155;padding-bottom:8px">
 						<h4 style="margin:0;color:#3bb4ff">📋 Cotización</h4>
 						<span style="font-size:12px;color:var(--muted)">${dateStr}</span>
@@ -6939,7 +4011,7 @@ msg = `${msg}\n\n— Codexis`;
 
 					${notes ? `<div style="margin-top:10px;font-size:11px;color:var(--muted);font-style:italic">${escapeHtml(notes)}</div>` : ''}
 
-					<button id="btn-${id}" class="btn" style="width:100%;margin-top:15px;background:#3bb4ff;color:#1b1b1b;font-weight:600">
+					<button id="btn-${id}" class="btn" style="width:100%;margin-top:15px;background:#3bb4ff;color:#0f172a;font-weight:600">
 						<span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:6px">picture_as_pdf</span>
 						Descargar PDF
 					</button>
@@ -6979,12 +4051,12 @@ msg = `${msg}\n\n— Codexis`;
 			y += 70;
 			doc.setFontSize(10);
 			doc.setFont(undefined, 'bold');
-			doc.text('CODEXIS', margin, y);
+			doc.text('Codexis COMPUTADORES', margin, y);
 			y += 15;
 			doc.setFont(undefined, 'normal');
 			doc.text('Cel: 3174190562', margin, y);
 			y += 12;
-			doc.text('Email: soporte@codexis.com', margin, y);
+			doc.text('Email: codexisbarbosa@hotmail.com', margin, y);
 
 			// 3. Info Cliente (Derecha, alineado con empresa)
 			y = 110;
@@ -7061,7 +4133,7 @@ msg = `${msg}\n\n— Codexis`;
 			// Footer
 			y = 750;
 			doc.setFontSize(8);
-doc.text('Cotización válida por 15 días - Codexis', margin, y);
+			doc.text('Cotización válida por 15 días - Mipc Computadores', margin, y);
 
 			doc.save(`Cotizacion_${clientName}_${Date.now()}.pdf`);
 		}
@@ -7132,291 +4204,3 @@ doc.text('Cotización válida por 15 días - Codexis', margin, y);
 				});
 			}
 		});
-		// ============ CATALOGO (catalog_items) ============
-		let catalogItems = [];
-		let currentEditingCatalogItem = null;
-
-		function switchInventorySubtab(tab) {
-			var invTab = document.getElementById('inv-subtab-content');
-			var catTab = document.getElementById('cat-subtab-content');
-			var btnInv = document.getElementById('subtab-inventory');
-			var btnCat = document.getElementById('subtab-catalog');
-			if (!invTab || !catTab) return;
-			if (tab === 'cat') {
-				invTab.style.display = 'none';
-				catTab.style.display = 'block';
-				if (btnInv) btnInv.style.background = '#64707a';
-				if (btnCat) { btnCat.style.background = '#7af0a5'; btnCat.style.color = '#1b1b1b'; }
-				renderCatalogItems();
-			} else {
-				invTab.style.display = 'block';
-				catTab.style.display = 'none';
-				if (btnInv) { btnInv.style.background = '#7af0a5'; btnInv.style.color = '#1b1b1b'; }
-				if (btnCat) btnCat.style.background = '#64707a';
-			}
-		}
-
-		async function loadCatalogItems() {
-			try {
-				var res = await fetch(API_URL + '/catalog_items', { cache: 'no-store' });
-				if (!res.ok) throw new Error('HTTP ' + res.status);
-				var raw = await res.json();
-				return Array.isArray(raw) ? raw : (raw.data || []);
-			} catch (err) { console.error('Error cargando catalogo:', err); return []; }
-		}
-
-		async function saveCatalogItems(list) {
-			await fetch(API_URL + '/catalog_items', {
-				method: 'POST', headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(list)
-			});
-		}
-
-		function populateCatalogCategories() {
-			var dl = document.getElementById('cat-categories-list');
-			var catFilter = document.getElementById('cat-category-filter');
-			if (!dl) return;
-			var cats = [];
-			var seen = {};
-			catalogItems.forEach(function (p) { if (p.category && !seen[p.category]) { seen[p.category] = true; cats.push(p.category); } });
-			dl.innerHTML = cats.map(function (c) { return '<option value="' + escapeHtml(c) + '">'; }).join('');
-			if (catFilter) {
-				var currentVal = catFilter.value;
-				catFilter.innerHTML = '<option value="all">Todas las categorías</option>' +
-					cats.map(function (c) { return '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>'; }).join('');
-				catFilter.value = currentVal;
-			}
-		}
-
-		function getMainImage(p) {
-			if (p.images && p.images.length > 0) {
-				var first = p.images[0];
-				return typeof first === 'string' ? first : (first.data || '');
-			}
-			if (p.image) return p.image;
-			return '';
-		}
-
-		async function renderCatalogItems() {
-			catalogItems = await loadCatalogItems();
-			populateCatalogCategories();
-			var tbody = document.getElementById('catalog-table-body');
-			var cardsContainer = document.getElementById('catalog-cards-container');
-			var summary = document.getElementById('catalog-summary');
-			var filterEl = document.getElementById('cat-filter');
-			var filter = filterEl ? filterEl.value.toLowerCase().trim() : '';
-			var catFilterEl = document.getElementById('cat-category-filter');
-			var catFilterVal = catFilterEl ? catFilterEl.value : 'all';
-			var availFilterEl = document.getElementById('cat-availability-filter');
-			var availFilter = availFilterEl ? availFilterEl.value : 'all';
-			if (!tbody) return;
-
-			var filtered = catalogItems.slice();
-			if (filter) filtered = filtered.filter(function (p) { return [p.name, p.category, p.description].filter(Boolean).join(' ').toLowerCase().indexOf(filter) >= 0; });
-			if (catFilterVal !== 'all') filtered = filtered.filter(function (p) { return p.category === catFilterVal; });
-			if (availFilter === 'visible') filtered = filtered.filter(function (p) { return p.available !== false; });
-			if (availFilter === 'hidden') filtered = filtered.filter(function (p) { return p.available === false; });
-
-			if (summary) summary.textContent = filtered.length + ' de ' + catalogItems.length + ' productos';
-
-			if (filtered.length === 0) {
-				tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><p style="font-size:48px;margin-bottom:12px">🛍️</p><p>No hay productos en el catálogo</p><p style="font-size:12px;margin-top:8px">Agrega tu primer producto con el botón "Nuevo Producto"</p></td></tr>';
-			} else {
-				tbody.innerHTML = filtered.map(function (p) {
-					var mainImg = getMainImage(p);
-					var avail = p.available !== false;
-					return '<tr>' +
-						'<td><div style="width:50px;height:50px;border-radius:6px;overflow:hidden;background:#1e293b">' + (mainImg ? '<img src="' + escapeHtml(mainImg) + '" style="width:100%;height:100%;object-fit:cover">' : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:20px">📦</div>') + '</div></td>' +
-						'<td style="font-weight:600">' + escapeHtml(p.name || '') + '</td>' +
-						'<td style="color:var(--muted);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(p.description || '--') + '</td>' +
-						'<td><span style="background:rgba(122,240,165,.15);color:#7af0a5;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600">' + escapeHtml(p.category || '--') + '</span></td>' +
-						'<td style="font-weight:700;color:#7af0a5">' + formatCurrency(p.price || 0) + '</td>' +
-						'<td>' + (avail ? '<span style="color:#7af0a5">✅</span>' : '<span style="color:#ff5b6b">❌</span>') + '</td>' +
-						'<td class="actions"><button class="btn btn-edit" onclick="openCatalogModal(\'' + p.id + '\')">✏️</button><button class="btn btn-delete" onclick="deleteCatalogItem(\'' + p.id + '\')">🗑️</button></td>' +
-						'</tr>';
-				}).join('');
-			}
-
-			// Render cards (mobile)
-			if (cardsContainer) {
-				if (filtered.length === 0) {
-					cardsContainer.innerHTML = '';
-				} else {
-					cardsContainer.innerHTML = filtered.map(function (p) {
-						var mainImg = getMainImage(p);
-						var avail = p.available !== false;
-						return '<div class="card" style="overflow:hidden">' +
-							'<div style="height:140px;background:#1e293b;overflow:hidden;position:relative">' +
-							(mainImg ? '<img src="' + escapeHtml(mainImg) + '" style="width:100%;height:100%;object-fit:cover">' : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:48px">📦</div>') +
-							(p.featured ? '<span style="position:absolute;top:6px;right:6px;background:var(--accent);color:#1b1b1b;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px">⭐ DEST.</span>' : '') +
-							(!avail ? '<span style="position:absolute;top:6px;left:6px;background:#ff5b6b;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px">OCULTO</span>' : '') +
-							'</div>' +
-							'<div style="padding:12px">' +
-							'<h4 style="font-weight:700;font-size:14px;margin:0 0 4px 0;color:#e2e8f0">' + escapeHtml(p.name) + '</h4>' +
-							(p.category ? '<span style="display:inline-block;background:rgba(122,240,165,.15);color:#7af0a5;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;margin-bottom:6px">' + escapeHtml(p.category) + '</span>' : '') +
-							(p.description ? '<p style="font-size:11px;color:var(--muted);margin:4px 0;line-height:1.4;max-height:36px;overflow:hidden">' + escapeHtml(p.description) + '</p>' : '') +
-							'<div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.04);padding-top:8px;margin-top:6px">' +
-							'<span style="font-size:16px;font-weight:800;color:#7af0a5">' + formatCurrency(p.price || 0) + '</span>' +
-							'<div style="display:flex;gap:4px">' +
-							'<button class="btn btn-edit" onclick="openCatalogModal(\'' + p.id + '\')" style="padding:4px 8px;font-size:11px">✏️</button>' +
-							'<button class="btn btn-delete" onclick="deleteCatalogItem(\'' + p.id + '\')" style="padding:4px 8px;font-size:11px">🗑️</button>' +
-							'</div>' +
-							'</div>' +
-							'</div>' +
-							'</div>';
-					}).join('');
-				}
-			}
-		}
-
-		// ---- Image upload ----
-		function handleCatalogImageUpload(input) {
-			var files = Array.from(input.files);
-			var currentImages = JSON.parse(document.getElementById('cat-item-images').value || '[]');
-			var remaining = 10 - currentImages.length;
-			var toProcess = files.slice(0, remaining);
-			toProcess.forEach(function (file) {
-				if (!file.type.startsWith('image/')) return;
-				var reader = new FileReader();
-				reader.onload = function (ev) {
-					var imgs = JSON.parse(document.getElementById('cat-item-images').value || '[]');
-					imgs.push(ev.target.result);
-					document.getElementById('cat-item-images').value = JSON.stringify(imgs);
-					showCatalogImagesPreview(imgs);
-				};
-				reader.readAsDataURL(file);
-			});
-		}
-
-		function showCatalogImagesPreview(images) {
-			var container = document.getElementById('cat-images-preview');
-			if (!container) return;
-			if (!images || images.length === 0) { container.innerHTML = ''; return; }
-			container.innerHTML = images.map(function (src, i) {
-				return '<div style="position:relative;display:inline-block">' +
-					'<img src="' + escapeHtml(src) + '" style="width:100px;height:100px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.1)">' +
-					'<button onclick="removeCatalogImage(' + i + ')" style="position:absolute;top:2px;right:2px;background:#ff5b6b;color:#fff;border:0;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px">✕</button>' +
-					(i === 0 ? '<div style="position:absolute;bottom:4px;left:4px;background:var(--accent);color:#1b1b1b;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700">PRINCIPAL</div>' : '') +
-					'</div>';
-			}).join('');
-		}
-
-		function removeCatalogImage(idx) {
-			var imgs = JSON.parse(document.getElementById('cat-item-images').value || '[]');
-			imgs.splice(idx, 1);
-			document.getElementById('cat-item-images').value = JSON.stringify(imgs);
-			showCatalogImagesPreview(imgs);
-		}
-
-		function clearCatalogImagesPreview() {
-			document.getElementById('cat-item-images').value = '[]';
-			document.getElementById('cat-image-input').value = '';
-			document.getElementById('cat-images-preview').innerHTML = '';
-		}
-
-		// ---- Open Modal ----
-		function openCatalogModal(editId) {
-			populateCatalogCategories();
-			if (editId) {
-				currentEditingCatalogItem = catalogItems.find(function (p) { return p.id === editId; });
-				if (!currentEditingCatalogItem) return;
-				document.getElementById('modal-catalog-title').innerHTML = '<span class="material-icons-round">edit</span> Editar Producto';
-				document.getElementById('cat-item-name').value = currentEditingCatalogItem.name || '';
-				document.getElementById('cat-item-description').value = currentEditingCatalogItem.description || '';
-				document.getElementById('cat-item-category').value = currentEditingCatalogItem.category || '';
-				document.getElementById('cat-item-price').value = currentEditingCatalogItem.price || '';
-				document.getElementById('cat-item-featured').checked = !!currentEditingCatalogItem.featured;
-				document.getElementById('cat-item-available').checked = currentEditingCatalogItem.available !== false;
-				var imgs = [];
-				if (currentEditingCatalogItem.images && Array.isArray(currentEditingCatalogItem.images)) {
-					imgs = currentEditingCatalogItem.images.map(function (img) { return typeof img === 'string' ? img : (img.data || ''); });
-				} else if (currentEditingCatalogItem.image) {
-					imgs = [currentEditingCatalogItem.image];
-				}
-				document.getElementById('cat-item-images').value = JSON.stringify(imgs);
-				showCatalogImagesPreview(imgs);
-			} else {
-				currentEditingCatalogItem = null;
-				document.getElementById('modal-catalog-title').innerHTML = '<span class="material-icons-round">shopping_bag</span> Nuevo Producto';
-				document.getElementById('cat-item-name').value = '';
-				document.getElementById('cat-item-description').value = '';
-				document.getElementById('cat-item-category').value = '';
-				document.getElementById('cat-item-price').value = '';
-				document.getElementById('cat-item-featured').checked = false;
-				document.getElementById('cat-item-available').checked = true;
-				clearCatalogImagesPreview();
-			}
-			document.getElementById('modal-catalog-item').classList.add('show');
-		}
-
-		// ---- Save ----
-		async function saveCatalogItem() {
-			var name = document.getElementById('cat-item-name').value.trim();
-			var description = document.getElementById('cat-item-description').value.trim();
-			var category = document.getElementById('cat-item-category').value.trim();
-			var price = parseFloat(document.getElementById('cat-item-price').value) || 0;
-			var featured = document.getElementById('cat-item-featured').checked;
-			var available = document.getElementById('cat-item-available').checked;
-			var images = JSON.parse(document.getElementById('cat-item-images').value || '[]');
-
-			if (!name) { alert('Completa al menos el nombre del producto'); return; }
-
-			showLoading('Guardando producto...');
-
-			try {
-				var item;
-				if (currentEditingCatalogItem) {
-					var idx = catalogItems.findIndex(function (p) { return p.id === currentEditingCatalogItem.id; });
-					if (idx === -1) { alert('No se encontró el producto'); return; }
-					item = Object.assign({}, currentEditingCatalogItem, {
-						name: name, description: description, category: category, price: price,
-						featured: featured, available: available,
-						images: images.map(function (d) { return { data: d }; }),
-						image: images.length > 0 ? images[0] : '',
-						updatedAt: new Date().toISOString()
-					});
-					catalogItems[idx] = item;
-				} else {
-					item = {
-						id: 'cat_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
-						name: name, description: description, category: category, price: price,
-						featured: featured, available: available,
-						images: images.map(function (d) { return { data: d }; }),
-						image: images.length > 0 ? images[0] : '',
-						showInCatalog: true,
-						createdAt: new Date().toISOString(),
-						updatedAt: new Date().toISOString()
-					};
-					catalogItems.push(item);
-				}
-
-				await saveCatalogItems(catalogItems);
-				closeModal('#modal-catalog-item');
-				renderCatalogItems();
-			} catch (err) {
-				console.error('Error al guardar:', err);
-				alert('Error al guardar el producto');
-			} finally {
-				hideLoading();
-			}
-		}
-
-		// ---- Delete ----
-		async function deleteCatalogItem(id) {
-			if (!confirm('¿Eliminar este producto del catálogo?')) return;
-			showLoading('Eliminando...');
-			try {
-				catalogItems = catalogItems.filter(function (p) { return p.id !== id; });
-				await saveCatalogItems(catalogItems);
-				renderCatalogItems();
-			} catch (err) {
-				console.error('Error al eliminar:', err);
-				alert('Error al eliminar el producto');
-			} finally {
-				hideLoading();
-			}
-		}
-	</script>
-</body>
-
-</html>
