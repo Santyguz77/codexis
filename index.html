@@ -4349,8 +4349,7 @@
 
 		// eliminar orden (ahora asíncrono)
 		async function deleteOrder(id) {
-			const list = (await loadOrders()).filter(x => x.id != id);
-			await saveOrders(list);
+			await deleteItem('orders', id);
 			await renderOrders();
 			await renderFinance();
 			await computeMetrics();
@@ -4992,8 +4991,7 @@
 		}
 
 		async function deleteClient(id) {
-			const list = (await loadClients()).filter(x => x.id != id);
-			await saveClients(list);
+			await deleteItem('clients', id);
 			await renderClients();
 			// repoblar select de clientes
 			await populateClientSelect();
@@ -5332,8 +5330,7 @@
 				await saveTransactions(transactions);
 			}
 
-			const list = invoices.filter(x => x.id !== id);
-			await saveInvoices(list);
+			await deleteItem('invoices', id);
 			await renderInvoices();
 			await renderInventory();
 			await renderFinance();
@@ -5681,8 +5678,7 @@ msg = `${msg}\n\n— Codexis`;
 		}
 
 		async function deleteTransaction(id) {
-			const list = (await loadTransactions()).filter(x => x.id != id);
-			await saveTransactions(list);
+			await deleteItem('transactions', id);
 			// actualizar selects despues de eliminar
 			await populateFinanceCategorySelects();
 			await renderFinance();
@@ -5843,10 +5839,8 @@ msg = `${msg}\n\n— Codexis`;
 
 		// Eliminar ítem de inventario
 		async function deleteInventoryItem(id) {
-			const list = await loadInventory();
-			const newList = list.filter(x => x.id !== id);
-			await saveInventory(newList);
-			// eliminar movimientos asociados
+			await deleteItem('inventory', id);
+			// eliminar movimientos asociados (esto sí se hace masivo por ahora, o podrías buscar otro modo si hay muchos)
 			let movs = await loadInventoryMovements();
 			movs = movs.filter(m => m.itemId !== id);
 			await saveInventoryMovements(movs);
@@ -7962,8 +7956,9 @@ doc.text('Cotización válida por 15 días - Codexis', margin, y);
 			if (!confirm('¿Eliminar este producto del catálogo?')) return;
 			showLoading('Eliminando...');
 			try {
+				await deleteItem('catalog_items', id);
+				// Actualizar lista local si es necesario, o simplemente recargar
 				catalogItems = catalogItems.filter(function (p) { return p.id !== id; });
-				await saveCatalogItems(catalogItems);
 				renderCatalogItems();
 			} catch (err) {
 				console.error('Error al eliminar:', err);
