@@ -25,7 +25,7 @@
 		}
 
 		// Configuración de API - solo Cloudflare
-		const API_BASE = "https://casinos-bunny-edited-officers.trycloudflare.com/api";
+		const API_BASE = "https://consultation-paying-detailed-cottages.trycloudflare.com/api";
 		let API_TIMEOUT_MS = 10000; // 10 segundos timeout por defecto
 		let API_SAVE_TIMEOUT_MS = 30000; // 30 segundos para guardar (imágenes)
 		let MAX_RETRIES = 2; // solo 2 intentos
@@ -2716,7 +2716,7 @@
 				const act = btn.getAttribute('data-act');
 				if (act === 'edit') btn.onclick = () => openInvoiceModal(id);
 				if (act === 'del') btn.onclick = async () => { if (confirm('Eliminar factura?')) await deleteInvoice(id); };
-				if (act === 'pdf') btn.onclick = async () => await exportInvoicePDF(id);
+				if (act === 'pdf') btn.onclick = async () => await exportInvoicePDF_New(id);
 			});
 
 			// Renderizar tarjetas para móvil
@@ -2769,7 +2769,7 @@
 				// Acciones tarjetas
 				$$('#invoices-cards-container .card-btn-edit').forEach(btn => btn.onclick = () => openInvoiceModal(btn.dataset.id));
 				$$('#invoices-cards-container .card-btn-del').forEach(btn => btn.onclick = async () => { if (confirm('¿Eliminar factura?')) await deleteInvoice(btn.dataset.id); });
-				$$('#invoices-cards-container .card-btn-pdf').forEach(btn => btn.onclick = async () => await exportInvoicePDF(btn.dataset.id));
+				$$('#invoices-cards-container .card-btn-pdf').forEach(btn => btn.onclick = async () => await exportInvoicePDF_New(btn.dataset.id));
 			}
 
 			const sum = document.getElementById('invoices-summary');

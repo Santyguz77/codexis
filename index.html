@@ -1448,6 +1448,7 @@
 			gap: 16px;
 			scroll-behavior: smooth;
 			background: #ffffff;
+		}
 
 		.chat-messages::-webkit-scrollbar {
 			width: 6px;
@@ -1832,6 +1833,295 @@
 				box-shadow: 0 0 0 0 rgba(255, 91, 107, 0);
 			}
 		}
+
+		/* DASHBOARD BENTO DESIGN */
+		.chart-container-bento {
+			background: #ffffff;
+			padding: 24px;
+			border-radius: 0;
+			border: 1px solid rgba(0, 0, 0, 0.08);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+			display: flex;
+			flex-direction: column;
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+
+		.chart-container-bento:hover {
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		}
+
+		.chart-header-bento {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 20px;
+		}
+
+		.chart-tag {
+			font-size: 10px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: #888;
+			margin: 0 0 4px 0;
+		}
+
+		.chart-title {
+			font-size: 18px;
+			font-weight: 700;
+			margin: 0;
+			color: #1b1b1b;
+		}
+
+		.chart-legend-bento {
+			display: flex;
+			gap: 12px;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 10px;
+			font-weight: 700;
+			text-transform: uppercase;
+			color: #666;
+		}
+
+		.legend-item .dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 2px;
+		}
+
+		.legend-item .dot.income { background: #7af0a5; }
+		.legend-item .dot.expense { background: #ff5b6b; }
+
+		/* ============================================
+		   QR MODAL — PROFESIONAL Y COMPLETAMENTE OPACO
+		   ============================================ */
+
+		/* Animación de entrada de la tarjeta QR */
+		@keyframes qrCardIn {
+			from {
+				transform: scale(0.88) translateY(24px);
+				opacity: 0;
+			}
+			to {
+				transform: scale(1) translateY(0);
+				opacity: 1;
+			}
+		}
+
+		/* Animación de entrada del overlay */
+		@keyframes qrOverlayIn {
+			from { opacity: 0; }
+			to   { opacity: 1; }
+		}
+
+		/* Overlay — completamente opaco, negro sólido */
+		.modal-qr-overlay {
+			display: none;
+			position: fixed !important;
+			inset: 0 !important;
+			z-index: 999999 !important;
+			background: #000000 !important; /* Negro 100% opaco, sin transparencia */
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+			box-sizing: border-box;
+		}
+
+		.modal-qr-overlay.show {
+			display: flex !important;
+			animation: qrOverlayIn 0.25s ease forwards;
+		}
+
+		/* Tarjeta QR premium */
+		.qr-card-premium {
+			background: linear-gradient(160deg, #1a1a1a 0%, #0f0f0f 100%);
+			width: 100%;
+			max-width: 440px;
+			padding: 44px 36px 36px;
+			border-radius: 28px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+			box-shadow:
+				0 0 0 1px rgba(199, 255, 0, 0.18),
+				0 32px 80px rgba(0, 0, 0, 0.9),
+				0 8px 24px rgba(0, 0, 0, 0.8);
+			position: relative;
+			border: 1px solid rgba(255, 255, 255, 0.07);
+			animation: qrCardIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+			overflow: hidden;
+		}
+
+		/* Línea superior de acento verde-lima */
+		.qr-card-premium::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 10%;
+			right: 10%;
+			height: 3px;
+			border-radius: 0 0 4px 4px;
+			background: linear-gradient(90deg, transparent, #c7ff00, transparent);
+		}
+
+		.qr-header-logo {
+			width: 58px;
+			height: 58px;
+			margin-bottom: 20px;
+			border-radius: 14px;
+			filter: drop-shadow(0 0 12px rgba(199, 255, 0, 0.5));
+		}
+
+		.qr-card-title {
+			color: #ffffff !important;
+			font-size: 22px;
+			font-weight: 800;
+			margin: 0 0 8px 0;
+			letter-spacing: -0.03em;
+			line-height: 1.2;
+		}
+
+		.qr-card-subtitle {
+			color: rgba(255, 255, 255, 0.5) !important;
+			font-size: 13px;
+			margin: 0 0 28px 0;
+			max-width: 300px;
+			line-height: 1.5;
+			font-weight: 400;
+		}
+
+		/* Botón cerrar */
+		.qr-close-btn {
+			position: absolute;
+			right: 18px;
+			top: 18px;
+			background: rgba(255, 255, 255, 0.08);
+			border: 1px solid rgba(255, 255, 255, 0.12);
+			color: rgba(255, 255, 255, 0.7) !important;
+			width: 34px;
+			height: 34px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			font-size: 15px;
+			transition: all 0.25s;
+			z-index: 10;
+			padding: 0;
+			line-height: 1;
+		}
+
+		.qr-close-btn:hover {
+			background: rgba(255, 255, 255, 0.18);
+			color: #ffffff !important;
+			transform: rotate(90deg) scale(1.1);
+			border-color: rgba(255, 255, 255, 0.25);
+		}
+
+		/* Contenedor imagen QR */
+		.qr-image-wrapper {
+			background: #ffffff !important;
+			padding: 18px;
+			border-radius: 20px;
+			margin-bottom: 28px;
+			box-shadow:
+				0 0 0 1px rgba(199, 255, 0, 0.3),
+				0 0 40px rgba(199, 255, 0, 0.15),
+				0 16px 40px rgba(0, 0, 0, 0.6);
+		}
+
+		.qr-image-wrapper img {
+			width: 240px;
+			height: 240px;
+			display: block;
+			border-radius: 8px;
+		}
+
+		/* Divisor sutil entre imagen y botones */
+		.qr-divider {
+			width: 100%;
+			height: 1px;
+			background: rgba(255, 255, 255, 0.06);
+			margin-bottom: 22px;
+		}
+
+		/* Grid de acciones */
+		.qr-actions-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 12px;
+			width: 100%;
+			margin-bottom: 22px;
+		}
+
+		.qr-action-btn {
+			background: rgba(255, 255, 255, 0.06);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			color: rgba(255, 255, 255, 0.85) !important;
+			padding: 13px 10px;
+			border-radius: 14px;
+			font-size: 13px;
+			font-weight: 600;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			transition: all 0.2s ease;
+			letter-spacing: 0.01em;
+		}
+
+		.qr-action-btn:hover {
+			background: rgba(255, 255, 255, 0.12);
+			color: #ffffff !important;
+			transform: translateY(-2px);
+			border-color: rgba(255, 255, 255, 0.2);
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+		}
+
+		.qr-action-btn.primary {
+			background: #c7ff00;
+			color: #000000 !important;
+			border: none;
+			font-weight: 700;
+			letter-spacing: 0.02em;
+		}
+
+		.qr-action-btn.primary:hover {
+			background: #d4ff33;
+			color: #000000 !important;
+			box-shadow: 0 6px 20px rgba(199, 255, 0, 0.35);
+		}
+
+		/* Pie del modal */
+		.qr-card-footer {
+			color: rgba(255, 255, 255, 0.28) !important;
+			font-size: 11px;
+			line-height: 1.6;
+			max-width: 320px;
+			letter-spacing: 0.02em;
+		}
+
+		/* Responsive: en pantallas muy pequeñas */
+		@media (max-width: 480px) {
+			.qr-card-premium {
+				padding: 36px 22px 28px;
+				border-radius: 22px;
+			}
+			.qr-image-wrapper img {
+				width: 200px;
+				height: 200px;
+			}
+		}
+
+
 	</style>
 </head>
 
@@ -1986,142 +2276,100 @@
 				</div>
 
 				<!-- Gráficos - Layout Mejorado -->
-			<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:24px">
+			<!-- Gráficos - Layout Bento Mejorado -->
+			<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));gap:20px;margin-top:24px">
 				
-				<!-- Gráfico Completo: Income vs Expenses (2 columnas) -->
-				<div style="grid-column:1/-1;background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
+				<!-- Financial Performance: Ingresos vs Gastos -->
+				<div class="chart-container-bento">
+					<div class="chart-header-bento">
 						<div>
-							<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d">Financial Performance</p>
-							<h4 style="font-size:20px;font-weight:700;margin:8px 0 0 0;color:#1b1b1b">Ingresos vs Gastos</h4>
+							<p class="chart-tag">Financial Performance</p>
+							<h4 class="chart-title">Ingresos vs Gastos</h4>
 						</div>
-						<div style="display:flex;gap:16px">
-							<div style="display:flex;align-items:center;gap:8px">
-								<span style="width:8px;height:8px;background:#00897b;display:block"></span>
-								<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d">Ingresos</span>
-							</div>
-							<div style="display:flex;align-items:center;gap:8px">
-								<span style="width:8px;height:8px;background:#7e57c2;display:block"></span>
-								<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d">Gastos</span>
-							</div>
+						<div class="chart-legend-bento">
+							<div class="legend-item"><span class="dot income"></span>Ingresos</div>
+							<div class="legend-item"><span class="dot expense"></span>Gastos</div>
 						</div>
 					</div>
-					<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;height:240px;border-bottom:1px solid #f0f0f0;padding-bottom:12px">
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:60%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:15%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:55%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:27%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:70%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:5%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:40%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:50%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:50%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:28%;background:#00897b;opacity:0.8"></div>
-						</div>
-						<div style="background:#f5f5f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
-							<div style="width:100%;height:65%;background:#7e57c2;opacity:0.6"></div>
-							<div style="width:100%;height:20%;background:#00897b;opacity:0.8"></div>
-						</div>
-					</div>
-					<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:12px">
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">ENE</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">FEB</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">MAR</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">ABR</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">MAY</span>
-						<span style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;text-align:center">JUN</span>
+					<div style="height:200px">
+						<canvas id="financialChart"></canvas>
 					</div>
 				</div>
 
-				<!-- Orders by Status Donut (1 columna) -->
-				<div style="background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03);display:flex;flex-direction:column">
-					<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;color:#6d6d6d;margin-bottom:24px">Estado Operacional</p>
-					<div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:240px">
-						<svg style="width:200px;height:200px;transform:rotate(-90deg)">
-							<circle cx="100" cy="100" fill="none" r="75" stroke="#ffc1a3" stroke-width="14"></circle>
-							<circle cx="100" cy="100" fill="none" r="75" stroke="#80deea" stroke-dasharray="470" stroke-dashoffset="120" stroke-width="14" opacity="0.9"></circle>
-							<circle cx="100" cy="100" fill="none" r="75" stroke="#a5d6a7" stroke-dasharray="470" stroke-dashoffset="320" stroke-width="14" opacity="0.8"></circle>
-						</svg>
-						<div style="position:absolute;text-align:center">
-							<p style="font-size:24px;font-weight:700;color:#1b1b1b;margin:0">100%</p>
-							<p style="font-size:11px;font-weight:700;color:#999;text-transform:uppercase;margin:4px 0 0 0">Cobertura</p>
+				<!-- Operational Status: Órdenes por Estado -->
+				<div class="chart-container-bento">
+					<div class="chart-header-bento">
+						<div>
+							<p class="chart-tag">Estado Operacional</p>
+							<h4 class="chart-title">Distribución de Órdenes</h4>
 						</div>
 					</div>
-					<div style="margin-top:24px;display:flex;flex-direction:column;gap:12px">
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9">
-							<span style="font-size:11px;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#1b1b1b">
-								<span style="width:8px;height:8px;background:#a5d6a7;display:block"></span> Entregado
-							</span>
-							<span style="font-weight:700;color:#1b1b1b">642</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9">
-							<span style="font-size:11px;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#1b1b1b">
-								<span style="width:8px;height:8px;background:#80deea;display:block"></span> Pendiente
-							</span>
-							<span style="font-weight:700;color:#1b1b1b">412</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9">
-							<span style="font-size:11px;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#1b1b1b">
-								<span style="width:8px;height:8px;background:#ffc1a3;display:block"></span> Retornado
-							</span>
-							<span style="font-weight:700;color:#1b1b1b">230</span>
-						</div>
+					<div style="height:200px">
+						<canvas id="ordersStatusChart"></canvas>
 					</div>
 				</div>
 
-				<!-- Top 5 Clientes (1 columna) -->
-				<div style="background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<h4 style="font-size:16px;font-weight:600;margin:0 0 16px 0;color:#1b1b1b;display:flex;align-items:center">
-						<span class="material-icons-round" style="vertical-align:middle;margin-right:8px;font-size:20px">emoji_events</span> Top 5 Clientes
-					</h4>
-					<div style="display:flex;flex-direction:column;gap:12px">
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9;border-radius:0">
-							<div style="display:flex;flex-direction:column">
-								<span style="font-weight:600;color:#1b1b1b;font-size:14px">Cliente Premium</span>
-								<span style="font-size:12px;color:#6d6d6d">Monto total</span>
-							</div>
-							<span style="font-weight:700;color:#00695c;font-size:16px">$14,250</span>
+				<!-- Trend Analysis: Evolución mensual -->
+				<div class="chart-container-bento">
+					<div class="chart-header-bento">
+						<div>
+							<p class="chart-tag">Análisis de Tendencias</p>
+							<h4 class="chart-title">Órdenes por Mes</h4>
 						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9;border-radius:0">
-							<div style="display:flex;flex-direction:column">
-								<span style="font-weight:600;color:#1b1b1b;font-size:14px">Carlos Mendez</span>
-								<span style="font-size:12px;color:#6d6d6d">Monto total</span>
-							</div>
-							<span style="font-weight:700;color:#00695c;font-size:16px">$12,800</span>
-						</div>
-						<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f9f9f9;border-radius:0">
-							<div style="display:flex;flex-direction:column">
-								<span style="font-weight:600;color:#1b1b1b;font-size:14px">María López</span>
-								<span style="font-size:12px;color:#6d6d6d">Monto total</span>
-							</div>
-							<span style="font-weight:700;color:#00695c;font-size:16px">$11,500</span>
-						</div>
+					</div>
+					<div style="height:200px">
+						<canvas id="ordersTimelineChart"></canvas>
 					</div>
 				</div>
 
-				<!-- Órdenes Recientes (1 columna) -->
-				<div style="background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<h4 style="font-size:16px;font-weight:600;margin:0 0 16px 0;color:#1b1b1b;display:flex;align-items:center">
-						<span class="material-icons-round" style="vertical-align:middle;margin-right:8px;font-size:20px">schedule</span> Órdenes Recientes
-					</h4>
-					<div id="recent-orders-list" style="max-height:280px;overflow:auto"></div>
+				<!-- Product Insights: Top 5 Productos -->
+				<div class="chart-container-bento">
+					<div class="chart-header-bento">
+						<div>
+							<p class="chart-tag">Desempeño de Catálogo</p>
+							<h4 class="chart-title">Top 5 Productos</h4>
+						</div>
+					</div>
+					<div style="height:200px">
+						<canvas id="topProductsChart"></canvas>
+					</div>
 				</div>
 
-				<!-- Alertas de Inventario (2 columnas) -->
-				<div style="grid-column:1/-1;background:#ffffff;padding:24px;border-radius:0;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 2px rgba(0,0,0,0.03)">
-					<h4 style="font-size:16px;font-weight:600;margin:0 0 16px 0;color:#1b1b1b;display:flex;align-items:center">
-						<span class="material-icons-round" style="vertical-align:middle;margin-right:8px;font-size:20px">warning</span> Alertas de Inventario
-					</h4>
-					<div id="inventory-alerts" style="max-height:300px;overflow:auto"></div>
+				<!-- CRM Insights: Top 5 Clientes -->
+				<div class="chart-container-bento">
+					<div class="chart-header-bento">
+						<div>
+							<p class="chart-tag">Gestión de Clientes</p>
+							<h4 class="chart-title">Top 5 Clientes</h4>
+						</div>
+					</div>
+					<div style="height:200px">
+						<canvas id="topClientsChart"></canvas>
+					</div>
+				</div>
+
+				<!-- Recent Activity: Órdenes Recientes -->
+				<div class="chart-container-bento">
+					<div class="chart-header-bento">
+						<div>
+							<p class="chart-tag">Actividad Reciente</p>
+							<h4 class="chart-title">Últimas Órdenes</h4>
+						</div>
+						<span class="material-icons-round" style="color:var(--muted);font-size:20px">schedule</span>
+					</div>
+					<div id="recent-orders-list" style="height:200px;overflow-y:auto"></div>
+				</div>
+
+				<!-- Inventory Alerts: Alertas Críticas -->
+				<div class="chart-container-bento" style="grid-column: 1 / -1">
+					<div class="chart-header-bento">
+						<div>
+							<p class="chart-tag" style="color:#ff5b6b">Control Crítico</p>
+							<h4 class="chart-title">Alertas de Inventario</h4>
+						</div>
+						<span class="material-icons-round" style="color:#ff5b6b;font-size:20px">warning</span>
+					</div>
+					<div id="inventory-alerts" style="min-height:100px;max-height:300px;overflow-y:auto"></div>
 				</div>
 
 			</div>
@@ -2854,9 +3102,41 @@
 		</div>
 	</div>
 
+	<!-- NUEVO: Modal Visualización de QR Profesional -->
+	<div class="modal-qr-overlay" id="modal-qr-display" onclick="if(event.target === this) this.classList.remove('show')">
+		<div class="qr-card-premium">
+			<button class="qr-close-btn" onclick="document.getElementById('modal-qr-display').classList.remove('show')">✕</button>
+			
+			<img src="icon-192.png" class="qr-header-logo" alt="Logo">
+			<h3 class="qr-card-title" id="qr-modal-title">Código de Acceso</h3>
+			<p class="qr-card-subtitle" id="qr-modal-subtitle">Escanea para acceder a la información detallada.</p>
+
+			<div class="qr-image-wrapper">
+				<img id="qr-display-img" src="" alt="QR Code">
+			</div>
+
+			<div class="qr-actions-grid">
+				<button class="qr-action-btn primary" id="qr-btn-copy">
+					<span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
+					Copiar Link
+				</button>
+				<button class="qr-action-btn" id="qr-btn-download">
+					<span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+					Descargar
+				</button>
+			</div>
+
+			<div class="qr-card-footer">
+				Este código QR permite el acceso directo a la plataforma de seguimiento de Codexis.
+			</div>
+		</div>
+	</div>
+
 	<!-- incluir jsPDF desde CDN -->
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 	<script>
 		// NUEVO: Sistema de autenticación
@@ -2901,7 +3181,7 @@
 		}
 
 		// Configuración de API - solo Cloudflare
-		const API_BASE = "https://casinos-bunny-edited-officers.trycloudflare.com/api";
+		const API_BASE = "https://consultation-paying-detailed-cottages.trycloudflare.com/api";
 		const API_URL = API_BASE;
 		let API_TIMEOUT_MS = 10000; // 10 segundos timeout por defecto
 		let API_SAVE_TIMEOUT_MS = 30000; // 30 segundos para guardar (imágenes)
@@ -3563,9 +3843,12 @@
 						<button class="btn btn-copy-link" data-id="${o.id}" style="background:#9c27b0;color:#fff" title="Copiar enlace público">🔗 Link</button>
 						<button class="btn btn-edit" data-id="${o.id}">Editar</button>
 						<button class="btn btn-delete" data-id="${o.id}">Eliminar</button>
-						<button class="btn" style="background:#071a2a;color:#7af0a5" data-id="${o.id}" class="btn-pdf">PDF</button>
+						<button class="btn btn-pdf" style="background:#071a2a;color:#7af0a5" data-id="${o.id}">PDF</button>
 						<button class="btn btn-whatsapp" data-id="${o.id}" style="background:#25D366;color:#1b1b1b">WhatsApp</button>
-						${o.serial ? `<button class="btn btn-print-qr" data-serial="${escapeHtml(o.serial)}" data-brand="${escapeHtml(o.brand || '')}" data-model="${escapeHtml(o.model || '')}" style="background:#e040fb;color:#fff" title="Imprimir QR del equipo">📱 QR</button>` : ''}
+						<div style="display:flex;gap:4px">
+							<button class="btn btn-print-qr" data-id="${o.id}" data-type="order" style="background:#c7ff00;color:#000" title="Ver QR de Seguimiento (Orden)">📦 QR Orden</button>
+							${o.serial ? `<button class="btn btn-print-qr" data-serial="${escapeHtml(o.serial)}" data-type="equipment" style="background:#e040fb;color:#fff" title="Ver QR de Hoja de Vida (Equipo)">📱 QR Equipo</button>` : ''}
+						</div>
 					</td>
 				`;
 				tbody.appendChild(tr);
@@ -3590,8 +3873,6 @@
 			// nuevo: copiar enlace público
 			$$('.btn-copy-link').forEach(b => b.onclick = async () => await copyPublicLink(b.dataset.id));
 
-			// imprimir QR del equipo
-			$$('.btn-print-qr').forEach(b => b.onclick = () => printEquipmentQR(b.dataset.serial, b.dataset.brand, b.dataset.model));
 
 			// abrir hoja de vida
 			$$('.btn-view-eq').forEach(b => b.onclick = () => {
@@ -3679,7 +3960,10 @@
 							<button class="btn btn-pdf-card" data-id="${o.id}" style="background:#071a2a;color:#7af0a5">📄 PDF</button>
 							<button class="btn btn-whatsapp-card" data-id="${o.id}" style="background:#25D366;color:#1b1b1b">📱 WhatsApp</button>
 							<button class="btn btn-copy-link-card" data-id="${o.id}" style="background:#9c27b0;color:#fff">🔗 Link</button>
-							${o.serial ? `<button class="btn btn-print-qr-card" data-serial="${escapeHtml(o.serial)}" data-brand="${escapeHtml(o.brand || '')}" data-model="${escapeHtml(o.model || '')}" style="background:#e040fb;color:#fff">📱 QR Equipo</button>` : ''}
+							<div style="display:flex;gap:4px;width:100%">
+								<button class="btn btn-print-qr" data-id="${o.id}" data-type="order" style="background:#c7ff00;color:#000;flex:1">📦 QR Orden</button>
+								${o.serial ? `<button class="btn btn-print-qr" data-serial="${escapeHtml(o.serial)}" data-type="equipment" style="background:#e040fb;color:#fff;flex:1">📱 QR Equipo</button>` : ''}
+							</div>
 							<button class="btn btn-delete-card" data-id="${o.id}" style="background:#ff5b6b;color:#fff">🗑️ Eliminar</button>
 						</div>
 					`;
@@ -3696,7 +3980,30 @@
 				$$('.btn-pdf-card').forEach(b => b.onclick = () => exportOrderPDF(b.dataset.id));
 				$$('.btn-whatsapp-card').forEach(b => b.onclick = () => openWhatsApp(b.dataset.id));
 				$$('.btn-copy-link-card').forEach(b => b.onclick = async () => await copyPublicLink(b.dataset.id));
-				$$('.btn-print-qr-card').forEach(b => b.onclick = () => printEquipmentQR(b.dataset.serial, b.dataset.brand, b.dataset.model));
+				// Botones QR (tanto tabla como tarjetas) se re-bindean aquí para cubrir ambos casos
+				$$('.btn-print-qr').forEach(b => {
+					b.onclick = async (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						const id = b.dataset.id;
+						const serial = b.dataset.serial;
+						const type = b.dataset.type || 'equipment';
+
+						if (type === 'order') {
+							const orders = await loadOrders();
+							const order = orders.find(o => o.id == id);
+							if (order) {
+								if (!order.accessToken) {
+									order.accessToken = generateAccessToken();
+									await saveOrders(orders);
+								}
+								showQRCodeModal('order', id, order);
+							}
+						} else {
+							showQRCodeModal('equipment', serial);
+						}
+					};
+				});
 			}
 
 			$('#orders-count').textContent = `Mostrando ${filtered.length} registros`;
@@ -4858,7 +5165,7 @@
 			const brand = eq?.brand || '';
 			const model = eq?.model || '';
 
-			btnPrintQR.onclick = () => printEquipmentQR(serial, brand, model);
+			btnPrintQR.onclick = () => showQRCodeModal('equipment', serial);
 			btnCopyLink.onclick = () => copyEquipmentLink(serial);
 
 			container.innerHTML = '';
@@ -5441,8 +5748,67 @@ msg = `${msg}\n\n— Codexis`;
 			return `${baseUrl}equipo.html?serial=${encodeURIComponent(serial)}`;
 		}
 
+		// Función profesional para mostrar QR (Soporta Ordenes y Equipos)
+		function showQRCodeModal(type, id, data) {
+			const modal = document.getElementById('modal-qr-display');
+			const img = document.getElementById('qr-display-img');
+			const title = document.getElementById('qr-modal-title');
+			const subtitle = document.getElementById('qr-modal-subtitle');
+			const btnCopy = document.getElementById('qr-btn-copy');
+			const btnDownload = document.getElementById('qr-btn-download');
+			
+			if (!modal || !img) return;
+
+			let link = '';
+			let modalTitle = '';
+			let modalSubtitle = '';
+
+			if (type === 'order') {
+				// El dato es la orden completa o el enlace generado
+				const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+				link = data.link || `${baseUrl}orden.html?token=${data.accessToken}`;
+				modalTitle = "Seguimiento de Orden";
+				modalSubtitle = `Escanea para ver el estado de la orden #${data.id}`;
+			} else {
+				// Tipo equipo (serial)
+				link = getEquipmentLink(id);
+				modalTitle = "Hoja de Vida";
+				modalSubtitle = `Historial técnico del equipo S/N: ${id}`;
+			}
+			
+			const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}&bgcolor=ffffff&color=000000&margin=10`;
+			
+			img.src = qrUrl;
+			title.textContent = modalTitle;
+			subtitle.textContent = modalSubtitle;
+
+			// Configurar botones de acción
+			btnCopy.onclick = async () => {
+				try {
+					await navigator.clipboard.writeText(link);
+					const originalText = btnCopy.innerHTML;
+					btnCopy.innerHTML = '<span class="material-symbols-outlined">check</span> Copiado';
+					setTimeout(() => btnCopy.innerHTML = originalText, 2000);
+				} catch (err) {
+					alert('No se pudo copiar el enlace');
+				}
+			};
+
+			btnDownload.onclick = () => {
+				const a = document.createElement('a');
+				a.href = qrUrl;
+				a.download = `QR_${type}_${id}.png`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+			};
+			
+			modal.classList.add('show');
+		}
+
 		// Imprimir QR del equipo como sticker compacto con logo
 		async function printEquipmentQR(serial, brand, model) {
+
 			if (!serial) return alert('No hay número de serie para este equipo');
 
 			const link = getEquipmentLink(serial);
@@ -5614,7 +5980,7 @@ msg = `${msg}\n\n— Codexis`;
 				const act = btn.getAttribute('data-act');
 				if (act === 'edit') btn.onclick = () => openInvoiceModal(id);
 				if (act === 'del') btn.onclick = async () => { if (confirm('Eliminar factura?')) await deleteInvoice(id); };
-				if (act === 'pdf') btn.onclick = async () => await exportInvoicePDF(id);
+				if (act === 'pdf') btn.onclick = async () => await exportInvoicePDF_New(id);
 			});
 
 			// Renderizar tarjetas para móvil
@@ -5667,7 +6033,7 @@ msg = `${msg}\n\n— Codexis`;
 				// Acciones tarjetas
 				$$('#invoices-cards-container .card-btn-edit').forEach(btn => btn.onclick = () => openInvoiceModal(btn.dataset.id));
 				$$('#invoices-cards-container .card-btn-del').forEach(btn => btn.onclick = async () => { if (confirm('¿Eliminar factura?')) await deleteInvoice(btn.dataset.id); });
-				$$('#invoices-cards-container .card-btn-pdf').forEach(btn => btn.onclick = async () => await exportInvoicePDF(btn.dataset.id));
+				$$('#invoices-cards-container .card-btn-pdf').forEach(btn => btn.onclick = async () => await exportInvoicePDF_New(btn.dataset.id));
 			}
 
 			const sum = document.getElementById('invoices-summary');
@@ -6120,60 +6486,48 @@ msg = `${msg}\n\n— Codexis`;
 			// Nuevos widgets
 			renderRecentOrders(orders, clients);
 			renderTopClientsChart(orders, transactions, clients);
-			renderMonthlyComparisonChart(transactions);
 			renderInventoryAlerts(inventory);
 		}
 
 		function renderOrdersStatusChart(orders) {
-			const statuses = {
-				'ingresado': 0,
-				'en_reparacion': 0,
-				'espera_entrega': 0,
-				'entregado': 0
-			};
-
+			const statuses = { 'ingresado': 0, 'en_reparacion': 0, 'espera_entrega': 0, 'entregado': 0 };
 			orders.forEach(o => {
 				const status = o.status || 'ingresado';
-				if (statuses.hasOwnProperty(status)) {
-					statuses[status]++;
-				}
+				if (statuses.hasOwnProperty(status)) statuses[status]++;
 			});
 
 			const ctx = document.getElementById('ordersStatusChart');
 			if (!ctx) return;
-
 			if (ordersStatusChart) ordersStatusChart.destroy();
 
 			ordersStatusChart = new Chart(ctx, {
 				type: 'doughnut',
 				data: {
-					labels: ['Ingresado', 'En Reparación', 'Espera Entrega', 'Entregado'],
+					labels: ['Ingresado', 'Reparación', 'Espera', 'Entregado'],
 					datasets: [{
 						data: [statuses.ingresado, statuses.en_reparacion, statuses.espera_entrega, statuses.entregado],
-						backgroundColor: [
-							'#3bb4ff',
-							'#ffcc33',
-							'#ff9f43',
-							'#7af0a5'
-						],
-						borderColor: '#0f2430',
-						borderWidth: 2
+						backgroundColor: ['#3bb4ff', '#ffcc33', '#ff9f43', '#7af0a5'],
+						borderColor: '#ffffff',
+						borderWidth: 4,
+						hoverOffset: 15
 					}]
 				},
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
+					cutout: '75%',
 					plugins: {
 						legend: {
 							position: 'bottom',
-							labels: {
-								color: '#e6eef3',
-								padding: 15,
-								font: { size: 12 }
-							}
+							labels: { color: '#6d6d6d', usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 11, weight: '600' } }
 						},
-						title: {
-							display: false
+						tooltip: {
+							backgroundColor: '#1b1b1b',
+							padding: 12,
+							titleFont: { size: 13 },
+							bodyFont: { size: 12 },
+							cornerRadius: 4,
+							displayColors: true
 						}
 					}
 				}
@@ -6181,7 +6535,6 @@ msg = `${msg}\n\n— Codexis`;
 		}
 
 		function renderFinancialChart(transactions) {
-			// Últimos 7 días
 			const days = [];
 			const income = [];
 			const expenses = [];
@@ -6192,21 +6545,12 @@ msg = `${msg}\n\n— Codexis`;
 				const dateStr = date.toISOString().slice(0, 10);
 				days.push(dateStr);
 
-				const dayIncome = transactions
-					.filter(t => t.type === 'income' && t.date === dateStr)
-					.reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-				const dayExpenses = transactions
-					.filter(t => t.type === 'expense' && t.date === dateStr)
-					.reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-				income.push(dayIncome);
-				expenses.push(dayExpenses);
+				income.push(transactions.filter(t => t.type === 'income' && t.date === dateStr).reduce((sum, t) => sum + Number(t.amount || 0), 0));
+				expenses.push(transactions.filter(t => t.type === 'expense' && t.date === dateStr).reduce((sum, t) => sum + Number(t.amount || 0), 0));
 			}
 
 			const ctx = document.getElementById('financialChart');
 			if (!ctx) return;
-
 			if (financialChart) financialChart.destroy();
 
 			financialChart = new Chart(ctx, {
@@ -6217,53 +6561,26 @@ msg = `${msg}\n\n— Codexis`;
 						return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
 					}),
 					datasets: [
-						{
-							label: 'Ingresos',
-							data: income,
-							backgroundColor: '#7af0a5',
-							borderColor: '#7af0a5',
-							borderWidth: 1
-						},
-						{
-							label: 'Gastos',
-							data: expenses,
-							backgroundColor: '#ff6b6b',
-							borderColor: '#ff6b6b',
-							borderWidth: 1
-						}
+						{ label: 'Ingresos', data: income, backgroundColor: '#7af0a5', borderRadius: 4, barThickness: 12 },
+						{ label: 'Gastos', data: expenses, backgroundColor: '#ff6b6b', borderRadius: 4, barThickness: 12 }
 					]
 				},
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
 					plugins: {
-						legend: {
-							labels: {
-								color: '#e6eef3',
-								font: { size: 12 }
-							}
-						}
+						legend: { display: false },
+						tooltip: { backgroundColor: '#1b1b1b', padding: 12, cornerRadius: 4 }
 					},
 					scales: {
-						y: {
-							beginAtZero: true,
-							ticks: {
-								color: '#9aa5b1',
-								callback: function (value) {
-									return '$' + value.toLocaleString();
-								}
-							},
-							grid: {
-								color: 'rgba(255, 255, 255, 0.05)'
-							}
+						y: { 
+							beginAtZero: true, 
+							grid: { color: 'rgba(0,0,0,0.03)', drawBorder: false },
+							ticks: { color: '#999', font: { size: 10 }, callback: v => '$' + v.toLocaleString() }
 						},
-						x: {
-							ticks: {
-								color: '#9aa5b1'
-							},
-							grid: {
-								color: 'rgba(255, 255, 255, 0.05)'
-							}
+						x: { 
+							grid: { display: false },
+							ticks: { color: '#999', font: { size: 10 } }
 						}
 					}
 				}
@@ -6271,27 +6588,20 @@ msg = `${msg}\n\n— Codexis`;
 		}
 
 		function renderOrdersTimelineChart(orders) {
-			// Últimos 6 meses
 			const months = [];
 			const orderCounts = [];
-
 			for (let i = 5; i >= 0; i--) {
 				const date = new Date();
 				date.setMonth(date.getMonth() - i);
-				const monthStr = date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
-				months.push(monthStr);
-
-				const count = orders.filter(o => {
-					const orderDate = new Date(o.date);
-					return orderDate.getMonth() === date.getMonth() && orderDate.getFullYear() === date.getFullYear();
-				}).length;
-
-				orderCounts.push(count);
+				months.push(date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' }));
+				orderCounts.push(orders.filter(o => {
+					const od = new Date(o.date);
+					return od.getMonth() === date.getMonth() && od.getFullYear() === date.getFullYear();
+				}).length);
 			}
 
 			const ctx = document.getElementById('ordersTimelineChart');
 			if (!ctx) return;
-
 			if (ordersTimelineChart) ordersTimelineChart.destroy();
 
 			ordersTimelineChart = new Chart(ctx, {
@@ -6301,80 +6611,43 @@ msg = `${msg}\n\n— Codexis`;
 					datasets: [{
 						label: 'Órdenes',
 						data: orderCounts,
-						borderColor: '#c7ff00',
-						backgroundColor: 'rgba(199, 255, 0, 0.1)',
+						borderColor: '#3bb4ff',
+						backgroundColor: 'rgba(59, 180, 255, 0.05)',
 						borderWidth: 3,
 						fill: true,
 						tension: 0.4,
-						pointRadius: 5,
-						pointBackgroundColor: '#c7ff00',
-						pointBorderColor: '#0f2430',
-						pointBorderWidth: 2
+						pointRadius: 4,
+						pointBackgroundColor: '#3bb4ff'
 					}]
 				},
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
-					plugins: {
-						legend: {
-							display: false
-						}
-					},
+					plugins: { legend: { display: false } },
 					scales: {
-						y: {
-							beginAtZero: true,
-							ticks: {
-								color: '#9aa5b1',
-								stepSize: 1
-							},
-							grid: {
-								color: 'rgba(255, 255, 255, 0.05)'
-							}
-						},
-						x: {
-							ticks: {
-								color: '#9aa5b1'
-							},
-							grid: {
-								color: 'rgba(255, 255, 255, 0.05)'
-							}
-						}
+						y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: '#999', stepSize: 1 } },
+						x: { grid: { display: false }, ticks: { color: '#999' } }
 					}
 				}
 			});
 		}
 
 		function renderTopProductsChart(inventory, movements) {
-			// Contar salidas por producto del inventario
 			const productCounts = {};
-
-			// Filtrar solo movimientos de salida (out)
-			const outMovements = movements.filter(m => m.type === 'out');
-
-			outMovements.forEach(m => {
-				const itemId = m.itemId;
-				const quantity = Number(m.quantity || 0);
-
-				// Buscar el item en el inventario
-				const item = inventory.find(i => i.id === itemId);
+			movements.filter(m => m.type === 'out').forEach(m => {
+				const item = inventory.find(i => i.id === m.itemId);
 				if (item) {
-					const productName = item.name || 'Sin nombre';
-					productCounts[productName] = (productCounts[productName] || 0) + quantity;
+					const name = item.name || 'Sin nombre';
+					productCounts[name] = (productCounts[name] || 0) + Number(m.quantity || 0);
 				}
 			});
 
-			// Ordenar y tomar top 5
-			const sorted = Object.entries(productCounts)
-				.sort((a, b) => b[1] - a[1])
-				.slice(0, 5);
-
-			// Si no hay datos, mostrar mensaje
-			const labels = sorted.length > 0 ? sorted.map(([product]) => product) : ['Sin ventas aún'];
-			const data = sorted.length > 0 ? sorted.map(([, count]) => count) : [0];
+			const sorted = Object.entries(productCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+			const labels = sorted.length > 0 ? sorted.map(([n]) => n) : ['Sin ventas'];
+			const data = sorted.length > 0 ? sorted.map(([, c]) => c) : [0];
 
 			const ctx = document.getElementById('topProductsChart');
 			if (!ctx) return;
-
 			if (topProductsChart) topProductsChart.destroy();
 
 			topProductsChart = new Chart(ctx, {
@@ -6382,47 +6655,21 @@ msg = `${msg}\n\n— Codexis`;
 				data: {
 					labels: labels,
 					datasets: [{
-						label: 'Unidades vendidas',
+						label: 'Unidades',
 						data: data,
-						backgroundColor: [
-							'#3bb4ff',
-							'#7af0a5',
-							'#ffcc33',
-							'#ff9f43',
-							'#c7ff00'
-						],
-						borderColor: '#0f2430',
-						borderWidth: 2
+						backgroundColor: ['#3bb4ff', '#7af0a5', '#ffcc33', '#ff9f43', '#818cf8'],
+						borderRadius: 4,
+						barThickness: 15
 					}]
 				},
 				options: {
 					indexAxis: 'y',
 					responsive: true,
 					maintainAspectRatio: false,
-					plugins: {
-						legend: {
-							display: false
-						}
-					},
+					plugins: { legend: { display: false } },
 					scales: {
-						x: {
-							beginAtZero: true,
-							ticks: {
-								color: '#9aa5b1',
-								stepSize: 1
-							},
-							grid: {
-								color: 'rgba(255, 255, 255, 0.05)'
-							}
-						},
-						y: {
-							ticks: {
-								color: '#9aa5b1'
-							},
-							grid: {
-								color: 'rgba(255, 255, 255, 0.05)'
-							}
-						}
+						x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: '#999', stepSize: 1 } },
+						y: { grid: { display: false }, ticks: { color: '#999', font: { size: 10 } } }
 					}
 				}
 			});
@@ -6433,48 +6680,31 @@ msg = `${msg}\n\n— Codexis`;
 		function renderRecentOrders(orders, clients) {
 			const container = document.getElementById('recent-orders-list');
 			if (!container) return;
-
-			const recent = orders
-				.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-				.slice(0, 7);
+			const recent = orders.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 7);
 
 			if (recent.length === 0) {
-				container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">Sin órdenes registradas</div>';
+				container.innerHTML = '<div style="color:#999;text-align:center;padding:20px;font-size:13px">Sin órdenes recientes</div>';
 				return;
 			}
 
-			const statusLabels = {
-				ingresado: 'Ingresado',
-				en_reparacion: 'En Reparación',
-				espera_entrega: 'Espera Entrega',
-				entregado: 'Entregado'
-			};
-			const statusColors = {
-				ingresado: '#a3e635',
-				en_reparacion: '#3bb4ff',
-				espera_entrega: '#ffcc33',
-				entregado: '#7af0a5'
-			};
+			const statusLabels = { ingresado: 'Ingresado', en_reparacion: 'Reparación', espera_entrega: 'Espera', entregado: 'Entregado' };
+			const statusColors = { ingresado: '#3bb4ff', en_reparacion: '#ffcc33', espera_entrega: '#ff9f43', entregado: '#7af0a5' };
 
 			container.innerHTML = recent.map(o => {
 				const client = clients.find(c => c.id === o.clientId) || { name: 'Sin nombre' };
 				const st = o.status || 'ingresado';
 				const color = statusColors[st] || '#94a3b8';
-				const label = statusLabels[st] || st;
-				const date = o.date ? new Date(o.date).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : '';
-				return `<div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid rgba(255,255,255,0.04)">
+				return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.03)">
 					<div style="flex:1;min-width:0">
-						<div style="font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(client.name)}</div>
-						<div style="font-size:12px;color:var(--muted)">${escapeHtml(o.brand || '')} ${escapeHtml(o.model || '')}</div>
+						<div style="font-weight:700;color:#1b1b1b;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(client.name)}</div>
+						<div style="font-size:11px;color:#888">${escapeHtml(o.brand || '')} ${escapeHtml(o.model || '')}</div>
 					</div>
-					<span style="font-size:11px;padding:3px 8px;border-radius:8px;background:${color}22;color:${color};font-weight:600;white-space:nowrap">${label}</span>
-					<span style="font-size:12px;color:var(--muted);white-space:nowrap">${date}</span>
+					<span style="font-size:10px;padding:2px 8px;border-radius:4px;background:${color}15;color:${color};font-weight:700;text-transform:uppercase">${statusLabels[st] || st}</span>
 				</div>`;
 			}).join('');
 		}
 
 		function renderTopClientsChart(orders, transactions, clients) {
-			// Contar órdenes por cliente
 			const clientOrders = {};
 			orders.forEach(o => {
 				const client = clients.find(c => c.id === o.clientId);
@@ -6482,12 +6712,9 @@ msg = `${msg}\n\n— Codexis`;
 				clientOrders[name] = (clientOrders[name] || 0) + 1;
 			});
 
-			const sorted = Object.entries(clientOrders)
-				.sort((a, b) => b[1] - a[1])
-				.slice(0, 5);
-
-			const labels = sorted.length > 0 ? sorted.map(([name]) => name.length > 18 ? name.slice(0, 18) + '...' : name) : ['Sin datos'];
-			const data = sorted.length > 0 ? sorted.map(([, count]) => count) : [0];
+			const sorted = Object.entries(clientOrders).sort((a, b) => b[1] - a[1]).slice(0, 5);
+			const labels = sorted.length > 0 ? sorted.map(([n]) => n.length > 15 ? n.slice(0, 15) + '...' : n) : ['Sin datos'];
+			const data = sorted.length > 0 ? sorted.map(([, c]) => c) : [0];
 
 			const ctx = document.getElementById('topClientsChart');
 			if (!ctx) return;
@@ -6500,9 +6727,9 @@ msg = `${msg}\n\n— Codexis`;
 					datasets: [{
 						label: 'Órdenes',
 						data: data,
-						backgroundColor: ['#a78bfa', '#818cf8', '#6366f1', '#4f46e5', '#4338ca'],
-						borderColor: '#1b1b1b',
-						borderWidth: 2
+						backgroundColor: '#818cf8',
+						borderRadius: 4,
+						barThickness: 15
 					}]
 				},
 				options: {
@@ -6511,15 +6738,8 @@ msg = `${msg}\n\n— Codexis`;
 					maintainAspectRatio: false,
 					plugins: { legend: { display: false } },
 					scales: {
-						x: {
-							beginAtZero: true,
-							ticks: { color: '#94a3b8', stepSize: 1 },
-							grid: { color: 'rgba(255,255,255,0.05)' }
-						},
-						y: {
-							ticks: { color: '#94a3b8' },
-							grid: { color: 'rgba(255,255,255,0.05)' }
-						}
+						x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: '#999', stepSize: 1 } },
+						y: { grid: { display: false }, ticks: { color: '#999', font: { size: 10 } } }
 					}
 				}
 			});
@@ -6613,9 +6833,9 @@ msg = `${msg}\n\n— Codexis`;
 
 			if (outOfStock.length > 0) {
 				html += '<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:#ff5b6b;margin-bottom:6px"><span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:4px">error</span> Sin Stock (' + outOfStock.length + ')</div>';
-				html += outOfStock.slice(0, 5).map(i => `<div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;background:rgba(255,91,107,0.08);margin-bottom:4px">
-					<span style="flex:1;font-size:13px;color:#e2e8f0">${i.name || 'Sin nombre'}</span>
-					<span style="font-size:12px;font-weight:600;color:#ff5b6b">0 uds</span>
+				html += outOfStock.slice(0, 5).map(i => `<div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:4px;background:rgba(255,91,107,0.05);margin-bottom:4px">
+					<span style="flex:1;font-size:13px;color:#1b1b1b;font-weight:500">${i.name || 'Sin nombre'}</span>
+					<span style="font-size:12px;font-weight:700;color:#ff5b6b">0</span>
 				</div>`).join('');
 				if (outOfStock.length > 5) html += `<div style="font-size:12px;color:var(--muted);padding:4px 8px">... y ${outOfStock.length - 5} más</div>`;
 				html += '</div>';
@@ -6623,9 +6843,9 @@ msg = `${msg}\n\n— Codexis`;
 
 			if (lowStock.length > 0) {
 				html += '<div><div style="font-size:13px;font-weight:600;color:#ffcc33;margin-bottom:6px"><span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:4px">warning</span> Stock Bajo (' + lowStock.length + ')</div>';
-				html += lowStock.slice(0, 5).map(i => `<div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;background:rgba(255,204,51,0.08);margin-bottom:4px">
-					<span style="flex:1;font-size:13px;color:#e2e8f0">${i.name || 'Sin nombre'}</span>
-					<span style="font-size:12px;font-weight:600;color:#ffcc33">${i.stock} uds</span>
+				html += lowStock.slice(0, 5).map(i => `<div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:4px;background:rgba(255,204,51,0.05);margin-bottom:4px">
+					<span style="flex:1;font-size:13px;color:#1b1b1b;font-weight:500">${i.name || 'Sin nombre'}</span>
+					<span style="font-size:12px;font-weight:700;color:#ffcc33">${i.stock} uds</span>
 				</div>`).join('');
 				if (lowStock.length > 5) html += `<div style="font-size:12px;color:var(--muted);padding:4px 8px">... y ${lowStock.length - 5} más</div>`;
 				html += '</div>';
@@ -7414,6 +7634,137 @@ doc.text('Cotización válida por 15 días - Codexis', margin, y);
 				alert('Error al eliminar el producto');
 			} finally {
 				hideLoading();
+			}
+		}
+
+		/* NUEVO: exportar factura a PDF con diseño moderno */
+		async function exportInvoicePDF_New(id) {
+			const invoices = await loadInvoices();
+			const invoice = invoices.find(i => i.id === id);
+			if (!invoice) return alert('Factura no encontrada');
+
+			const clients = await loadClients();
+			const client = clients.find(c => c.id === invoice.clientId) || { name: '--', cedula: '', phone: '', email: '', address: '' };
+
+			const itemsHTML = (invoice.items || []).map(item => `
+				<div style="display: grid; grid-template-columns: repeat(12, 1fr); padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+					<div style="grid-column: span 6;">
+						<p style="font-size: 14px; font-weight: 500; margin: 0;">${escapeHtml(item.description || '')}</p>
+					</div>
+					<div style="grid-column: span 2; text-align: center; font-size: 14px;">${item.quantity || 0}</div>
+					<div style="grid-column: span 2; text-align: right; font-size: 14px;">${formatCurrency(item.unitPrice || 0)}</div>
+					<div style="grid-column: span 2; text-align: right; font-size: 14px; font-weight: 700;">${formatCurrency(item.total || 0)}</div>
+				</div>
+			`).join('');
+
+			const invoiceHTML = `
+				<div id="invoice-template-final" style="width: 750px; padding: 40px; background: white; font-family: 'Inter', sans-serif; color: #1b1b1b; line-height: 1.5;">
+					<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px;">
+						<div>
+							<p style="text-transform: uppercase; letter-spacing: 0.2em; font-size: 10px; color: #777777; margin-bottom: 8px;">Detalle de Transacción</p>
+							<h1 style="font-size: 48px; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase;">${escapeHtml(invoice.invoiceNumber || '')}</h1>
+						</div>
+						<div style="text-align: right;">
+							<div style="font-size: 24px; font-weight: 900; letter-spacing: -0.05em; margin-bottom: 8px;">CODEXIS</div>
+							<div style="font-size: 10px; color: #777777; text-transform: uppercase; letter-spacing: 0.1em;">Soporte Profesional</div>
+						</div>
+					</div>
+
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 60px;">
+						<div>
+							<div style="font-size: 20px; font-weight: 900; margin-bottom: 16px;">CODEXIS</div>
+							<div style="font-size: 12px; color: #474747;">
+								<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 4px;">Contacto</p>
+								<p><strong>Cel:</strong> 3174190562</p>
+								<p>soporte@codexis.com</p>
+							</div>
+						</div>
+						<div style="text-align: right;">
+							<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 4px;">Fecha de Emisión</p>
+							<p style="font-size: 20px; font-weight: 700;">${invoice.date || ''}</p>
+						</div>
+					</div>
+
+					<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 60px; border-top: 1px solid #f0f0f0; padding-top: 30px;">
+						<div>
+							<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 4px;">Facturar a</p>
+							<p style="font-size: 16px; font-weight: 700; text-transform: uppercase;">${escapeHtml(client.name)}</p>
+						</div>
+						<div>
+							<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 4px;">Cédula / NIT</p>
+							<p style="font-size: 16px;">${escapeHtml(client.cedula || '--')}</p>
+						</div>
+						<div>
+							<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 4px;">Teléfono</p>
+							<p style="font-size: 16px;">${escapeHtml(client.phone || '--')}</p>
+						</div>
+					</div>
+
+					<div style="margin-bottom: 60px;">
+						<div style="display: grid; grid-template-columns: repeat(12, 1fr); border-bottom: 2px solid #1b1b1b; padding-bottom: 8px; margin-bottom: 8px;">
+							<div style="grid-column: span 6; text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: 0.1em;">Descripción</div>
+							<div style="grid-column: span 2; text-align: center; text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: 0.1em;">Cant.</div>
+							<div style="grid-column: span 2; text-align: right; text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: 0.1em;">Precio Unit.</div>
+							<div style="grid-column: span 2; text-align: right; text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: 0.1em;">Total</div>
+						</div>
+						${itemsHTML}
+					</div>
+
+					<div style="display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 80px;">
+						<div style="width: 250px;">
+							<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+								<span style="text-transform: uppercase; font-size: 9px; color: #777777; letter-spacing: 0.1em;">Subtotal</span>
+								<span style="font-size: 14px; font-weight: 500;">${formatCurrency(invoice.subtotal || 0)}</span>
+							</div>
+							<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+								<span style="text-transform: uppercase; font-size: 9px; color: #777777; letter-spacing: 0.1em;">Impuestos (0%)</span>
+								<span style="font-size: 14px;">$ 0,00</span>
+							</div>
+							<div style="display: flex; justify-content: space-between; padding: 20px; background: #e2f3f0; margin-top: 20px;">
+								<span style="text-transform: uppercase; font-size: 10px; font-weight: 900; letter-spacing: 0.2em;">Total General</span>
+								<span style="font-size: 24px; font-weight: 900; letter-spacing: -0.02em;">${formatCurrency(invoice.total || 0)}</span>
+							</div>
+						</div>
+					</div>
+
+					${invoice.notes ? `
+						<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+							<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 8px;">Notas Adicionales</p>
+							<p style="font-size: 12px; color: #474747; line-height: 1.6;">${escapeHtml(invoice.notes)}</p>
+						</div>
+					` : ''}
+
+					<div style="margin-top: 100px; padding-top: 40px; border-top: 1px solid #f0f0f0; text-align: center;">
+						<p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 9px; color: #777777; margin-bottom: 20px;">Gracias por elegir las soluciones tecnológicas de CODEXIS.</p>
+						<div style="font-weight: 900; font-size: 14px; letter-spacing: -0.02em;">CODEXIS</div>
+						<p style="text-transform: uppercase; letter-spacing: 0.2em; font-size: 8px; color: #bbbbbb; margin-top: 8px;">© 2024 CODEXIS. SOPORTE PROFESIONAL.</p>
+					</div>
+				</div>
+			`;
+
+			const container = document.createElement('div');
+			container.style.position = 'fixed';
+			container.style.left = '-9999px';
+			container.innerHTML = invoiceHTML;
+			document.body.appendChild(container);
+
+			const opt = {
+				margin: 0,
+				filename: `Factura_${invoice.invoiceNumber || id}.pdf`,
+				image: { type: 'jpeg', quality: 0.98 },
+				html2canvas: { scale: 2, useCORS: true },
+				jsPDF: { unit: 'pt', format: 'letter', orientation: 'portrait' }
+			};
+
+			try {
+				const worker = html2pdf().set(opt).from(container.firstElementChild);
+				const pdfBlobUrl = await worker.output('bloburl');
+				window.open(pdfBlobUrl, '_blank');
+			} catch (err) {
+				console.error('Error:', err);
+				alert('Error al generar PDF');
+			} finally {
+				document.body.removeChild(container);
 			}
 		}
 	</script>

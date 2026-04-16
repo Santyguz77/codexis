@@ -918,19 +918,28 @@
     </div>
 
     <script>
-        // ===== DATOS DE PRODUCTOS =====
-        const PRODUCTOS = [
-            { id: 1, nombre: "Auriculares Sony WH-1000XM5", precio: 399.99, imagen: "https://via.placeholder.com/300x300?text=Sony+Headphones", categoria: "audio", stock: 15 },
-            { id: 2, nombre: "iPhone 15 Pro Max", precio: 1199.99, imagen: "https://via.placeholder.com/300x300?text=iPhone+15", categoria: "telefono", stock: 8 },
-            { id: 3, nombre: "Samsung Galaxy S24", precio: 999.99, imagen: "https://via.placeholder.com/300x300?text=Galaxy+S24", categoria: "telefono", stock: 12 },
-            { id: 4, nombre: "iPad Pro 12.9", precio: 1099.99, imagen: "https://via.placeholder.com/300x300?text=iPad+Pro", categoria: "tablet", stock: 6 },
-            { id: 5, nombre: "Apple Watch Series 9", precio: 399.99, imagen: "https://via.placeholder.com/300x300?text=Apple+Watch", categoria: "accesorios", stock: 20 },
-            { id: 6, nombre: "MacBook Pro 16\"", precio: 2499.99, imagen: "https://via.placeholder.com/300x300?text=MacBook+Pro", categoria: "computadora", stock: 5 },
-            { id: 7, nombre: "Samsung TV 65\" QLED", precio: 1799.99, imagen: "https://via.placeholder.com/300x300?text=Samsung+TV", categoria: "tv", stock: 4 },
-            { id: 8, nombre: "AirPods Pro 2", precio: 249.99, imagen: "https://via.placeholder.com/300x300?text=AirPods+Pro", categoria: "audio", stock: 25 },
-        ];
-
+        const API_URL = "https://consultation-paying-detailed-cottages.trycloudflare.com/api";
+        let PRODUCTOS = [];
         let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        // ===== CARGA DE DATOS =====
+        async function loadCatalog() {
+            try {
+                const res = await fetch(API_URL + '/catalog_items', { cache: 'no-store' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                PRODUCTOS = Array.isArray(data) ? data : (data.data || []);
+                
+                // Una vez cargados, renderizar secciones iniciales
+                renderHeroSection();
+                renderFeaturedCategories();
+                renderCatalogo();
+                updateCartBadge();
+            } catch (err) {
+                console.error('Error cargando catálogo:', err);
+                PRODUCTOS = [];
+            }
+        }
 
         // ===== FUNCIONES PRINCIPALES =====
         function showPage(pageId) {
@@ -951,21 +960,96 @@
             const container = document.getElementById('producto-container');
             if (!container) return;
 
-            container.innerHTML = PRODUCTOS.map(producto => `
-        <div class="group cursor-pointer">
-            <div class="aspect-[4/5] bg-surface-container-low overflow-hidden relative mb-8">
-                <img class="w-full h-full object-cover grayscale mix-blend-multiply transition-transform duration-500 group-hover:scale-105" src="${producto.imagen}" alt="${producto.nombre}"/>
-            </div>
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="text-xl font-bold tracking-tight mb-2">${producto.nombre}</h3>
-                    <p class="text-on-surface-variant label-sm uppercase tracking-[0.1em]">Stock: ${producto.stock}</p>
+            if (PRODUCTOS.length === 0) {
+                container.innerHTML = '<div class="col-span-full py-20 text-center text-outline-variant uppercase text-sm tracking-widest">Cargando productos...</div>';
+                return;
+            }
+
+            container.innerHTML = PRODUCTOS.map(producto => {
+                const img = producto.image || (producto.images && producto.images[0] ? (producto.images[0].data || producto.images[0]) : '');
+                return `
+                <div class="group cursor-pointer">
+                    <div class="aspect-[4/5] bg-surface-container-low overflow-hidden relative mb-8" onclick="showProductDetails('${producto.id}')">
+                        <img class="w-full h-full object-cover grayscale mix-blend-multiply transition-transform duration-500 group-hover:scale-105" src="${img}" alt="${producto.name}"/>
+                        ${producto.featured ? `<div class="absolute top-6 left-6"><span class="bg-primary text-white text-[10px] font-bold tracking-[0.2em] px-3 py-1 uppercase">Destacado</span></div>` : ''}
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div onclick="showProductDetails('${producto.id}')">
+                            <h3 class="text-xl font-bold tracking-tight mb-2 uppercase">${producto.name}</h3>
+                            <p class="text-on-surface-variant label-sm uppercase tracking-[0.1em]">${producto.category || 'General'}</p>
+                        </div>
+                        <span class="text-2xl font-black">$${Number(producto.price || 0).toLocaleString()}</span>
+                    </div>
+                    <button onclick="agregarAlCarrito('${producto.id}')" class="mt-8 w-full py-4 border border-outline-variant text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all duration-300">
+                        Agregar al Carrito
+                    </button>
                 </div>
-                <span class="text-2xl font-black">$${producto.precio.toFixed(2)}</span>
-            </div>
-            <button onclick="agregarAlCarrito(${producto.id})" class="mt-8 w-full py-4 border border-outline-variant text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all duration-300">Agregar al Carrito</button>
-        </div>
-    `).join('');
+            `;}).join('');
+        }
+
+        function renderHeroSection() {
+            const featured = PRODUCTOS.find(p => p.featured) || PRODUCTOS[0];
+            const heroTitle = document.querySelector('#home h1');
+            const heroDesc = document.querySelector('#home p');
+            const heroImg = document.querySelector('#home img');
+            const heroBtn = document.querySelector('#home button');
+
+            if (featured && heroTitle && heroDesc && heroImg) {
+                const img = featured.image || (featured.images && featured.images[0] ? (featured.images[0].data || featured.images[0]) : '');
+                heroTitle.innerHTML = featured.name.replace(' ', '<br/>').toUpperCase();
+                heroDesc.textContent = featured.description || 'Tecnología de precisión para el mundo moderno.';
+                heroImg.src = img;
+                heroBtn.setAttribute('onclick', `showProductDetails('${featured.id}')`);
+            }
+        }
+
+        function renderFeaturedCategories() {
+            const categories = [...new Set(PRODUCTOS.map(p => p.category).filter(Boolean))];
+            const catGrid = document.querySelector('#home section:nth-of-type(2) .grid');
+            if (!catGrid || categories.length === 0) return;
+
+            catGrid.innerHTML = categories.slice(0, 3).map((cat, i) => {
+                const representative = PRODUCTOS.find(p => p.category === cat);
+                const img = representative ? (representative.image || (representative.images && representative.images[0] ? (representative.images[0].data || representative.images[0]) : '')) : '';
+                return `
+                    <div class="group cursor-pointer ${i === 1 ? 'md:-mt-12' : ''}" onclick="filterByCategory('${cat}')">
+                        <div class="bg-surface-container-low aspect-[3/4] overflow-hidden mb-6">
+                            <img class="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-105" src="${img}" alt="${cat}"/>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold uppercase tracking-tight">${cat}</h3>
+                            <span class="text-[10px] font-bold tracking-widest text-outline">0${i+1}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterByCategory(cat) {
+            showPage('catalogo');
+            // Aquí se podría añadir lógica de filtrado real si se desea
+        }
+
+        async function showProductDetails(id) {
+            const producto = PRODUCTOS.find(p => p.id === id);
+            if (!producto) return;
+
+            const page = document.getElementById('producto');
+            const imgEl = page.querySelector('img');
+            const titleEl = page.querySelector('h1');
+            const descEl = page.querySelector('p');
+            const priceEl = page.querySelector('.text-4xl');
+            const categoryEl = page.querySelector('.text-on-surface-variant.mb-4');
+            const buyBtn = page.querySelector('button');
+
+            if (imgEl) imgEl.src = producto.image || (producto.images && producto.images[0] ? (producto.images[0].data || producto.images[0]) : '');
+            if (titleEl) titleEl.textContent = producto.name.toUpperCase();
+            if (descEl) descEl.textContent = producto.description || 'Sin descripción disponible.';
+            if (priceEl) priceEl.textContent = `$${Number(producto.price || 0).toLocaleString()}`;
+            if (categoryEl) categoryEl.textContent = (producto.category || 'GENERAL').toUpperCase() + ' / ' + id.substring(0, 5);
+            if (buyBtn) buyBtn.setAttribute('onclick', `agregarAlCarrito('${producto.id}')`);
+
+            showPage('producto');
         }
 
         function renderCarrito() {
@@ -973,8 +1057,15 @@
             const totales = document.getElementById('carrito-total');
 
             if (!carrito || carrito.length === 0) {
-                if (container) container.innerHTML = '<p class="text-center py-8 text-on-surface-variant">Tu carrito está vacío</p>';
-                if (totales) totales.innerHTML = '<p class="text-lg font-bold">Total: $0.00</p>';
+                if (container) container.innerHTML = '<p class="text-center py-20 text-on-surface-variant uppercase text-sm tracking-widest font-bold">Tu carrito está vacío</p>';
+                if (totales) {
+                    totales.innerHTML = `
+                        <div class="py-20 text-center">
+                            <h2 class="text-2xl font-black uppercase tracking-tight mb-4">Vacío</h2>
+                            <p class="text-on-surface-variant text-sm uppercase tracking-widest">Explora el catálogo para añadir productos.</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
@@ -984,30 +1075,31 @@
             carrito.forEach(item => {
                 const producto = PRODUCTOS.find(p => p.id === item.id);
                 if (producto) {
-                    const subtotal = producto.precio * item.cantidad;
+                    const img = producto.image || (producto.images && producto.images[0] ? (producto.images[0].data || producto.images[0]) : '');
+                    const subtotal = Number(producto.price || 0) * item.cantidad;
                     total += subtotal;
                     html += `
-                <div class="group flex flex-col md:flex-row gap-8 items-start bg-surface-container-low p-8 relative overflow-hidden transition-all duration-300 hover:bg-surface-container">
+                <div class="group flex flex-col md:flex-row gap-8 items-start bg-surface-container-low p-8 relative overflow-hidden transition-all duration-300 hover:bg-surface-container border border-outline-variant/10">
                     <div class="w-full md:w-48 aspect-square bg-surface-container-highest overflow-hidden">
-                        <img class="w-full h-full object-cover grayscale mix-blend-multiply transition-transform duration-500 group-hover:scale-105" src="${producto.imagen}" alt="${producto.nombre}"/>
+                        <img class="w-full h-full object-cover grayscale mix-blend-multiply transition-transform duration-500 group-hover:scale-105" src="${img}" alt="${producto.name}"/>
                     </div>
                     <div class="flex-grow flex flex-col justify-between h-full py-2">
                         <div>
                             <div class="flex justify-between items-start">
-                                <h3 class="text-xl font-bold tracking-tight uppercase">${producto.nombre}</h3>
-                                <button onclick="eliminarDelCarrito(${item.id})" class="text-on-surface-variant hover:text-primary transition-colors">
+                                <h3 class="text-xl font-bold tracking-tight uppercase">${producto.name}</h3>
+                                <button onclick="eliminarDelCarrito('${item.id}')" class="text-on-surface-variant hover:text-primary transition-colors">
                                     <span class="material-symbols-outlined">close</span>
                                 </button>
                             </div>
-                            <p class="font-['Inter'] text-[11px] tracking-[0.1em] font-medium uppercase text-on-surface-variant mt-1">Categoría: ${producto.categoria}</p>
+                            <p class="font-['Inter'] text-[11px] tracking-[0.1em] font-medium uppercase text-on-surface-variant mt-1">${producto.category || 'GENERAL'}</p>
                         </div>
                         <div class="mt-8 flex justify-between items-end">
                             <div class="flex items-center gap-6 border-b border-outline-variant pb-2">
-                                <button onclick="actualizarCarrito(${item.id}, ${item.cantidad - 1})" class="text-sm font-bold hover:opacity-50">-</button>
+                                <button onclick="actualizarCarrito('${item.id}', ${item.cantidad - 1})" class="text-sm font-bold hover:opacity-50">-</button>
                                 <span class="text-sm font-black w-4 text-center">${String(item.cantidad).padStart(2, '0')}</span>
-                                <button onclick="actualizarCarrito(${item.id}, ${item.cantidad + 1})" class="text-sm font-bold hover:opacity-50">+</button>
+                                <button onclick="actualizarCarrito('${item.id}', ${item.cantidad + 1})" class="text-sm font-bold hover:opacity-50">+</button>
                             </div>
-                            <div class="text-xl font-black">$${subtotal.toFixed(2)}</div>
+                            <div class="text-xl font-black font-['Inter'] tracking-tighter">$${subtotal.toLocaleString()}</div>
                         </div>
                     </div>
                 </div>
@@ -1018,45 +1110,46 @@
             if (container) container.innerHTML = html;
 
             if (totales) {
+                const tax = total * 0.19;
+                const shipping = total > 500000 ? 0 : 15000;
+                const grandTotal = total + tax + shipping;
+
                 totales.innerHTML = `
-            <div>
-                <h2 class="text-2xl font-black uppercase tracking-tight mb-8">Resumen</h2>
-                <div class="space-y-6">
-                    <div class="flex justify-between text-on-surface-variant">
-                        <span>Subtotal</span>
-                        <span>$${total.toFixed(2)}</span>
+                    <div class="sticky top-32">
+                        <h2 class="text-2xl font-black uppercase tracking-tight mb-8">Resumen</h2>
+                        <div class="space-y-6">
+                            <div class="flex justify-between text-on-surface-variant text-sm uppercase tracking-widest font-bold">
+                                <span>Subtotal</span>
+                                <span>$${total.toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between text-on-surface-variant text-sm uppercase tracking-widest font-bold">
+                                <span>IVA (19%)</span>
+                                <span>$${tax.toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between text-on-surface-variant text-sm uppercase tracking-widest font-bold">
+                                <span>Envío</span>
+                                <span>$${shipping.toLocaleString()}</span>
+                            </div>
+                            <div class="border-t border-outline-variant pt-6 flex justify-between items-baseline">
+                                <span class="font-black text-xl uppercase tracking-tighter">Total</span>
+                                <span class="font-black text-3xl tracking-tighter">$${grandTotal.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 space-y-4">
+                            <button onclick="procederPago()" class="w-full bg-primary text-on-primary py-8 text-sm font-black tracking-[0.2em] uppercase transition-all duration-300 hover:bg-primary-fixed active:scale-[0.98]">
+                                PROCEDER AL PAGO
+                            </button>
+                            <p class="text-[10px] text-center text-outline uppercase tracking-widest font-bold opacity-50">Transacción segura de Codexis</p>
+                        </div>
                     </div>
-                    <div class="flex justify-between text-on-surface-variant">
-                        <span>Impuestos (10%)</span>
-                        <span>$${(total * 0.1).toFixed(2)}</span>
-                    </div>
-                    <div class="flex justify-between text-on-surface-variant">
-                        <span>Envío</span>
-                        <span>$10.00</span>
-                    </div>
-                    <div class="border-t border-outline-variant pt-6 flex justify-between">
-                        <span class="font-black text-xl">Total</span>
-                        <span class="font-black text-2xl">$${(total * 1.1 + 10).toFixed(2)}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="relative">
-                    <input class="w-full bg-transparent border-b border-outline text-[11px] tracking-[0.15em] py-4 focus:ring-0 focus:border-primary placeholder:text-outline-variant uppercase font-medium" placeholder="CÓDIGO PROMOCIONAL" type="text"/>
-                    <button class="absolute right-0 bottom-4 text-[10px] font-black uppercase tracking-widest hover:text-on-surface-variant transition-colors">Aplicar</button>
-                </div>
-            </div>
-            <button onclick="procederPago()" class="w-full bg-primary text-on-primary py-8 text-sm font-black tracking-[0.2em] uppercase transition-all duration-300 hover:bg-primary-fixed active:scale-[0.98]">
-                PROCEDER AL PAGO
-            </button>
-        `;
+                `;
             }
         }
 
         function agregarAlCarrito(productoId) {
             const producto = PRODUCTOS.find(p => p.id === productoId);
-            if (!producto || producto.stock <= 0) {
-                alert('Producto sin stock');
+            if (!producto) {
+                alert('Ocurrió un error con este producto.');
                 return;
             }
 
@@ -1069,6 +1162,7 @@
 
             guardarCarrito();
             updateCartBadge();
+            alert(`¡${producto.name} agregado al carrito!`);
         }
 
         function actualizarCarrito(productoId, nuevaCantidad) {
@@ -1123,7 +1217,7 @@
                     fecha: new Date().toLocaleString(),
                     total: carrito.reduce((sum, item) => {
                         const prod = PRODUCTOS.find(p => p.id === item.id);
-                        return sum + (prod ? prod.precio * item.cantidad : 0);
+                        return sum + (prod ? Number(prod.price || 0) * item.cantidad : 0);
                     }, 0)
                 };
 
@@ -1135,16 +1229,12 @@
             }
         }
 
-        // Renderizar carrito al cargar la página
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Catálogo cargado - Carrito actualizado');
-            // Mostrar página home por defecto
-            showPage('home');
+            console.log('Catálogo Codexis inicializando...');
+            loadCatalog();
+            updateCartBadge();
         });
-
-        // Inicializar
-        renderCatalogo();
-        renderCarrito();
     </script>
 
 </body>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "surface-container": "#eeeeee",
+                        "outline-variant": "#c6c6c6",
+                        "secondary-fixed-dim": "#ababab",
+                        "outline": "#777777",
+                        "primary-container": "#3b3b3b",
+                        "tertiary": "#3b3b3b",
+                        "surface-container-low": "#f3f3f3",
+                        "on-primary-container": "#ffffff",
+                        "on-background": "#1b1b1b",
+                        "tertiary-fixed": "#5e5e5e",
+                        "surface-bright": "#f9f9f9",
+                        "primary": "#000000",
+                        "surface-tint": "#5e5e5e",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f1f1f1",
+                        "on-surface-variant": "#474747",
+                        "secondary-fixed": "#c6c6c6",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#e2e2e2",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#303030",
+                        "on-surface": "#1b1b1b",
+                        "on-secondary-container": "#1b1b1b",
+                        "tertiary-fixed-dim": "#474747",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "tertiary-container": "#747474",
+                        "on-tertiary-container": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface": "#f9f9f9",
+                        "on-error": "#ffffff",
+                        "on-primary": "#e2e2e2",
+                        "on-error-container": "#410002",
+                        "inverse-primary": "#c6c6c6",
+                        "background": "#f9f9f9",
+                        "surface-dim": "#dadada",
+                        "secondary-container": "#d4d4d4",
+                        "secondary": "#5e5e5e",
+                        "on-primary-fixed": "#ffffff",
+                        "primary-fixed": "#5e5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#474747",
+                        "surface-container-high": "#e8e8e8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-header {
+            background: rgba(249, 249, 249, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-background min-h-screen selection:bg-primary-container selection:text-white">
+    <!-- Top Navigation Bar -->
+    <nav
+        class="fixed top-0 w-full z-50 rounded-none bg-[#f9f9f9]/80 backdrop-blur-[20px] dark:bg-black/80 flex justify-between items-center px-6 md:px-20 py-6 max-w-none">
+        <div class="text-2xl font-black tracking-[-0.02em] text-black dark:text-white">CODEXIS</div>
+        <div class="hidden md:flex items-center space-x-12">
+            <a class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-[#474747] dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+                href="#">Collections</a>
+            <a class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-[#474747] dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+                href="#">Hardware</a>
+            <a class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-[#474747] dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+                href="#">Support</a>
+            <a class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-black dark:text-white font-bold border-b-2 border-black dark:border-white pb-1"
+                href="#">Invoices</a>
+        </div>
+        <div class="flex items-center space-x-6">
+            <span class="material-symbols-outlined cursor-pointer" data-icon="shopping_bag">shopping_bag</span>
+            <span class="material-symbols-outlined cursor-pointer" data-icon="account_circle">account_circle</span>
+        </div>
+    </nav>
+    <main class="pt-32 pb-40 px-6 md:px-20 max-w-7xl mx-auto">
+        <!-- Action Header -->
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div>
+                <p class="font-['Inter'] uppercase tracking-[0.2em] text-[0.6875rem] text-on-surface-variant mb-2">
+                    Transaction Detail</p>
+                <h1 class="text-[3.5rem] font-black tracking-[-0.02em] leading-none uppercase">FAC-000018</h1>
+            </div>
+            <div class="flex gap-4">
+                <button
+                    class="bg-[#e2f3f0] text-primary px-8 py-4 font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] font-bold hover:bg-[#d0ece7] transition-colors">
+                    <span class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+                        Download PDF
+                    </span>
+                </button>
+                <button
+                    class="bg-[#f0e2f3] text-primary px-8 py-4 font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] font-bold hover:bg-[#ebd0f3] transition-colors">
+                    <span class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]" data-icon="print">print</span>
+                        Print
+                    </span>
+                </button>
+            </div>
+        </div>
+        <!-- Invoice Body -->
+        <div class="bg-surface-container-low p-1 md:p-12 relative overflow-hidden">
+            <!-- Asymmetric decorative block -->
+            <div class="absolute top-0 right-0 w-1/3 h-1 bg-primary"></div>
+            <div class="bg-surface-container-lowest p-8 md:p-16">
+                <!-- Branding & Meta -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+                    <div>
+                        <div class="text-3xl font-black tracking-tighter mb-8">CODEXIS</div>
+                        <div class="space-y-1">
+                            <p
+                                class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">
+                                Contact</p>
+                            <p class="text-on-surface text-lg font-medium">Cel: 3174190562</p>
+                            <p class="text-on-surface text-lg">soporte@codexis.com</p>
+                        </div>
+                    </div>
+                    <div class="md:text-right">
+                        <div class="space-y-1">
+                            <p
+                                class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">
+                                Issue Date</p>
+                            <p class="text-2xl font-bold tracking-tight">2026-04-06</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Client Info Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-24 border-t border-outline-variant/10 pt-12">
+                    <div class="space-y-1">
+                        <p class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">
+                            Bill To</p>
+                        <p class="text-xl font-bold uppercase">ASTRID PLAZAS</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">
+                            Tax ID / Cédula</p>
+                        <p class="text-xl">37558866</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">
+                            Telephone</p>
+                        <p class="text-xl">3123553274</p>
+                    </div>
+                </div>
+                <!-- Product Table -->
+                <div class="mb-24">
+                    <div class="grid grid-cols-12 pb-4 mb-4 border-b-2 border-primary">
+                        <div class="col-span-6 font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] font-bold">
+                            Description</div>
+                        <div
+                            class="col-span-2 text-center font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] font-bold">
+                            Qty</div>
+                        <div
+                            class="col-span-2 text-right font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] font-bold">
+                            Unit Price</div>
+                        <div
+                            class="col-span-2 text-right font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] font-bold">
+                            Total</div>
+                    </div>
+                    <div class="grid grid-cols-12 py-8 group transition-colors hover:bg-surface-container-low/50">
+                        <div class="col-span-6">
+                            <p class="text-lg font-medium tracking-tight">REPARACION IMPRESORA</p>
+                            <p class="text-on-surface-variant text-sm mt-1">Technical maintenance and component
+                                verification.</p>
+                        </div>
+                        <div class="col-span-2 text-center text-lg">1</div>
+                        <div class="col-span-2 text-right text-lg">$ 50.000,00</div>
+                        <div class="col-span-2 text-right text-lg font-bold">$ 50.000,00</div>
+                    </div>
+                </div>
+                <!-- Financial Summary -->
+                <div class="flex flex-col items-end">
+                    <div class="w-full md:w-1/3 space-y-4">
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+                            <span
+                                class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">Subtotal</span>
+                            <span class="text-lg font-medium">$ 50.000,00</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+                            <span
+                                class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-on-surface-variant">Tax
+                                (0%)</span>
+                            <span class="text-lg">$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between items-center p-6 bg-[#e2f3f0] mt-8">
+                            <span class="font-['Inter'] uppercase tracking-[0.2em] text-[0.6875rem] font-black">Grand
+                                Total</span>
+                            <span class="text-3xl font-black tracking-tight">$ 50.000,00</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer Note -->
+                <div class="mt-32 pt-12 border-t border-outline-variant/10 text-center">
+                    <p class="font-['Inter'] uppercase tracking-[0.1em] text-[0.6875rem] text-[#777777]">Thank you for
+                        choosing CODEXIS hardware solutions.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Decorative Floating Image Section -->
+        <section class="mt-40">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+                <div class="relative aspect-square bg-surface-container-highest overflow-hidden">
+                    <img class="w-full h-full object-cover grayscale brightness-110 contrast-125"
+                        data-alt="Minimalist high-end office setup with a high-performance computer hardware and clean white desk in morning soft light"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtUrFsX3YRrRA8rqAaFi_KItngUphio_W0wLARWYUegtpXbiZxRx18cYPVkSMFqHBwPeV7aBUQ-_torYhBLE9t_VcV5jf3zk7PcveMI2jI9hdOTLtEaMWlGFi9tWPol_INAPkQVM4w6BIc6Y9sKZ8hx_Qb8kmQMvtVlMVZBgC8y4InZsZwRwDhd55FP06riUvZSWEQ-8wHiFBaoaSKxjkE_Ca90MEOKwbcYqxAUT01wk5nOAb-PF_WlAHySCLvksHzsadVtVMszCk" />
+                </div>
+                <div class="space-y-8">
+                    <p class="font-['Inter'] uppercase tracking-[0.2em] text-[0.6875rem] text-on-surface-variant">Our
+                        Standards</p>
+                    <h2 class="text-5xl font-black tracking-tighter uppercase leading-none">Soporte Profesional.</h2>
+                    <p class="text-lg text-on-surface-variant leading-relaxed">Every repair is handled with technical
+                        rigor. Our commitment to monochromatic precision extends from our hardware to our documentation.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer
+        class="bg-[#f3f3f3] dark:bg-zinc-950 flex flex-col md:flex-row justify-between items-center px-20 py-32 w-full mt-40">
+        <div class="font-black text-black dark:text-white mb-8 md:mb-0">CODEXIS</div>
+        <div class="flex flex-col items-center md:items-end gap-6">
+            <div class="flex gap-8">
+                <a class="font-['Inter'] uppercase tracking-[0.2em] text-[10px] text-[#777777] dark:text-zinc-500 hover:text-black dark:hover:text-white transition-all"
+                    href="#">Privacy</a>
+                <a class="font-['Inter'] uppercase tracking-[0.2em] text-[10px] text-[#777777] dark:text-zinc-500 hover:text-black dark:hover:text-white transition-all"
+                    href="#">Terms</a>
+                <a class="font-['Inter'] uppercase tracking-[0.2em] text-[10px] text-[#777777] dark:text-zinc-500 hover:text-black dark:hover:text-white transition-all"
+                    href="#">Shipping</a>
+                <a class="font-['Inter'] uppercase tracking-[0.2em] text-[10px] text-[#777777] dark:text-zinc-500 hover:text-black dark:hover:text-white transition-all"
+                    href="#">Global</a>
+            </div>
+            <div class="font-['Inter'] uppercase tracking-[0.2em] text-[10px] text-[#777777] dark:text-zinc-500">
+                © 2024 CODEXIS. SOPORTE PROFESIONAL.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
