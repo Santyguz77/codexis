@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Propuesta de Seguridad CODEXIS - Minimalist Premium</title>
+    <script src="productsData.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;family=Geist:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-high": "#e6e8ea",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface": "#191c1e",
+                        "primary": "#000000",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#bec6e0",
+                        "background": "#f7f9fb",
+                        "tertiary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-background": "#191c1e",
+                        "secondary": "#0051d5",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#45464d",
+                        "on-primary-fixed": "#131b2e",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-secondary-container": "#fefcff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "surface-bright": "#f7f9fb",
+                        "secondary-container": "#316bf3",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container": "#eceef0",
+                        "tertiary-container": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "outline": "#76777d",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "inverse-surface": "#2d3133",
+                        "surface-container-low": "#f2f4f6",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary-container": "#7c839b",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "surface": "#f7f9fb",
+                        "surface-tint": "#565e74",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-container": "#75859d",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-caps": ["Geist"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "spec-value": ["Geist"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "spec-value": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f7f9fb;
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+
+        .spec-hover {
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .group:hover .spec-hover {
+            opacity: 1;
+        }
+
+        @media print {
+
+            /* Ocultar elementos innecesarios */
+            nav,
+            button,
+            .sticky,
+            footer .grid,
+            footer .flex,
+            .spec-hover a {
+                display: none !important;
+            }
+
+            /* Configurar página de impresión */
+            @page {
+                size: letter;
+                margin: 1.5cm;
+            }
+
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                font-size: 11pt !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Estilo de espaciado en impresión */
+            .space-y-32> :not([hidden])~ :not([hidden]) {
+                --tw-space-y-reverse: 0 !important;
+                margin-top: 1.5rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+
+            section {
+                page-break-inside: avoid;
+                margin-top: 1rem !important;
+                margin-bottom: 2rem !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+
+            /* Reorganizar el grid de productos a 2 columnas */
+            #products-grid {
+                display: grid !important;
+                grid-template-cols: 1fr 1fr !important;
+                gap: 1.5rem !important;
+            }
+
+            /* Estilo de tarjeta para impresión */
+            .group {
+                page-break-inside: avoid;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 0.5rem !important;
+                padding: 1rem !important;
+                background: #ffffff !important;
+            }
+
+            /* Forzar mostrar las especificaciones técnicas */
+            .spec-hover {
+                display: block !important;
+                position: static !important;
+                opacity: 1 !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin-top: 1rem !important;
+                border-top: 1px dashed #cbd5e1 !important;
+                padding-top: 0.75rem !important;
+            }
+
+            /* Ocultar enlaces de ver ficha */
+            .spec-hover a {
+                display: none !important;
+            }
+
+            /* Limitar tamaño de imágenes en impresión */
+            .group img {
+                height: 160px !important;
+                border-radius: 0.25rem !important;
+            }
+
+            /* Forzar placeholders estéticos sin fondo negro pesado */
+            .group div.w-full.h-full {
+                height: 160px !important;
+                background-color: #f1f5f9 !important;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 0.25rem !important;
+                color: #475569 !important;
+            }
+
+            /* Distribución de la sección inferior en impresión (2 columnas a 1) */
+            .grid-cols-1.md\:grid-cols-2 {
+                grid-template-cols: 1fr !important;
+                gap: 2rem !important;
+            }
+
+            /* Forzar colores exactos en la tabla */
+            #quote-table-container table {
+                border: 1px solid #e2e8f0 !important;
+            }
+
+            #quote-table-container th {
+                background-color: #f8fafc !important;
+                color: #0f172a !important;
+            }
+
+            #quote-table-container td {
+                border-bottom: 1px solid #e2e8f0 !important;
+            }
+
+            /* Simplificar pie de página */
+            footer {
+                border-t: 1px solid #e2e8f0 !important;
+                padding-top: 2rem !important;
+                margin-top: 2rem !important;
+                background-color: transparent !important;
+            }
+
+            footer p {
+                text-align: center !important;
+                font-size: 9pt !important;
+                color: #64748b !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="font-body-md text-on-surface antialiased">
+    <!-- TopNavBar -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-surface-container">
+        <div
+            class="flex justify-between items-center w-full px-6 md:px-margin-desktop py-5 max-w-container-max mx-auto">
+            <div class="text-headline-md font-black tracking-tighter text-primary">CODEXIS</div>
+            <div class="hidden md:flex items-center gap-8">
+                <a class="font-label-caps text-label-caps text-primary border-b border-primary py-1"
+                    href="Montearroyo.html">PROPUESTA</a>
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="products.html">PRODUCTOS</a>
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="Specs.html">ESPECIFICACIONES</a>
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="garantia.html">GARANTÍA</a>
+            </div>
+            <button
+                class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-caps text-[11px] tracking-widest hover:bg-opacity-90 transition-all uppercase">CONTACTAR</button>
+        </div>
+    </nav>
+    <main class="max-w-container-max mx-auto px-6 md:px-margin-desktop space-y-32 py-24">
+        <!-- Hero Section -->
+        <section class="text-center max-w-4xl mx-auto space-y-8">
+            <div class="space-y-4">
+                <span class="font-label-caps text-label-caps text-secondary tracking-[0.3em] uppercase block">Sistemas
+                    de Seguridad de Alta Gama</span>
+                <h1 class="font-headline-xl text-headline-xl text-primary">Propuesta de Seguridad Integral para Altos de
+                    Montearroyo</h1>
+            </div>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                Soluciones tecnológicas de vanguardia diseñadas para la protección perimetral y residencial,
+                garantizando vigilancia 24/7 con precisión quirúrgica.
+            </p>
+            <div class="flex flex-wrap justify-center gap-8 pt-6">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">verified_user</span>
+                    <span class="font-label-caps text-[11px] tracking-widest uppercase">Seguridad total</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">visibility</span>
+                    <span class="font-label-caps text-[11px] tracking-widest uppercase">Monitoreo de alta
+                        definición</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Drone Survey Section -->
+        <section class="space-y-12 py-12 border-t border-surface-container" id="drone-survey">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                <!-- Video Player Column -->
+                <div class="space-y-6">
+                    <div>
+                        <span
+                            class="font-label-caps text-label-caps text-secondary tracking-widest uppercase block mb-2">Relevamiento
+                            de Campo</span>
+                        <h2 class="font-headline-lg text-primary tracking-tight">Análisis y Registro Aéreo</h2>
+                        <p class="text-on-surface-variant font-light mt-3 leading-relaxed">
+                            Para diseñar una propuesta de seguridad a la medida, realizamos un relevamiento fotográfico
+                            y de video aéreo del conjunto residencial. Esto nos permite identificar zonas ciegas,
+                            analizar el perímetro y planificar con precisión quirúrgica la ubicación y el ángulo de
+                            cobertura de cada cámara.
+                        </p>
+                    </div>
+
+                    <div
+                        class="bg-black rounded-xl overflow-hidden aspect-video shadow-lg border border-outline-variant relative group">
+                        <video id="drone-video-player" src="DJI_20260614165322_0012_D.MP4" controls
+                            class="w-full h-full object-cover"></video>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <span class="text-[10px] font-bold text-outline font-label-caps uppercase tracking-wider">Tomas
+                            de Drone:</span>
+                        <div
+                            class="flex bg-surface-container-low rounded-full p-1 border border-outline-variant w-fit text-[10px] font-label-caps font-bold">
+                            <button id="btn-drone-vid-1"
+                                onclick="changeDroneVideo('DJI_20260614165322_0012_D.MP4', this)"
+                                class="px-4 py-1.5 rounded-full transition-all bg-primary text-white shadow-sm">
+                                Vuelo de Reconocimiento 1
+                            </button>
+                            <button id="btn-drone-vid-2"
+                                onclick="changeDroneVideo('DJI_20260614170149_0032_D.MP4', this)"
+                                class="px-4 py-1.5 rounded-full transition-all text-on-surface-variant hover:text-primary">
+                                Vuelo de Reconocimiento 2
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photos Column -->
+                <div class="space-y-6">
+                    <div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline tracking-widest uppercase block mb-2">Registro
+                            Fotográfico</span>
+                        <h3 class="font-headline-md text-primary tracking-tight">Puntos de Vigilancia Relevados</h3>
+                        <p class="text-xs text-on-surface-variant font-light mt-2">
+                            Haz clic sobre cualquiera de las fotografías aéreas para abrirlas en alta resolución y
+                            examinar los cuadrantes de seguridad propuestos.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" id="drone-photos-grid">
+                        <!-- Se carga dinámicamente -->
+                    </div>
+
+                    <div class="pt-4 flex justify-center">
+                        <button id="btn-toggle-photos" onclick="toggleShowAllPhotos()"
+                            class="flex items-center gap-2 border border-outline text-primary px-5 py-2.5 rounded-full font-label-caps text-[11px] tracking-wider hover:bg-surface-container-low transition-colors uppercase font-bold">
+                            Ver Todas las Imágenes (44)
+                            <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Grid -->
+        <section class="space-y-12">
+            <div class="text-center space-y-2">
+                <h2 class="font-headline-lg text-headline-lg text-primary">Equipamiento y Sistemas de Seguridad</h2>
+                <p class="text-on-surface-variant font-light">Soluciones tecnológicas de alto rendimiento diseñadas para
+                    una protección integral.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter" id="products-grid">
+                <!-- Se cargan dinámicamente desde productsData.js -->
+            </div>
+        </section>
+        <!-- Infrastructure & Quote Summary -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-16 py-12 border-t border-surface-container">
+            <div class="space-y-8">
+                <h3 class="font-headline-lg text-primary tracking-tight">Resumen de Cotización</h3>
+                <div class="overflow-x-auto" id="quote-table-container">
+                    <!-- Se carga dinámicamente desde productsData.js -->
+                </div>
+            </div>
+            <div class="bg-surface-container-low p-10 flex flex-col justify-between rounded-lg">
+                <div>
+                    <span
+                        class="font-label-caps text-label-caps text-secondary mb-6 block tracking-widest uppercase">Codexis
+                        Shield</span>
+                    <h3 class="font-headline-lg text-primary mb-6 tracking-tight leading-tight">Un año de
+                        tranquilidad absoluta.</h3>
+                    <p class="text-on-surface-variant leading-relaxed mb-8 font-light">Nuestra cobertura integral
+                        garantiza el funcionamiento ininterrumpido de su infraestructura de seguridad mediante un
+                        soporte de nivel corporativo.</p>
+                    <ul class="space-y-5">
+                        <li class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="text-sm font-medium tracking-tight">Sustitución inmediata de hardware.</span>
+                        </li>
+                        <li class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="text-sm font-medium tracking-tight">Soporte técnico prioritario 24/7.</span>
+                        </li>
+                        <li class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="text-sm font-medium tracking-tight">Mantenimiento preventivo semestral.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-8 mt-8 border-t border-outline-variant/30 flex items-center gap-4">
+                    <span class="material-symbols-outlined text-4xl text-primary opacity-20">verified</span>
+                    <a href="garantia.html"
+                        class="text-[11px] font-label-caps text-on-surface-variant hover:text-primary transition-colors tracking-wider leading-4 uppercase">
+                        Garantía Extendida<br />Ver Detalles</a>
+                </div>
+            </div>
+        </section>
+        <!-- Final Summary Sticky Panel -->
+        <section
+            class="sticky bottom-8 z-50 bg-white shadow-xl border border-surface-container p-6 md:px-10 rounded-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full md:w-auto">
+                <div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full">
+                    <span class="material-symbols-outlined text-2xl">payments</span>
+                </div>
+                <div>
+                    <span
+                        class="font-label-caps text-[10px] text-outline block mb-1 uppercase tracking-widest">Inversión
+                        Total</span>
+                    <div class="flex items-baseline gap-3">
+                        <span class="font-headline-xl text-[36px] text-primary tracking-tighter leading-none"
+                            id="total-price">$0.00</span>
+                        <span class="font-label-caps text-[12px] text-on-surface-variant">COP + IVA</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <button
+                    class="bg-primary text-on-primary px-8 py-4 rounded-full font-label-caps text-[12px] tracking-[0.15em] uppercase hover:scale-[1.02] active:scale-100 transition-all flex items-center justify-center gap-3 w-full sm:w-auto">
+                    CONTACTAR
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-surface-container py-16">
+        <div class="max-w-container-max mx-auto px-6 md:px-margin-desktop">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+                <div class="space-y-6 max-w-xs">
+                    <div class="text-headline-md font-black tracking-tighter text-primary">CODEXIS</div>
+                    <p class="text-sm text-on-surface-variant font-light leading-relaxed">
+                        Sistemas de seguridad de alto rendimiento para entornos residenciales y corporativos exclusivos.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-12">
+                    <div class="space-y-4">
+                        <h5 class="font-label-caps text-[11px] tracking-widest text-primary uppercase">Empresa</h5>
+                        <ul class="space-y-3 text-sm text-on-surface-variant font-light">
+                            <li><a class="hover:text-primary transition-colors" href="#">Sobre nosotros</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Certificaciones</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="admin.html">Administración</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4">
+                        <h5 class="font-label-caps text-[11px] tracking-widest text-primary uppercase">Legal</h5>
+                        <ul class="space-y-3 text-sm text-on-surface-variant font-light">
+                            <li><a class="hover:text-primary transition-colors" href="#">Privacidad</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Términos</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Cookies</a></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4 col-span-2 md:col-span-1">
+                        <h5 class="font-label-caps text-[11px] tracking-widest text-primary uppercase">Soporte</h5>
+                        <p class="text-sm text-on-surface-variant font-light">Asistencia 24/7 para clientes Premium.</p>
+                        <p class="font-bold text-primary text-sm">+57 317 419 0562</p>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="mt-16 pt-8 border-t border-surface-container flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[12px] font-label-caps text-outline tracking-wider">
+                    © 2024 CODEXIS SECURITY SYSTEMS. TODOS LOS DERECHOS RESERVADOS. PREPARADO PARA ALTOS DE MONTEARROYO.
+                </p>
+                <div class="flex gap-4">
+                    <div
+                        class="w-8 h-8 rounded-full border border-surface-container flex items-center justify-center hover:border-primary transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">share</span>
+                    </div>
+                    <div
+                        class="w-8 h-8 rounded-full border border-surface-container flex items-center justify-center hover:border-primary transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">mail</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const WHATSAPP_NUMBER = "573174190562"; // Reemplaza con tu número de WhatsApp (código de país + número, sin espacios ni símbolos)
+        const WHATSAPP_MESSAGE = encodeURIComponent("Hola, estoy interesado en la propuesta de seguridad de CODEXIS para Altos de Montearroyo.");
+
+        // Galería del Drone
+        const dronePhotos = [
+
+            { src: "DJI_20260614165057_0006_D.JPG", desc: "Punto de acceso principal y vía de ingreso vehicular." },
+            { src: "DJI_20260614165152_0008_D.JPG", desc: "Detalle de los muros de contención y áreas de tránsito peatonal." },
+            { src: "DJI_20260614165238_0010_D.JPG", desc: "Vuelo cenital sobre los cuadrantes internos del conjunto." },
+            { src: "DJI_20260614165441_0013_D.JPG", desc: "Monitoreo perimetral - Zona boscosa colindante." },
+            { src: "DJI_20260614165532_0015_D.JPG", desc: "Estudio de elevación y puntos ciegos perimetrales." },
+            { src: "DJI_20260614165548_0017_D.JPG", desc: "Análisis topográfico - Pendiente y áreas de riesgo de acceso." },
+            { src: "DJI_20260614165651_0018_D.JPG", desc: "Sector central y distribución de vías internas." },
+            { src: "DJI_20260614165721_0019_D.JPG", desc: "Vigilancia perimetral - Análisis de cercado exterior." },
+            { src: "DJI_20260614165728_0021_D.JPG", desc: "Cobertura de cámaras - Esquinas críticas de Altos de Montearroyo." },
+            { src: "DJI_20260614165755_0022_D.JPG", desc: "Puntos de control perimetral - Conexión de fibra óptica exterior." },
+            { src: "DJI_20260614165828_0024_D.JPG", desc: "Monitoreo de entorno - Altura sugerida para domo PTZ." },
+            { src: "DJI_20260614165902_0027_D.JPG", desc: "Sector perimetral norte - Línea de vista libre sugerida." },
+            { src: "DJI_20260614165915_0028_D.JPG", desc: "Inspección perimetral - Control de aproximación forestal." },
+            { src: "DJI_20260614170134_0030_D.JPG", desc: "Acceso vehicular - Zonas de captación de matrículas (LPR)." },
+            { src: "DJI_20260614170218_0033_D.JPG", desc: "Puntos críticos de intrusión - Análisis del muro perimetral." },
+            { src: "DJI_20260614170223_0034_D.JPG", desc: "Senderos peatonales y puntos de instalación de domos fijos." },
+            { src: "DJI_20260614170239_0037_D.JPG", desc: "Vuelo general - Conexión física con central de monitoreo." },
+            { src: "DJI_20260614170256_0038_D.JPG", desc: "Puntos de red perimetrales - Canalización y ductos propuestos." },
+            { src: "DJI_20260614170336_0039_D.JPG", desc: "Estudio de altura y línea de vista - Zonas comunes Altas." },
+            { src: "DJI_20260614170341_0040_D.JPG", desc: "Inspección de linderos - Topografía de la quebrada vecina." },
+            { src: "DJI_20260614170358_0041_D.JPG", desc: "Linderos de seguridad - Análisis del sector nororiental." },
+            { src: "DJI_20260614170458_0042_D.JPG", desc: "Vuelo cenital - Puntos de anclaje para torres de telecomunicaciones." },
+            { src: "DJI_20260614170531_0043_D.JPG", desc: "Inspección perimetral de Altos de Montearroyo - Conectividad." },
+            { src: "DJI_20260614170541_0044_D.JPG", desc: "Análisis de cobertura - Cámaras sugeridas para la portería." },
+            { src: "DJI_20260614170613_0045_D.JPG", desc: "Muros divisorios y zonas residenciales adyacentes." },
+            { src: "DJI_20260614170655_0046_D.JPG", desc: "Reconocimiento aéreo - Sector sur de Altos de Montearroyo." },
+            { src: "DJI_20260614170700_0047_D.JPG", desc: "Vuelo general sobre Altos de Montearroyo - Zonas verdes." },
+            { src: "DJI_20260614170727_0048_D.JPG", desc: "Límites del conjunto y puntos de integración perimetral." },
+            { src: "DJI_20260614170731_0049_D.JPG", desc: "Inspección final de linderos - Seguridad perimetral perimetral." },
+            { src: "DJI_20260614170736_0050_D.JPG", desc: "Vista general de Altos de Montearroyo - Registro fotográfico final." }
+        ];
+
+        let activeLightboxIndex = 0;
+
+        window.changeDroneVideo = function (src, btn) {
+            const player = document.getElementById('drone-video-player');
+            if (player) {
+                player.src = src;
+                player.play();
+            }
+
+            // Alternar clases activas de los botones
+            document.querySelectorAll('#drone-survey button').forEach(b => {
+                if (b.id.startsWith('btn-drone-vid')) {
+                    b.className = "px-4 py-1.5 rounded-full transition-all text-on-surface-variant hover:text-primary";
+                }
+            });
+            btn.className = "px-4 py-1.5 rounded-full transition-all bg-primary text-white shadow-sm";
+        };
+
+        window.openLightbox = function (index) {
+            activeLightboxIndex = index;
+            updateLightboxContent();
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
+        };
+
+        window.closeLightbox = function () {
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = ''; // Restaurar scroll
+        };
+
+        window.navigateLightbox = function (direction) {
+            activeLightboxIndex = (activeLightboxIndex + direction + dronePhotos.length) % dronePhotos.length;
+            updateLightboxContent();
+        };
+
+        function updateLightboxContent() {
+            const imgEl = document.getElementById('lightbox-img');
+            const counterEl = document.getElementById('lightbox-counter');
+            const captionEl = document.getElementById('lightbox-caption');
+
+            if (imgEl && counterEl && captionEl) {
+                const photo = dronePhotos[activeLightboxIndex];
+                imgEl.src = photo.src;
+                counterEl.innerText = `Fotografía ${activeLightboxIndex + 1} de ${dronePhotos.length}`;
+                captionEl.innerText = photo.desc;
+            }
+        }
+
+        // Atajos de teclado para el Lightbox
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('lightbox-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                } else if (e.key === 'ArrowLeft') {
+                    navigateLightbox(-1);
+                } else if (e.key === 'ArrowRight') {
+                    navigateLightbox(1);
+                }
+            }
+        });
+
+        let showAllPhotos = false;
+
+        window.toggleShowAllPhotos = function () {
+            showAllPhotos = !showAllPhotos;
+            renderDronePhotos();
+        };
+
+        function renderDronePhotos() {
+            const grid = document.getElementById('drone-photos-grid');
+            if (!grid) return;
+
+            const limit = showAllPhotos ? dronePhotos.length : 6;
+
+            let html = '';
+            for (let i = 0; i < limit; i++) {
+                const photo = dronePhotos[i];
+                html += `
+                    <div class="group/thumb relative aspect-video rounded-lg overflow-hidden border border-outline-variant bg-surface-container-low cursor-pointer shadow-sm animate-fade-in" onclick="openLightbox(${i})">
+                        <img src="${photo.src}" class="w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105" alt="${photo.desc}" />
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-2xl">zoom_in</span>
+                        </div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+
+            // Actualizar texto del botón de ver más si existe
+            const btn = document.getElementById('btn-toggle-photos');
+            if (btn) {
+                btn.innerHTML = showAllPhotos
+                    ? `Mostrar Menos <span class="material-symbols-outlined text-sm">keyboard_arrow_up</span>`
+                    : `Ver Todas las Imágenes (${dronePhotos.length}) <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>`;
+            }
+        }
+
+        const inactiveOptionalIds = new Set();
+        const qtyModes = {}; // id -> 'recommended' | 'custom'
+        const customQuantities = {}; // id -> number
+
+        window.toggleOptional = function (id) {
+            if (inactiveOptionalIds.has(id)) {
+                inactiveOptionalIds.delete(id);
+            } else {
+                inactiveOptionalIds.add(id);
+            }
+            renderAll();
+        };
+
+        window.setQtyMode = function (id, mode) {
+            qtyModes[id] = mode;
+            renderAll();
+        };
+
+        window.adjustCustomQty = function (id, delta) {
+            const product = PRODUCTS_DATA.find(p => p.id === id);
+            if (!product) return;
+            const current = customQuantities[id] !== undefined ? customQuantities[id] : (product.qtyDesired || product.quantity || 1);
+            const next = Math.max(1, current + delta);
+            customQuantities[id] = next;
+            renderAll();
+        };
+
+        function renderAll() {
+            // Renderizar todos los productos en el grid principal
+            const productsGrid = document.getElementById('products-grid');
+            if (productsGrid) {
+                productsGrid.innerHTML = PRODUCTS_DATA.map(product => {
+                    // Generar las especificaciones resumidas si existen
+                    const specsHtml = product.specsSummary
+                        ? Object.entries(product.specsSummary).map(([key, val]) => `
+                            <div>
+                                <p class="text-[10px] text-outline uppercase tracking-wider">${key}</p>
+                                <p class="font-medium text-primary">${val}</p>
+                            </div>
+                        `).join('')
+                        : '';
+
+                    // Insignias según el series
+                    let badgeHtml = '';
+                    if (product.series) {
+                        const isPrimary = product.series === 'PREMIUM' || product.series === 'SERIE PRO' || product.series === 'MÁS VENDIDO';
+                        const badgeBg = isPrimary ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant';
+                        badgeHtml = `<span class="text-[9px] ${badgeBg} px-2 py-0.5 tracking-tighter uppercase font-bold rounded">${product.series}</span>`;
+                    }
+
+                    // Iconos de categoría dinámicos para cuando no hay imagen
+                    let categoryIcon = 'inventory_2';
+                    if (product.category === 'camaras') {
+                        categoryIcon = 'videocam';
+                    } else if (product.category === 'almacenamiento') {
+                        categoryIcon = 'dns';
+                    } else if (product.category === 'infraestructura') {
+                        categoryIcon = 'settings_ethernet';
+                    }
+
+                    const imageHtml = product.image
+                        ? `<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="${product.imageAlt}" src="${product.image}" />`
+                        : `<div class="w-full h-full flex flex-col items-center justify-center bg-surface-container text-outline gap-2"><span class="material-symbols-outlined text-[48px]">${categoryIcon}</span><span class="text-[9px] font-label-caps uppercase tracking-wider">Sin Imagen</span></div>`;
+
+                    const qtyRecommended = product.qtyRecommended || product.quantity || 1;
+                    const qtyDesired = product.qtyDesired || product.quantity || 1;
+                    const mode = qtyModes[product.id] || 'recommended';
+                    const customQty = customQuantities[product.id] !== undefined ? customQuantities[product.id] : qtyDesired;
+                    const activeQty = mode === 'recommended' ? qtyRecommended : customQty;
+
+                    const isInactive = inactiveOptionalIds.has(product.id);
+
+                    return `
+                        <div class="group cursor-default relative transition-all duration-300">
+                            <div class="${isInactive ? 'opacity-40 grayscale' : ''} relative aspect-[4/5] bg-white overflow-hidden mb-6 rounded-lg shadow-sm animate-fade-in transition-all duration-300">
+                                ${imageHtml}
+                                <div
+                                    class="spec-hover absolute inset-0 bg-white/95 flex flex-col justify-center p-10 text-center">
+                                    <span
+                                        class="font-label-caps text-[11px] text-outline mb-4 uppercase">Especificaciones</span>
+                                    <div class="space-y-4">
+                                        ${specsHtml || '<div><p class="text-xs text-on-surface-variant font-light">Consultar ficha técnica para más detalles.</p></div>'}
+                                    </div>
+                                    <a href="Specs.html#${product.id}"
+                                        class="mt-8 font-label-caps text-[10px] border-b border-primary pb-1 self-center uppercase">Ficha
+                                        Técnica Completa</a>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-start">
+                                <div class="${isInactive ? 'opacity-50' : ''} transition-opacity duration-300">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h3 class="font-headline-md text-primary tracking-tight text-lg md:text-xl">${product.name}</h3>
+                                        ${badgeHtml}
+                                    </div>
+                                    <p class="text-sm text-on-surface-variant mt-1">${product.tag}</p>
+                                </div>
+                                <div class="text-right pl-4 ${isInactive ? 'opacity-50 line-through' : ''} transition-all duration-300">
+                                    <span class="font-headline-md text-primary block text-base md:text-lg">$${product.price.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                                    <span class="text-[10px] text-outline block mt-1">Subtotal: $${(product.price * activeQty).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                                </div>
+                            </div>
+                            <!-- Cantidad y Control de Opcional -->
+                            <div class="mt-4 flex flex-col gap-3">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    ${product.optional ? `
+                                        <label class="bg-yellow-50 hover:bg-yellow-100 rounded-full w-fit px-3 py-1 border border-yellow-200 flex items-center gap-2 cursor-pointer transition-colors select-none">
+                                            <input type="checkbox" 
+                                                   class="text-primary focus:ring-primary border-outline-variant rounded" 
+                                                   onchange="toggleOptional('${product.id}')"
+                                                   ${!isInactive ? 'checked' : ''} />
+                                            <span class="text-[10px] text-yellow-800 font-bold uppercase tracking-tight">${!isInactive ? 'Incluido' : 'Omitido'}</span>
+                                        </label>
+                                    ` : ''}
+                                    ${(!product.optional || !isInactive) ? `
+                                        <div class="bg-surface-container-low rounded-full px-3 py-1 border border-outline-variant text-[11px] font-mono text-primary font-bold">
+                                            Cantidad: ${activeQty}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                ${(!product.optional || !isInactive) && product.allowCustomQty !== false ? `
+                                    <div class="flex flex-col gap-2">
+                                        <!-- Toggle de modo de cantidad -->
+                                        <div class="flex bg-surface-container-low rounded-full p-1 border border-outline-variant w-fit text-[10px] font-label-caps font-bold">
+                                            <button onclick="setQtyMode('${product.id}', 'recommended')" 
+                                                    class="px-2.5 py-0.5 rounded-full transition-all ${mode === 'recommended' ? 'bg-primary text-white shadow-sm' : 'text-on-surface-variant hover:text-primary'}">
+                                                Recomendado (${qtyRecommended})
+                                            </button>
+                                            <button onclick="setQtyMode('${product.id}', 'custom')" 
+                                                    class="px-2.5 py-0.5 rounded-full transition-all ${mode === 'custom' ? 'bg-primary text-white shadow-sm' : 'text-on-surface-variant hover:text-primary'}">
+                                                Personalizar
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Ajustador numérico si está en personalizado -->
+                                        ${mode === 'custom' ? `
+                                            <div class="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-full px-2 py-0.5 w-fit">
+                                                <button onclick="adjustCustomQty('${product.id}', -1)" class="w-5 h-5 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-bold transition-colors text-xs">-</button>
+                                                <span class="text-xs font-mono font-bold text-primary w-6 text-center">${customQty}</span>
+                                                <button onclick="adjustCustomQty('${product.id}', 1)" class="w-5 h-5 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-bold transition-colors text-xs">+</button>
+                                                <span class="text-[9px] text-outline uppercase font-label-caps font-bold pr-1">Uds.</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Renderizar Tabla de Cotización
+            const quoteContainer = document.getElementById('quote-table-container');
+            if (quoteContainer) {
+                const tableHtml = `
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-surface-container-highest">
+                                <th class="py-3 font-label-caps text-[11px] tracking-wider text-outline uppercase">Concepto</th>
+                                <th class="py-3 px-4 text-center font-label-caps text-[11px] tracking-wider text-outline uppercase">Cant.</th>
+                                <th class="py-3 text-right font-label-caps text-[11px] tracking-wider text-outline uppercase">V. Unitario</th>
+                                <th class="py-3 text-right font-label-caps text-[11px] tracking-wider text-outline uppercase">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-container/50">
+                            ${PRODUCTS_DATA.map(item => {
+                    const isInactive = inactiveOptionalIds.has(item.id);
+                    const mode = qtyModes[item.id] || 'recommended';
+                    const qtyRecommended = item.qtyRecommended || item.quantity || 1;
+                    const qtyDesired = item.qtyDesired || item.quantity || 1;
+                    const customQty = customQuantities[item.id] !== undefined ? customQuantities[item.id] : qtyDesired;
+                    const activeQty = mode === 'recommended' ? qtyRecommended : customQty;
+                    const itemSubtotal = isInactive ? 0 : item.price * activeQty;
+                    const qtyLabel = item.allowCustomQty !== false ? (mode === 'recommended' ? 'Rec.' : 'Pers.') : '';
+                    return `
+                                    <tr class="hover:bg-surface-container-low transition-colors duration-150 ${isInactive ? 'opacity-40 line-through bg-surface-container-low/30' : ''}">
+                                        <td class="py-4 pr-4">
+                                            <div class="font-medium text-primary">${item.name}</div>
+                                            <div class="text-xs text-on-surface-variant font-light mt-0.5">${item.tag} ${item.optional ? '<span class="text-[9px] bg-yellow-100 text-yellow-800 font-bold uppercase px-1.5 py-0.5 rounded ml-1">Opcional</span>' : ''}</div>
+                                        </td>
+                                        <td class="py-4 px-4 text-center">
+                                            <span class="font-mono font-medium text-primary block">${activeQty}</span>
+                                            ${qtyLabel ? `<span class="text-[8px] uppercase tracking-wider text-outline font-bold block mt-0.5">${isInactive ? '-' : qtyLabel}</span>` : ''}
+                                        </td>
+                                        <td class="py-4 text-right font-mono text-on-surface-variant">$${item.price.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>
+                                        <td class="py-4 text-right font-mono font-bold text-primary">${isInactive ? 'Omitido' : '$' + itemSubtotal.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>
+                                    </tr>
+                                `;
+                }).join('')}
+                            <!-- Fila: Mano de Obra -->
+                            <tr class="border-t-2 border-secondary/30 bg-secondary/5">
+                                <td class="py-4 pr-4">
+                                    <div class="font-medium text-secondary flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base">engineering</span>
+                                        Mano de Obra e Instalación
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="font-mono font-medium text-secondary block">—</span>
+                                </td>
+                                <td class="py-4 text-right font-mono text-on-surface-variant">—</td>
+                                <td class="py-4 text-right font-mono font-bold text-secondary" id="labor-cost-table">$0</td>
+                            </tr>
+                            <!-- Fila: Total General -->
+                            <tr class="border-t-2 border-primary bg-surface-container-low">
+                                <td class="py-4 pr-4" colspan="3">
+                                    <div class="font-bold text-primary uppercase tracking-wider text-xs font-label-caps">Inversión Total</div>
+                                </td>
+                                <td class="py-4 text-right font-mono font-black text-primary text-base" id="grand-total-table">$0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+                quoteContainer.innerHTML = tableHtml;
+            }
+
+            // Calcular y Renderizar Inversión Total
+            const total = PRODUCTS_DATA.reduce((sum, item) => {
+                if (inactiveOptionalIds.has(item.id)) return sum;
+                const mode = qtyModes[item.id] || 'recommended';
+                const qtyRecommended = item.qtyRecommended || item.quantity || 1;
+                const qtyDesired = item.qtyDesired || item.quantity || 1;
+                const customQty = customQuantities[item.id] !== undefined ? customQuantities[item.id] : qtyDesired;
+                const activeQty = mode === 'recommended' ? qtyRecommended : customQty;
+                return sum + (item.price * activeQty);
+            }, 0);
+
+            // Mano de obra: 30% del total de equipos
+            const laborCost = Math.round(total * 0.30);
+            const grandTotal = total + laborCost;
+
+            // Actualizar filas de la tabla
+            const laborTableEl = document.getElementById('labor-cost-table');
+            if (laborTableEl) laborTableEl.innerText = '$' + laborCost.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            const grandTotalTableEl = document.getElementById('grand-total-table');
+            if (grandTotalTableEl) grandTotalTableEl.innerText = '$' + grandTotal.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+            // Actualizar panel sticky
+            const totalPriceEl = document.getElementById('total-price');
+            if (totalPriceEl) {
+                totalPriceEl.innerText = '$' + grandTotal.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+        }
+
+        // Cargar primera visualización
+        renderAll();
+        renderDronePhotos();
+
+        // Event Listeners para botones
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.innerText.includes('CONTACTAR') || btn.innerText.includes('APROBAR')) {
+                    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`, '_blank');
+                }
+            });
+        });
+    </script>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal"
+        class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex flex-col justify-between p-6 transition-all duration-300">
+        <!-- Top controls -->
+        <div class="flex justify-between items-center text-white">
+            <span id="lightbox-counter" class="font-mono text-xs tracking-wider uppercase opacity-70">Foto 1 de 6</span>
+            <button onclick="closeLightbox()"
+                class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+        </div>
+
+        <!-- Main content (Image) -->
+        <div class="flex-grow flex items-center justify-center relative w-full h-0">
+            <!-- Left button -->
+            <button onclick="navigateLightbox(-1)"
+                class="absolute left-2 md:left-6 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-white transition-colors z-10">
+                <span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+            </button>
+
+            <img id="lightbox-img" src="" class="max-w-full max-h-full object-contain select-none shadow-2xl rounded"
+                alt="Drone Survey Full" />
+
+            <!-- Right button -->
+            <button onclick="navigateLightbox(1)"
+                class="absolute right-2 md:right-6 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-white transition-colors z-10">
+                <span class="material-symbols-outlined text-2xl">arrow_forward_ios</span>
+            </button>
+        </div>
+
+        <!-- Bottom caption -->
+        <div class="text-center text-white pb-4">
+            <p id="lightbox-caption" class="text-xs font-light tracking-wide max-w-lg mx-auto opacity-80"></p>
+        </div>
+    </div>
+</body>
+
+</html>

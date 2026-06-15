@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Panel de Administración CODEXIS - Minimalist Premium</title>
+    <script src="productsData.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;family=Geist:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-high": "#e6e8ea",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface": "#191c1e",
+                        "primary": "#000000",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#bec6e0",
+                        "background": "#f7f9fb",
+                        "tertiary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-background": "#191c1e",
+                        "secondary": "#0051d5",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#45464d",
+                        "on-primary-fixed": "#131b2e",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-secondary-container": "#fefcff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "surface-bright": "#f7f9fb",
+                        "secondary-container": "#316bf3",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container": "#eceef0",
+                        "tertiary-container": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "outline": "#76777d",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "inverse-surface": "#2d3133",
+                        "surface-container-low": "#f2f4f6",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary-container": "#7c839b",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "surface": "#f7f9fb",
+                        "surface-tint": "#565e74",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-container": "#75859d",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-caps": ["Geist"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "spec-value": ["Geist"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "spec-value": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f7f9fb;
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+    </style>
+</head>
+
+<body class="font-body-md text-on-surface antialiased">
+    <!-- TopNavBar -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-surface-container">
+        <div
+            class="flex justify-between items-center w-full px-6 md:px-margin-desktop py-5 max-w-container-max mx-auto">
+            <div class="text-headline-md font-black tracking-tighter text-primary">CODEXIS</div>
+            <div class="hidden md:flex items-center gap-8">
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="Montearroyo.html">PROPUESTA</a>
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="products.html">PRODUCTOS</a>
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="Specs.html">ESPECIFICACIONES</a>
+                <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+                    href="garantia.html">GARANTÍA</a>
+            </div>
+            <button
+                class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-caps text-[11px] tracking-widest hover:bg-opacity-90 transition-all uppercase btn-contact">CONTACTAR</button>
+        </div>
+    </nav>
+
+    <main class="max-w-container-max mx-auto px-6 md:px-margin-desktop py-12 space-y-12">
+        <!-- Title Header -->
+        <section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-surface-container pb-6">
+            <div>
+                <span class="font-label-caps text-label-caps text-secondary block tracking-wider uppercase">Base de Datos Local</span>
+                <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Administración de Productos</h1>
+            </div>
+            <div class="flex gap-3">
+                <button id="btn-export" class="bg-secondary text-on-secondary px-5 py-3 rounded font-label-caps text-[11px] hover:bg-opacity-95 transition-all flex items-center gap-2 font-bold uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    Exportar productsData.js
+                </button>
+                <button id="btn-reset" class="bg-white border border-error text-error px-5 py-3 rounded font-label-caps text-[11px] hover:bg-error-container/20 transition-all flex items-center gap-2 font-bold uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-sm">restart_alt</span>
+                    Restablecer
+                </button>
+            </div>
+        </section>
+
+        <!-- Help Info banner -->
+        <section class="bg-primary text-on-primary p-6 rounded-lg flex items-start gap-4">
+            <span class="material-symbols-outlined text-3xl text-secondary-fixed">info</span>
+            <div class="space-y-1">
+                <h4 class="font-bold text-sm">¿Cómo guardar los cambios permanentemente en tus archivos?</h4>
+                <p class="text-xs text-on-primary-container font-light leading-relaxed">
+                    1. Realiza las modificaciones deseadas (añadir, editar o eliminar productos) utilizando los formularios de abajo.<br>
+                    2. Haz clic en el botón azul de arriba **"Exportar productsData.js"** para descargar el archivo.<br>
+                    3. Mueve el archivo descargado a la carpeta de tu proyecto, reemplazando el archivo `productsData.js` existente. ¡Eso es todo!
+                </p>
+            </div>
+        </section>
+
+        <!-- Columns Grid -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Products List (8 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-surface-container shadow-sm">
+                    <h3 class="font-bold text-primary">Lista de Productos y Servicios</h3>
+                    <button id="btn-new-product" class="text-secondary hover:text-primary font-label-caps text-xs flex items-center gap-1 uppercase font-bold transition-all">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        Añadir Nuevo
+                    </button>
+                </div>
+
+                <div class="space-y-4" id="admin-products-list">
+                    <!-- Loaded dynamically in JS -->
+                </div>
+            </div>
+
+            <!-- Editor Form (5 cols) -->
+            <div class="lg:col-span-5 bg-white p-8 rounded-lg border border-surface-container shadow-sm h-fit space-y-6">
+                <div>
+                    <h3 class="font-bold text-primary text-lg" id="form-title">Añadir Producto</h3>
+                    <p class="text-xs text-on-surface-variant font-light mt-1">Ingresa los detalles del dispositivo o servicio.</p>
+                </div>
+
+                <form class="space-y-5" id="product-form">
+                    <input type="hidden" id="form-mode" value="add" />
+                    
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-id">ID de Hardware (Único)</label>
+                        <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-id" placeholder="ej: bullet-4k" required type="text" />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-name">Nombre Comercial</label>
+                        <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-name" placeholder="ej: Codexis Bullet 4K Elite" required type="text" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-category">Categoría</label>
+                            <select class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-category" required>
+                                <option value="camaras">Cámaras</option>
+                                <option value="almacenamiento">Almacenamiento</option>
+                                <option value="infraestructura">Infraestructura</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-price">Precio (COP)</label>
+                            <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-price" min="0" placeholder="ej: 1400000" required step="1" type="number" />
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-qty-recommended">Cant. Recomendada</label>
+                            <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-qty-recommended" min="1" placeholder="ej: 8" required type="number" />
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-qty-desired">Cant. Deseada</label>
+                            <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-qty-desired" min="1" placeholder="ej: 12" required type="number" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-series">Serie / Badge</label>
+                            <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-series" placeholder="ej: SERIE PRO, PREMIUM" required type="text" />
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-tag">Etiqueta Resumen</label>
+                            <input class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light" id="prod-tag" placeholder="ej: Perimetral Largo Alcance" required type="text" />
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-primary uppercase tracking-wider">Imagen del Producto</label>
+                        <div class="border-2 border-dashed border-outline-variant hover:border-primary rounded-lg p-6 text-center cursor-pointer transition-all relative bg-surface-container-low flex flex-col items-center justify-center min-h-[120px]" id="drop-zone">
+                            <input type="file" id="prod-image-file" accept="image/*" class="hidden" />
+                            <div class="space-y-2 py-2" id="upload-prompt">
+                                <span class="material-symbols-outlined text-3xl text-outline">add_photo_alternate</span>
+                                <p class="text-xs text-on-surface-variant font-light">Arrastra una imagen aquí o <span class="text-secondary font-medium">haz clic para buscar</span></p>
+                                <p class="text-[10px] text-outline font-light">Formatos sugeridos: JPG, PNG. Máx. 1.5MB recomendado.</p>
+                            </div>
+                            <div class="hidden flex flex-col items-center gap-2" id="upload-preview-container">
+                                <img id="upload-preview" class="w-32 h-32 object-cover rounded border border-outline-variant shadow-sm" src="" />
+                                <button type="button" id="btn-remove-image" class="text-[10px] text-error font-bold font-label-caps uppercase hover:underline mt-1">Eliminar Imagen</button>
+                            </div>
+                            <!-- Hidden input to store base64 string -->
+                            <input type="hidden" id="prod-image-base64" />
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-primary uppercase tracking-wider" for="prod-description">Descripción Breve</label>
+                        <textarea class="w-full px-3 py-2 border border-outline-variant rounded bg-white text-sm focus:outline-none focus:border-primary transition-all font-light h-20" id="prod-description" placeholder="Breve resumen de cobertura o funcionamiento..." required></textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input class="text-primary focus:ring-primary border-outline-variant rounded" id="prod-featured" type="checkbox" />
+                        <label class="text-xs text-on-surface-variant font-light select-none cursor-pointer" for="prod-featured">Destacado en Propuesta (Aparece en inicio)</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input class="text-primary focus:ring-primary border-outline-variant rounded" id="prod-optional" type="checkbox" />
+                        <label class="text-xs text-on-surface-variant font-light select-none cursor-pointer" for="prod-optional">Producto Opcional (Permite al cliente activarlo/desactivarlo en la propuesta)</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input class="text-primary focus:ring-primary border-outline-variant rounded" id="prod-allow-custom-qty" type="checkbox" />
+                        <label class="text-xs text-on-surface-variant font-light select-none cursor-pointer" for="prod-allow-custom-qty">Permitir Personalizar Cantidad (Muestra selectores en la propuesta)</label>
+                    </div>
+
+                    <!-- Specs List Detailed -->
+                    <div class="space-y-3 pt-2 border-t border-surface-container">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-[10px] font-bold text-primary uppercase tracking-wider">Especificaciones Técnicas</label>
+                            <button id="btn-add-spec" class="text-xs text-secondary hover:text-primary font-bold font-label-caps" type="button">+ Añadir Fila</button>
+                        </div>
+                        <div class="space-y-2" id="form-specs-container">
+                            <!-- JS will inject dynamic spec rows -->
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-4 border-t border-surface-container">
+                        <button class="w-full bg-primary text-on-primary font-label-caps text-[11px] tracking-widest uppercase py-3 font-bold hover:bg-opacity-95 transition-all" type="submit">
+                            Guardar Producto
+                        </button>
+                        <button id="btn-cancel" class="w-1/2 bg-white border border-outline-variant text-on-surface-variant font-label-caps text-[11px] tracking-widest uppercase py-3 font-bold hover:bg-surface-container-low transition-all" type="button">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-surface-container py-16">
+        <div class="max-w-container-max mx-auto px-6 md:px-margin-desktop">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+                <div class="space-y-6 max-w-xs">
+                    <div class="text-headline-md font-black tracking-tighter text-primary">CODEXIS</div>
+                    <p class="text-sm text-on-surface-variant font-light leading-relaxed">
+                        Sistemas de seguridad de alto rendimiento para entornos residenciales y corporativos exclusivos.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-12">
+                    <div class="space-y-4">
+                        <h5 class="font-label-caps text-[11px] tracking-widest text-primary uppercase">Empresa</h5>
+                        <ul class="space-y-3 text-sm text-on-surface-variant font-light">
+                            <li><a class="hover:text-primary transition-colors" href="#">Sobre nosotros</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Certificaciones</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="admin.html">Administración</a></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4">
+                        <h5 class="font-label-caps text-[11px] tracking-widest text-primary uppercase">Legal</h5>
+                        <ul class="space-y-3 text-sm text-on-surface-variant font-light">
+                            <li><a class="hover:text-primary transition-colors" href="#">Privacidad</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Términos</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Cookies</a></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4 col-span-2 md:col-span-1">
+                        <h5 class="font-label-caps text-[11px] tracking-widest text-primary uppercase">Soporte</h5>
+                        <p class="text-sm text-on-surface-variant font-light">Asistencia 24/7 para clientes Premium.</p>
+                        <p class="font-bold text-primary text-sm">+57 317 419 0562</p>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="mt-16 pt-8 border-t border-surface-container flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[12px] font-label-caps text-outline tracking-wider">
+                    © 2024 CODEXIS SECURITY SYSTEMS. TODOS LOS DERECHOS RESERVADOS. PREPARADO PARA ALTOS DE MONTEARROYO.
+                </p>
+                <div class="flex gap-4">
+                    <div
+                        class="w-8 h-8 rounded-full border border-surface-container flex items-center justify-center hover:border-primary transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">share</span>
+                    </div>
+                    <div
+                        class="w-8 h-8 rounded-full border border-surface-container flex items-center justify-center hover:border-primary transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">mail</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const WHATSAPP_NUMBER = "573174190562"; // Reemplaza con tu número de WhatsApp
+        const WHATSAPP_MESSAGE = encodeURIComponent("Hola, necesito contactar con un asesor de CODEXIS.");
+
+        // Referencias de elementos UI
+        const listContainer = document.getElementById('admin-products-list');
+        const form = document.getElementById('product-form');
+        const formTitle = document.getElementById('form-title');
+        const formMode = document.getElementById('form-mode');
+        const specsContainer = document.getElementById('form-specs-container');
+
+        // Elementos de la zona de subida de imágenes
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('prod-image-file');
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const previewContainer = document.getElementById('upload-preview-container');
+        const previewImg = document.getElementById('upload-preview');
+        const base64Input = document.getElementById('prod-image-base64');
+        const removeImageBtn = document.getElementById('btn-remove-image');
+
+        // Cargar datos actuales
+        let products = JSON.parse(localStorage.getItem('products_data')) || [];
+
+        // Configurar comportamiento drag & drop y selector de archivos
+        dropZone.addEventListener('click', (e) => {
+            if (e.target === removeImageBtn || removeImageBtn.contains(e.target)) return;
+            fileInput.click();
+        });
+
+        // Prevenir comportamiento por defecto del navegador al arrastrar
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+            document.body.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Resaltar zona de arrastre
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-primary', 'bg-surface-container-high');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-primary', 'bg-surface-container-high');
+            }, false);
+        });
+
+        // Manejar archivo arrastrado
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                handleImageFile(files[0]);
+            }
+        });
+
+        // Manejar archivo seleccionado mediante diálogo
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                handleImageFile(fileInput.files[0]);
+            }
+        });
+
+        function handleImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona un archivo de imagen válido.');
+                return;
+            }
+            if (file.size > 1.5 * 1024 * 1024) {
+                if (!confirm('Esta imagen supera los 1.5MB. Las imágenes muy pesadas pueden ralentizar la carga. ¿Deseas continuar?')) {
+                    return;
+                }
+            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                displayImagePreview(reader.result);
+            };
+        }
+
+        function displayImagePreview(base64data) {
+            previewImg.src = base64data;
+            base64Input.value = base64data;
+            uploadPrompt.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+        }
+
+        function clearImage() {
+            previewImg.src = '';
+            base64Input.value = '';
+            fileInput.value = '';
+            previewContainer.classList.add('hidden');
+            uploadPrompt.classList.remove('hidden');
+        }
+
+        removeImageBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearImage();
+        });
+
+        // Inicializar especificaciones en el formulario con filas por defecto
+        function addSpecRow(key = '', val = '') {
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center spec-form-row';
+            div.innerHTML = `
+                <input class="w-1/2 px-2 py-1 border border-outline-variant rounded bg-white text-xs focus:outline-none focus:border-primary transition-all font-light spec-key" placeholder="Característica" required value="${key}" type="text" />
+                <input class="w-1/2 px-2 py-1 border border-outline-variant rounded bg-white text-xs focus:outline-none focus:border-primary transition-all font-light spec-val" placeholder="Detalle técnico" required value="${val}" type="text" />
+                <button class="text-error hover:text-red-700 font-bold p-1 btn-delete-spec-row" type="button">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+            `;
+            specsContainer.appendChild(div);
+            
+            // Vincular el botón de borrado de la fila
+            div.querySelector('.btn-delete-spec-row').addEventListener('click', () => {
+                div.remove();
+            });
+        }
+
+        // Renderizar lista de productos en el admin
+        function renderAdminList() {
+            listContainer.innerHTML = '';
+            
+            if (products.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center p-8 bg-white border border-surface-container rounded-lg text-on-surface-variant font-light">
+                        No hay productos registrados. Haz clic en "Añadir Nuevo".
+                    </div>
+                `;
+                return;
+            }
+
+            products.forEach(p => {
+                const badgeClass = p.category === 'camaras' ? 'bg-blue-100 text-blue-800' : p.category === 'almacenamiento' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800';
+                const imageSrc = p.image || 'https://via.placeholder.com/150?text=Sin+Imagen';
+                
+                const card = document.createElement('div');
+                card.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white border border-surface-container rounded-lg shadow-sm gap-4 hover:border-secondary transition-all';
+                card.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img class="w-16 h-16 object-cover border border-outline-variant rounded bg-surface-container" src="${p.image || 'https://via.placeholder.com/80/eceef0/76777d?text=' + (p.category === 'almacenamiento' ? 'HDD' : 'Red')}" alt="${p.name}" />
+                        <div>
+                             <div class="flex items-center gap-2 flex-wrap">
+                                <h4 class="font-bold text-primary text-base leading-tight">${p.name}</h4>
+                                <span class="text-[9px] px-2 py-0.5 font-bold uppercase rounded ${badgeClass}">${p.category}</span>
+                                ${p.featured ? '<span class="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-800 font-bold uppercase rounded">Destacado</span>' : ''}
+                                ${p.optional ? '<span class="text-[9px] px-1.5 py-0.5 bg-yellow-100 text-yellow-800 font-bold uppercase rounded">Opcional</span>' : ''}
+                            </div>
+                            <p class="text-xs text-outline font-label-caps mt-1">${p.tag} / ID: ${p.id} / Cant. Rec.: ${p.qtyRecommended || p.quantity || 1} / Cant. Des.: ${p.qtyDesired || p.quantity || 1}</p>
+                            <p class="text-sm text-primary font-bold mt-1">$${p.price.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} COP</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto justify-end border-t border-surface-container sm:border-0 pt-3 sm:pt-0">
+                        <button class="btn-edit border border-outline text-primary px-3 py-1.5 rounded font-label-caps text-[10px] hover:bg-surface-container transition-all uppercase font-bold" data-id="${p.id}">
+                            Editar
+                        </button>
+                        <button class="btn-delete border border-error text-error px-3 py-1.5 rounded font-label-caps text-[10px] hover:bg-error-container/20 transition-all uppercase font-bold" data-id="${p.id}">
+                            Eliminar
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+
+            // Vincular botones de Editar
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    loadProductInForm(id);
+                });
+            });
+
+            // Vincular botones de Eliminar
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    if (confirm(`¿Estás seguro de eliminar el producto "${id}"?`)) {
+                        deleteProduct(id);
+                    }
+                });
+            });
+        }
+
+        // Cargar producto en el formulario para editar
+        function loadProductInForm(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            formTitle.innerText = `Editar: ${p.name}`;
+            formMode.value = "edit";
+            
+            document.getElementById('prod-id').value = p.id;
+            document.getElementById('prod-id').disabled = true; // No permitir cambiar la ID
+            document.getElementById('prod-name').value = p.name;
+            document.getElementById('prod-category').value = p.category;
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-qty-recommended').value = p.qtyRecommended || p.quantity || 1;
+            document.getElementById('prod-qty-desired').value = p.qtyDesired || p.quantity || 1;
+            document.getElementById('prod-series').value = p.series;
+            document.getElementById('prod-tag').value = p.tag;
+            
+            if (p.image) {
+                displayImagePreview(p.image);
+            } else {
+                clearImage();
+            }
+            
+            document.getElementById('prod-description').value = p.description;
+            document.getElementById('prod-featured').checked = p.featured;
+            document.getElementById('prod-optional').checked = p.optional || false;
+            document.getElementById('prod-allow-custom-qty').checked = p.allowCustomQty !== undefined ? p.allowCustomQty : true;
+
+            // Limpiar y cargar especificaciones
+            specsContainer.innerHTML = '';
+            if (p.specsDetailed) {
+                Object.entries(p.specsDetailed).forEach(([key, val]) => {
+                    addSpecRow(key, val);
+                });
+            }
+            if (specsContainer.children.length === 0) {
+                addSpecRow();
+            }
+
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Limpiar el formulario para añadir nuevo
+        function resetForm() {
+            formTitle.innerText = "Añadir Producto";
+            formMode.value = "add";
+            form.reset();
+            document.getElementById('prod-id').disabled = false;
+            document.getElementById('prod-qty-recommended').value = 1;
+            document.getElementById('prod-qty-desired').value = 1;
+            document.getElementById('prod-allow-custom-qty').checked = true;
+            clearImage();
+            specsContainer.innerHTML = '';
+            
+            // Fila de especificación por defecto
+            addSpecRow("Resolución Máxima", "");
+            addSpecRow("Sensor de Imagen", "");
+            addSpecRow("Lente / Óptica", "");
+        }
+
+        // Guardar cambios (añadir o editar)
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('prod-id').value.trim();
+            const name = document.getElementById('prod-name').value.trim();
+            const category = document.getElementById('prod-category').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const qtyRecommended = parseInt(document.getElementById('prod-qty-recommended').value) || 1;
+            const qtyDesired = parseInt(document.getElementById('prod-qty-desired').value) || 1;
+            const series = document.getElementById('prod-series').value.trim();
+            const tag = document.getElementById('prod-tag').value.trim();
+            const image = document.getElementById('prod-image-base64').value;
+            const description = document.getElementById('prod-description').value.trim();
+            const featured = document.getElementById('prod-featured').checked;
+            const optional = document.getElementById('prod-optional').checked;
+            const allowCustomQty = document.getElementById('prod-allow-custom-qty').checked;
+
+            // Construir especificaciones técnicas dinámicas
+            const specsDetailed = {};
+            document.querySelectorAll('.spec-form-row').forEach(row => {
+                const key = row.querySelector('.spec-key').value.trim();
+                const val = row.querySelector('.spec-val').value.trim();
+                if (key && val) {
+                    specsDetailed[key] = val;
+                }
+            });
+
+            // Construir resumen básico (por defecto toma los dos primeros para cámaras)
+            const specKeys = Object.keys(specsDetailed);
+            const specsSummary = {};
+            if (specKeys.length > 0) specsSummary[specKeys[0]] = specsDetailed[specKeys[0]];
+            if (specKeys.length > 1) specsSummary[specKeys[1]] = specsDetailed[specKeys[1]];
+
+            const productData = {
+                id,
+                name,
+                category,
+                series,
+                tag,
+                description,
+                price,
+                quantity: qtyRecommended, // para compatibilidad
+                qtyRecommended,
+                qtyDesired,
+                allowCustomQty,
+                image,
+                imageAlt: name,
+                featured,
+                optional,
+                specsSummary,
+                specsDetailed
+            };
+
+            if (formMode.value === "add") {
+                // Verificar ID duplicado
+                if (products.some(p => p.id === id)) {
+                    alert(`Error: Ya existe un producto con el ID "${id}". Usa uno diferente.`);
+                    return;
+                }
+                products.push(productData);
+            } else {
+                // Edición
+                const index = products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    products[index] = productData;
+                }
+            }
+
+            // Guardar en localStorage
+            localStorage.setItem('products_data', JSON.stringify(products));
+            resetForm();
+            renderAdminList();
+            alert("Producto guardado exitosamente.");
+        });
+
+        // Eliminar producto
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('products_data', JSON.stringify(products));
+            renderAdminList();
+            if (formMode.value === "edit" && document.getElementById('prod-id').value === id) {
+                resetForm();
+            }
+        }
+
+        // Exportar a archivo productsData.js
+        document.getElementById('btn-export').addEventListener('click', () => {
+            // Formatear archivo JS
+            const fileContent = `// Datos Centralizados de Productos CODEXIS
+// Puedes agregar, quitar o modificar los productos y sus especificaciones en este archivo.
+// Los cambios se verán reflejados automáticamente en la Propuesta, Catálogo y Especificaciones.
+
+const INITIAL_PRODUCTS_DATA = ${JSON.stringify(products, null, 4)};
+
+// Cargar de localStorage si existe, de lo contrario inicializar con INITIAL_PRODUCTS_DATA
+if (!localStorage.getItem('products_data')) {
+    localStorage.setItem('products_data', JSON.stringify(INITIAL_PRODUCTS_DATA));
+} else {
+    // Autorecuperación / Migración de base de datos local
+    try {
+        const stored = JSON.parse(localStorage.getItem('products_data'));
+        let modified = false;
+        stored.forEach(p => {
+            if (p.qtyRecommended === undefined || p.qtyDesired === undefined) {
+                const initialMatch = INITIAL_PRODUCTS_DATA.find(init => init.id === p.id);
+                p.qtyRecommended = initialMatch ? initialMatch.qtyRecommended : (p.quantity || 1);
+                p.qtyDesired = initialMatch ? initialMatch.qtyDesired : (p.quantity || 1);
+                p.quantity = p.qtyRecommended; // mantener sincronía para compatibilidad
+                modified = true;
+            }
+        });
+        if (modified) {
+            localStorage.setItem('products_data', JSON.stringify(stored));
+        }
+    } catch(e) {
+        console.error("Error al migrar localStorage de productos:", e);
+    }
+}
+const PRODUCTS_DATA = JSON.parse(localStorage.getItem('products_data'));
+`;
+
+            // Crear enlace de descarga
+            const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "productsData.js");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert("Archivo productsData.js generado con éxito.\nPor favor, guarda el archivo en tu carpeta reemplazando el existente.");
+        });
+
+        // Restablecer valores de fábrica
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            if (confirm("¿Seguro que quieres borrar tus modificaciones visuales y restaurar los datos iniciales?")) {
+                localStorage.removeItem('products_data');
+                location.reload();
+            }
+        });
+
+        // Vincular acciones del formulario
+        document.getElementById('btn-add-spec').addEventListener('click', () => addSpecRow());
+        document.getElementById('btn-new-product').addEventListener('click', resetForm);
+        document.getElementById('btn-cancel').addEventListener('click', resetForm);
+
+        // Click handler para botón de contacto superior
+        document.querySelectorAll('.btn-contact').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`, '_blank');
+            });
+        });
+
+        // Inicialización
+        resetForm();
+        renderAdminList();
+    </script>
+</body>
+
+</html>
