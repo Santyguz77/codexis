@@ -379,8 +379,8 @@
         const base64Input = document.getElementById('prod-image-base64');
         const removeImageBtn = document.getElementById('btn-remove-image');
 
-        // Cargar datos actuales
-        let products = JSON.parse(localStorage.getItem('products_data')) || [];
+        // Cargar datos actuales (clonamos para no mutar la constante original)
+        let products = JSON.parse(JSON.stringify(PRODUCTS_DATA));
 
         // Configurar comportamiento drag & drop y selector de archivos
         dropZone.addEventListener('click', (e) => {
@@ -679,17 +679,15 @@
                 }
             }
 
-            // Guardar en localStorage
-            localStorage.setItem('products_data', JSON.stringify(products));
+            // Aplicar cambios en memoria (no persistimos en localStorage)
             resetForm();
             renderAdminList();
-            alert("Producto guardado exitosamente.");
+            alert("Producto actualizado en la sesión (no persistido en localStorage). Si deseas conservarlo, usa 'Exportar productsData.js'.");
         });
 
         // Eliminar producto
         function deleteProduct(id) {
             products = products.filter(p => p.id !== id);
-            localStorage.setItem('products_data', JSON.stringify(products));
             renderAdminList();
             if (formMode.value === "edit" && document.getElementById('prod-id').value === id) {
                 resetForm();
@@ -705,31 +703,8 @@
 
 const INITIAL_PRODUCTS_DATA = ${JSON.stringify(products, null, 4)};
 
-// Cargar de localStorage si existe, de lo contrario inicializar con INITIAL_PRODUCTS_DATA
-if (!localStorage.getItem('products_data')) {
-    localStorage.setItem('products_data', JSON.stringify(INITIAL_PRODUCTS_DATA));
-} else {
-    // Autorecuperación / Migración de base de datos local
-    try {
-        const stored = JSON.parse(localStorage.getItem('products_data'));
-        let modified = false;
-        stored.forEach(p => {
-            if (p.qtyRecommended === undefined || p.qtyDesired === undefined) {
-                const initialMatch = INITIAL_PRODUCTS_DATA.find(init => init.id === p.id);
-                p.qtyRecommended = initialMatch ? initialMatch.qtyRecommended : (p.quantity || 1);
-                p.qtyDesired = initialMatch ? initialMatch.qtyDesired : (p.quantity || 1);
-                p.quantity = p.qtyRecommended; // mantener sincronía para compatibilidad
-                modified = true;
-            }
-        });
-        if (modified) {
-            localStorage.setItem('products_data', JSON.stringify(stored));
-        }
-    } catch(e) {
-        console.error("Error al migrar localStorage de productos:", e);
-    }
-}
-const PRODUCTS_DATA = JSON.parse(localStorage.getItem('products_data'));
+// Fuente de datos inmutable: PRODUCTS_DATA siempre será igual al contenido de INITIAL_PRODUCTS_DATA
+const PRODUCTS_DATA = INITIAL_PRODUCTS_DATA;
 `;
 
             // Crear enlace de descarga
@@ -748,9 +723,11 @@ const PRODUCTS_DATA = JSON.parse(localStorage.getItem('products_data'));
 
         // Restablecer valores de fábrica
         document.getElementById('btn-reset').addEventListener('click', () => {
-            if (confirm("¿Seguro que quieres borrar tus modificaciones visuales y restaurar los datos iniciales?")) {
-                localStorage.removeItem('products_data');
-                location.reload();
+            if (confirm("¿Seguro que quieres descartar las modificaciones de la sesión y restaurar los datos iniciales?")) {
+                products = JSON.parse(JSON.stringify(PRODUCTS_DATA));
+                resetForm();
+                renderAdminList();
+                alert('Datos restaurados desde productsData.js (no se utilizó localStorage).');
             }
         });
 
