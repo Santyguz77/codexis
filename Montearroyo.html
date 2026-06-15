@@ -325,8 +325,9 @@
 
                     <div
                         class="bg-black rounded-xl overflow-hidden aspect-video shadow-lg border border-outline-variant relative group">
-                        <video id="drone-video-player" src="DJI_20260614165322_0012_D.MP4" controls
-                            class="w-full h-full object-cover"></video>
+                        <div id="drone-video-wrapper" class="absolute inset-0 w-full h-full">
+                            <iframe src="https://drive.google.com/file/d/1rMfCqRNCtZUKTLP0oxj-xGxCykRYrdJL/preview" allow="autoplay; encrypted-media" frameborder="0" class="absolute inset-0 w-full h-full"></iframe>
+                        </div>
                     </div>
 
                     <div class="flex flex-wrap gap-3 items-center">
@@ -335,12 +336,12 @@
                         <div
                             class="flex bg-surface-container-low rounded-full p-1 border border-outline-variant w-fit text-[10px] font-label-caps font-bold">
                             <button id="btn-drone-vid-1"
-                                onclick="changeDroneVideo('DJI_20260614165322_0012_D.MP4', this)"
+                                onclick="changeDroneVideo('drive:1rMfCqRNCtZUKTLP0oxj-xGxCykRYrdJL', this)"
                                 class="px-4 py-1.5 rounded-full transition-all bg-primary text-white shadow-sm">
                                 Vuelo de Reconocimiento 1
                             </button>
                             <button id="btn-drone-vid-2"
-                                onclick="changeDroneVideo('DJI_20260614170149_0032_D.MP4', this)"
+                                onclick="changeDroneVideo('drive:1P1t3z-u6tfW2_KM4mHiW2InmRZ3IO7ZP', this)"
                                 class="px-4 py-1.5 rounded-full transition-all text-on-surface-variant hover:text-primary">
                                 Vuelo de Reconocimiento 2
                             </button>
@@ -513,27 +514,30 @@
         const WHATSAPP_MESSAGE = encodeURIComponent("Hola, estoy interesado en la propuesta de seguridad de CODEXIS para Altos de Montearroyo.");
 
         // Galería del Drone
+        // Para cargar recursos desde Google Drive, reemplaza la propiedad `src` por el formato
+        // 'drive:FILE_ID' (por ejemplo: 'drive:1a2B3cD4eF5gHiJ6') y el sistema generará las URLs
+        // necesarias automáticamente. Los videos en Drive se muestran mediante iframe de preview.
         const dronePhotos = [
 
-            { src: "DJI_20260614165057_0006_D.JPG", desc: "Punto de acceso principal y vía de ingreso vehicular." },
-            { src: "DJI_20260614165152_0008_D.JPG", desc: "Detalle de los muros de contención y áreas de tránsito peatonal." },
-            { src: "DJI_20260614165238_0010_D.JPG", desc: "Vuelo cenital sobre los cuadrantes internos del conjunto." },
-            { src: "DJI_20260614165441_0013_D.JPG", desc: "Monitoreo perimetral - Zona boscosa colindante." },
-            { src: "DJI_20260614165532_0015_D.JPG", desc: "Estudio de elevación y puntos ciegos perimetrales." },
-            { src: "DJI_20260614165548_0017_D.JPG", desc: "Análisis topográfico - Pendiente y áreas de riesgo de acceso." },
-            { src: "DJI_20260614165651_0018_D.JPG", desc: "Sector central y distribución de vías internas." },
-            { src: "DJI_20260614165721_0019_D.JPG", desc: "Vigilancia perimetral - Análisis de cercado exterior." },
-            { src: "DJI_20260614165728_0021_D.JPG", desc: "Cobertura de cámaras - Esquinas críticas de Altos de Montearroyo." },
-            { src: "DJI_20260614165755_0022_D.JPG", desc: "Puntos de control perimetral - Conexión de fibra óptica exterior." },
-            { src: "DJI_20260614165828_0024_D.JPG", desc: "Monitoreo de entorno - Altura sugerida para domo PTZ." },
-            { src: "DJI_20260614165902_0027_D.JPG", desc: "Sector perimetral norte - Línea de vista libre sugerida." },
-            { src: "DJI_20260614165915_0028_D.JPG", desc: "Inspección perimetral - Control de aproximación forestal." },
-            { src: "DJI_20260614170134_0030_D.JPG", desc: "Acceso vehicular - Zonas de captación de matrículas (LPR)." },
-            { src: "DJI_20260614170218_0033_D.JPG", desc: "Puntos críticos de intrusión - Análisis del muro perimetral." },
-            { src: "DJI_20260614170223_0034_D.JPG", desc: "Senderos peatonales y puntos de instalación de domos fijos." },
-            { src: "DJI_20260614170239_0037_D.JPG", desc: "Vuelo general - Conexión física con central de monitoreo." },
-            { src: "DJI_20260614170256_0038_D.JPG", desc: "Puntos de red perimetrales - Canalización y ductos propuestos." },
-            { src: "DJI_20260614170336_0039_D.JPG", desc: "Estudio de altura y línea de vista - Zonas comunes Altas." },
+            { src: "drive:1OKjVSl8TeDV7Q20YHAjCxkqHCCa0mf5s", desc: "Punto de acceso principal y vía de ingreso vehicular." },
+            { src: "drive:1Hnuo3MFHoJaxXzdCmX1EXPvc2NDIpfry", desc: "Detalle de los muros de contención y áreas de tránsito peatonal." },
+            { src: "drive:13DDZw8KBJb4cem24Tpmz03cWf8vc-r1e", desc: "Vuelo cenital sobre los cuadrantes internos del conjunto." },
+            { src: "drive:1QHj2wkv21dCeZFlDtlbezCbtOQBRD4-p", desc: "Monitoreo perimetral - Zona boscosa colindante." },
+            { src: "drive:1Bc--RIpQHG7IMqBh14ViZGHdBDg8gSHy", desc: "Estudio de elevación y puntos ciegos perimetrales." },
+            { src: "drive:1PhP6hJfKgtiq9CQ4cdTuyBMQCJBOhq0z", desc: "Análisis topográfico - Pendiente y áreas de riesgo de acceso." },
+            { src: "drive:1KQyLyxJmOcqRa-1ICZEcynecx5wjOHJ0", desc: "Sector central y distribución de vías internas." },
+            { src: "drive:1hCJ4SdfctduNcNKoy94VGVPwOhlyLbZ5", desc: "Vigilancia perimetral - Análisis de cercado exterior." },
+            { src: "drive:1oPiIqUXS7Kytp6YOkY1iL2OaEsg1K2tm", desc: "Cobertura de cámaras - Esquinas críticas de Altos de Montearroyo." },
+            { src: "drive:1nIhUSjW1fLkU6fHwT8m4D4CtSc9Ndpim", desc: "Puntos de control perimetral - Conexión de fibra óptica exterior." },
+            { src: "drive:1OjoEp2qZJ0aVAPPlKx3S4o9Dckf3YZtP", desc: "Monitoreo de entorno - Altura sugerida para domo PTZ." },
+            { src: "drive:1uccl1aeUe62TXlXu1l3a0ZCz30tD721d", desc: "Sector perimetral norte - Línea de vista libre sugerida." },
+            { src: "drive:1uccl1aeUe62TXlXu1l3a0ZCz30tD721d", desc: "Inspección perimetral - Control de aproximación forestal." },
+            { src: "drive:1U_5BD9NYX0Mli_YySOfscGKb2rJwVSop", desc: "Acceso vehicular - Zonas de captación de matrículas (LPR)." },
+            { src: "drive:1DrygIrroVcnZ8KmOV1Po8vvpRHMeU4_V", desc: "Puntos críticos de intrusión - Análisis del muro perimetral." },
+            { src: "drive:1ulnNQUhaQDPW-HCnTKNSBAjx2b6JX2mj", desc: "Senderos peatonales y puntos de instalación de domos fijos." },
+            { src: "drive:1cx24aTMQbRyxw5khezE7Izi28w76Bh_I", desc: "Vuelo general - Conexión física con central de monitoreo." },
+            { src: "drive:1qiWidgeCGioKuUYaKqyX0WA0uSM1mRbW", desc: "Puntos de red perimetrales - Canalización y ductos propuestos." },
+            { src: "drive:1W5bSkNPJjykhrRMCJcLcgjHarHA1N_HK", desc: "Estudio de altura y línea de vista - Zonas comunes Altas." },
             { src: "DJI_20260614170341_0040_D.JPG", desc: "Inspección de linderos - Topografía de la quebrada vecina." },
             { src: "DJI_20260614170358_0041_D.JPG", desc: "Linderos de seguridad - Análisis del sector nororiental." },
             { src: "DJI_20260614170458_0042_D.JPG", desc: "Vuelo cenital - Puntos de anclaje para torres de telecomunicaciones." },
@@ -550,10 +554,18 @@
         let activeLightboxIndex = 0;
 
         window.changeDroneVideo = function (src, btn) {
-            const player = document.getElementById('drone-video-player');
-            if (player) {
-                player.src = src;
-                player.play();
+            const wrapper = document.getElementById('drone-video-wrapper');
+            if (!wrapper) return;
+
+            // Si es referencia a Google Drive, incrustamos un iframe de preview
+            if (isDriveRef(src)) {
+                const preview = driveVideoPreviewUrl(src);
+                wrapper.innerHTML = `<iframe src="${preview}" allow="autoplay; encrypted-media" frameborder="0" class="absolute inset-0 w-full h-full"></iframe>`;
+            } else {
+                // usar elemento <video>
+                wrapper.innerHTML = `<video id="drone-video-player" src="${src}" controls class="absolute inset-0 w-full h-full object-cover"></video>`;
+                const player = document.getElementById('drone-video-player');
+                try { player.play(); } catch(e) { /* auto-play may be blocked */ }
             }
 
             // Alternar clases activas de los botones
@@ -591,7 +603,7 @@
 
             if (imgEl && counterEl && captionEl) {
                 const photo = dronePhotos[activeLightboxIndex];
-                imgEl.src = photo.src;
+                imgEl.src = isDriveRef(photo.src) ? driveImageUrl(photo.src) : photo.src;
                 counterEl.innerText = `Fotografía ${activeLightboxIndex + 1} de ${dronePhotos.length}`;
                 captionEl.innerText = photo.desc;
             }
@@ -618,6 +630,58 @@
             renderDronePhotos();
         };
 
+        // Helpers para Google Drive
+        function isDriveRef(src) {
+            return typeof src === 'string' && src.startsWith('drive:');
+        }
+
+        function driveImageUrl(src) {
+            // src expected: 'drive:FILE_ID'
+            if (!isDriveRef(src)) return src;
+            const id = src.split(':')[1];
+            return `https://drive.google.com/thumbnail?id=${id}&sz=w900`;
+        }
+
+        function driveVideoPreviewUrl(src) {
+            if (!isDriveRef(src)) return src;
+            const id = src.split(':')[1];
+            return `https://drive.google.com/file/d/${id}/preview`;
+        }
+
+        function drivePreviewUrl(src) {
+            if (!isDriveRef(src)) return src;
+            const id = src.split(':')[1];
+            return `https://drive.google.com/file/d/${id}/preview`;
+        }
+
+        function handleThumbError(imgEl, src) {
+            if (!imgEl || !isDriveRef(src)) return;
+            const id = src.split(':')[1];
+            imgEl.onerror = null;
+            imgEl.src = `https://drive.google.com/thumbnail?id=${id}&sz=w1600`;
+        }
+
+        function driveThumbStyle(src) {
+            if (!isDriveRef(src)) return '';
+            const id = src.split(':')[1];
+            return `background-image:url('https://drive.google.com/thumbnail?id=${id}&sz=w1200')`;
+        }
+
+        function driveThumbFallbackStyle(index) {
+            const palettes = [
+                'background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 45%, #93c5fd 100%);',
+                'background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 45%, #7dd3fc 100%);',
+                'background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 45%, #cbd5e1 100%);',
+                'background: linear-gradient(135deg, #ecfeff 0%, #cffafe 45%, #a5f3fc 100%);'
+            ];
+            return palettes[index % palettes.length];
+        }
+
+        function driveFallbackLabel(photo) {
+            const raw = photo && photo.desc ? photo.desc : 'Imagen';
+            return raw.length > 34 ? `${raw.slice(0, 34)}...` : raw;
+        }
+
         function renderDronePhotos() {
             const grid = document.getElementById('drone-photos-grid');
             if (!grid) return;
@@ -627,12 +691,20 @@
             let html = '';
             for (let i = 0; i < limit; i++) {
                 const photo = dronePhotos[i];
+                const previewHref = isDriveRef(photo.src) ? drivePreviewUrl(photo.src) : '#';
+                const fallbackLabel = driveFallbackLabel(photo);
                 html += `
                     <div class="group/thumb relative aspect-video rounded-lg overflow-hidden border border-outline-variant bg-surface-container-low cursor-pointer shadow-sm animate-fade-in" onclick="openLightbox(${i})">
-                        <img src="${photo.src}" class="w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105" alt="${photo.desc}" />
-                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                        <div class="absolute inset-0 transition-transform duration-500 group-hover/thumb:scale-105" style="${driveThumbFallbackStyle(i)} ${isDriveRef(photo.src) ? driveThumbStyle(photo.src) : ''}">
+                            <img src="${isDriveRef(photo.src) ? driveImageUrl(photo.src) : photo.src}" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover" alt="${photo.desc}" />
+                            <div class="absolute inset-0 flex items-end justify-start p-3 text-[11px] leading-4 text-white bg-gradient-to-t from-black/65 via-black/15 to-transparent pointer-events-none">
+                                <span class="inline-block bg-black/35 px-2 py-1 rounded-md backdrop-blur-[2px]">${fallbackLabel}</span>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
                             <span class="material-symbols-outlined text-white text-2xl">zoom_in</span>
                         </div>
+                        <a href="${previewHref}" target="_blank" onclick="event.stopPropagation()" class="absolute top-2 right-2 bg-white/90 text-xs px-2 py-1 rounded shadow-sm hover:bg-white">Ver</a>
                     </div>
                 `;
             }
