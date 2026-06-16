@@ -130,6 +130,7 @@
         }
 
         @media print {
+
             /* Ocultar elementos innecesarios */
             nav,
             button,
@@ -171,11 +172,14 @@
                 width: 100% !important;
                 border-collapse: collapse !important;
             }
-            th, td {
+
+            th,
+            td {
                 padding: 8px !important;
                 border-bottom: 1px solid #cbd5e1 !important;
                 font-size: 9pt !important;
             }
+
             th {
                 background-color: #f1f5f9 !important;
                 color: #0f172a !important;
@@ -189,7 +193,7 @@
             }
 
             /* Fichas técnicas en impresión */
-            #non-cameras-grid > div {
+            #non-cameras-grid>div {
                 page-break-inside: avoid;
                 border: 1px solid #cbd5e1 !important;
                 border-radius: 0.5rem !important;
@@ -219,6 +223,7 @@
                 margin-top: 2rem !important;
                 background-color: transparent !important;
             }
+
             footer p {
                 text-align: center !important;
                 font-size: 8pt !important;
@@ -292,7 +297,8 @@
         </section>
         <!-- Grid for NVR & Infrastructure (Dynamic) -->
         <section class="space-y-8">
-            <h2 class="font-headline-lg text-headline-lg text-primary flex items-center gap-2 border-t border-surface-container pt-12">
+            <h2
+                class="font-headline-lg text-headline-lg text-primary flex items-center gap-2 border-t border-surface-container pt-12">
                 <span class="material-symbols-outlined text-2xl">dns</span>
                 Infraestructura, Almacenamiento y Servicios
             </h2>
@@ -346,12 +352,14 @@
                         <div class="w-px h-8 bg-outline-variant"></div>
                         <div class="flex flex-col">
                             <span class="text-xs text-outline uppercase font-bold">Almacenamiento</span>
-                            <span class="text-headline-md font-bold text-primary leading-none">16 TB</span>
+                            <span class="text-headline-md font-bold text-primary leading-none">12 TB</span>
                         </div>
+
                         <div class="w-px h-8 bg-outline-variant"></div>
                         <div class="flex flex-col">
                             <span class="text-xs text-outline uppercase font-bold">Total General</span>
-                            <span class="text-headline-md font-bold text-primary leading-none" id="specs-grand-total">$0</span>
+                            <span class="text-headline-md font-bold text-primary leading-none"
+                                id="specs-grand-total">$0</span>
                         </div>
                     </div>
                 </div>
@@ -381,7 +389,8 @@
                         <ul class="space-y-3 text-sm text-on-surface-variant font-light">
                             <li><a class="hover:text-primary transition-colors" href="#">Sobre nosotros</a></li>
                             <li><a class="hover:text-primary transition-colors" href="#">Certificaciones</a></li>
-                            <li><a class="hover:text-primary transition-colors" href="admin.html">Administración</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="admin.html">Administración</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="space-y-4">
@@ -427,7 +436,7 @@
         if (camerasTbody) {
             const cameras = PRODUCTS_DATA.filter(p => p.category === 'camaras');
             camerasTbody.innerHTML = cameras.map(camera => {
-                const imgHtml = camera.image 
+                const imgHtml = camera.image
                     ? `<img alt="${camera.name}" class="w-12 h-12 rounded object-cover border border-outline-variant" src="${camera.image}" />`
                     : `<div class="w-12 h-12 rounded border border-outline-variant bg-surface-container flex items-center justify-center text-outline"><span class="material-symbols-outlined text-base">videocam</span></div>`;
 
@@ -486,8 +495,8 @@
                     categoryIcon = 'settings_ethernet';
                 }
 
-                const imageHtml = item.image 
-                    ? `<img alt="${item.name}" class="w-full h-48 object-cover" src="${item.image}" />` 
+                const imageHtml = item.image
+                    ? `<img alt="${item.name}" class="w-full h-48 object-cover" src="${item.image}" />`
                     : `<div class="w-full h-48 flex flex-col items-center justify-center bg-surface-container text-outline gap-2"><span class="material-symbols-outlined text-[48px]">${categoryIcon}</span><span class="text-[9px] font-label-caps uppercase tracking-wider">Sin Imagen</span></div>`;
 
                 return `
