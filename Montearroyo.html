@@ -5,7 +5,8 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Propuesta de Seguridad CODEXIS - Minimalist Premium</title>
+    <title>Propuesta de Seguridad CODEXIS</title>
+    <link rel="icon" href="icon-192.png" type="image/png" />
     <script src="productsData.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
@@ -326,7 +327,9 @@
                     <div
                         class="bg-black rounded-xl overflow-hidden aspect-video shadow-lg border border-outline-variant relative group">
                         <div id="drone-video-wrapper" class="absolute inset-0 w-full h-full">
-                            <iframe src="https://drive.google.com/file/d/1rMfCqRNCtZUKTLP0oxj-xGxCykRYrdJL/preview" allow="autoplay; encrypted-media" frameborder="0" class="absolute inset-0 w-full h-full"></iframe>
+                            <iframe src="https://drive.google.com/file/d/1rMfCqRNCtZUKTLP0oxj-xGxCykRYrdJL/preview"
+                                allow="autoplay; encrypted-media" frameborder="0"
+                                class="absolute inset-0 w-full h-full"></iframe>
                         </div>
                     </div>
 
@@ -565,7 +568,7 @@
                 // usar elemento <video>
                 wrapper.innerHTML = `<video id="drone-video-player" src="${src}" controls class="absolute inset-0 w-full h-full object-cover"></video>`;
                 const player = document.getElementById('drone-video-player');
-                try { player.play(); } catch(e) { /* auto-play may be blocked */ }
+                try { player.play(); } catch (e) { /* auto-play may be blocked */ }
             }
 
             // Alternar clases activas de los botones
@@ -946,8 +949,10 @@
                 return sum + (item.price * activeQty);
             }, 0);
 
-            // Mano de obra: 30% del total de equipos
-            const laborCost = Math.round(total * 0.30);
+            // Mano de obra: 13% del total de equipos. Si se incluye el item TUBO EMT (ID: "EMT"), es el 18%.
+            const hasEmt = !inactiveOptionalIds.has('EMT');
+            const laborRate = hasEmt ? 0.18 : 0.13;
+            const laborCost = Math.round(total * laborRate);
             const grandTotal = total + laborCost;
 
             // Actualizar filas de la tabla
