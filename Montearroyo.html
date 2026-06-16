@@ -951,7 +951,7 @@
 
             // Mano de obra: 13% del total de equipos. Si se incluye el item TUBO EMT (ID: "EMT"), es el 18%.
             const hasEmt = !inactiveOptionalIds.has('EMT');
-            const laborRate = hasEmt ? 0.18 : 0.13;
+            const laborRate = hasEmt ? 0.20 : 0.15;
             const laborCost = Math.round(total * laborRate);
             const grandTotal = total + laborCost;
 
