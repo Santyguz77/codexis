@@ -25,7 +25,7 @@
 		}
 
 		// Configuración de API - solo Cloudflare
-		const API_BASE = "https://consultation-paying-detailed-cottages.trycloudflare.com/api";
+		const API_BASE = "https://advance-barrier-tank-rep.trycloudflare.com/api";
 		let API_TIMEOUT_MS = 10000; // 10 segundos timeout por defecto
 		let API_SAVE_TIMEOUT_MS = 30000; // 30 segundos para guardar (imágenes)
 		let MAX_RETRIES = 2; // solo 2 intentos

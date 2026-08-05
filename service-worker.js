@@ -6,11 +6,14 @@ const CACHE_VERSION = '1.0.0';
 const ESSENTIAL_FILES = [
   '/',
   '/index.html',
+  '/cotizacion.html',
+  '/contrato.html',
   '/orden.html',
   '/order.html',
   '/manifest.json',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/productsData.js'
 ];
 
 // Archivos de imágenes y recursos adicionales

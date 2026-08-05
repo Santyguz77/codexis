@@ -25,7 +25,7 @@
 		}
 
 		// Configuración de API - solo Cloudflare
-		const API_BASE = "https://consultation-paying-detailed-cottages.trycloudflare.com/api";
+		const API_BASE = "https://advance-barrier-tank-rep.trycloudflare.com/api";
 		let API_TIMEOUT_MS = 10000; // 10 segundos timeout por defecto
 		let API_SAVE_TIMEOUT_MS = 30000; // 30 segundos para guardar (imágenes)
 		let MAX_RETRIES = 2; // solo 2 intentos
@@ -823,8 +823,7 @@
 
 		// eliminar orden (ahora asíncrono)
 		async function deleteOrder(id) {
-			const list = (await loadOrders()).filter(x => x.id != id);
-			await saveOrders(list);
+			await deleteItem('orders', id);
 			await renderOrders();
 			await renderFinance();
 			await computeMetrics();
@@ -1511,8 +1510,7 @@
 		}
 
 		async function deleteClient(id) {
-			const list = (await loadClients()).filter(x => x.id != id);
-			await saveClients(list);
+			await deleteItem('clients', id);
 			await renderClients();
 			// repoblar select de clientes
 			await populateClientSelect();
@@ -1852,8 +1850,7 @@
 				await saveTransactions(transactions);
 			}
 
-			const list = invoices.filter(x => x.id !== id);
-			await saveInvoices(list);
+			await deleteItem('invoices', id);
 			await renderInvoices();
 			await renderInventory();
 			await renderFinance();
@@ -2176,8 +2173,7 @@
 		}
 
 		async function deleteTransaction(id) {
-			const list = (await loadTransactions()).filter(x => x.id != id);
-			await saveTransactions(list);
+			await deleteItem('transactions', id);
 			// actualizar selects despues de eliminar
 			await populateFinanceCategorySelects();
 			await renderFinance();
@@ -2338,9 +2334,7 @@
 
 		// Eliminar ítem de inventario
 		async function deleteInventoryItem(id) {
-			const list = await loadInventory();
-			const newList = list.filter(x => x.id !== id);
-			await saveInventory(newList);
+			await deleteItem('inventory', id);
 			// eliminar movimientos asociados
 			let movs = await loadInventoryMovements();
 			movs = movs.filter(m => m.itemId !== id);

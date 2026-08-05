@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cotizaciones Offline - CODEXIS</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#b2dfdb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <!-- Cargar catálogo inicial de productos -->
+    <script src="productsData.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#b2dfdb",
+                        "on-primary": "#1b1b1b",
+                        "surface": "#f9f9f9",
+                        "on-surface": "#1b1b1b",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                    },
+                    borderRadius: {
+                        DEFAULT: "0rem",
+                        lg: "0rem",
+                        xl: "0rem",
+                        full: "9999px"
+                    },
+                    fontFamily: {
+                        headline: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #1b1b1b;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .custom-blur {
+            backdrop-filter: blur(12px);
+        }
+
+        /* Estilos de impresión profesionales para PDF sin depender de internet */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .print-page {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+            @page {
+                size: letter;
+                margin: 1cm;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-neutral-100 text-neutral-900 flex flex-col">
+
+    <!-- NAVBAR Y NAVEGACIÓN (no-print) -->
+    <header class="no-print bg-neutral-900 text-white sticky top-0 z-50 border-b border-neutral-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="flex items-center space-x-2 text-white hover:text-teal-300 transition">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </a>
+                <div class="flex flex-col">
+                    <h1 class="text-lg font-black tracking-widest uppercase">CODEXIS</h1>
+                    <span class="text-[10px] text-teal-400 font-semibold tracking-wider uppercase">Generador de Cotizaciones Offline</span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Global -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="saveQuotationLocal()" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1 border border-neutral-700 transition">
+                    <span class="material-symbols-outlined text-sm">save</span>
+                    <span class="hidden sm:inline">Guardar Local</span>
+                </button>
+                <button onclick="openSavedQuotationsModal()" class="bg-neutral-800 hover:bg-neutral-700 text-teal-300 px-3 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1 border border-neutral-700 transition">
+                    <span class="material-symbols-outlined text-sm">folder_open</span>
+                    <span class="hidden sm:inline">Cotizaciones</span>
+                </button>
+                <button onclick="goToContractFromActiveQuote()" class="bg-amber-400 hover:bg-amber-300 text-neutral-950 px-3 py-2 text-xs sm:text-sm font-black uppercase tracking-wider flex items-center gap-1 transition shadow-md">
+                    <span class="material-symbols-outlined text-base">description</span>
+                    <span class="hidden sm:inline">Generar Contrato</span>
+                </button>
+                <button onclick="generatePDF()" class="bg-teal-400 hover:bg-teal-300 text-neutral-950 px-3 py-2 text-xs sm:text-sm font-black uppercase tracking-wider flex items-center gap-1 transition shadow-lg">
+                    <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+                    <span>Descargar PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PANEL PRINCIPAL (DOS COLUMNAS EN DESKTOP: EDITOR + PREVIEW) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- FORMULARIO EDITOR (no-print) -->
+        <div class="no-print lg:col-span-5 space-y-6">
+            
+            <!-- DATOS DEL CLIENTE Y COTIZACIÓN -->
+            <div class="bg-white p-5 shadow-sm border border-neutral-200 space-y-4">
+                <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-neutral-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-teal-600">person</span>
+                        Datos del Cliente
+                    </h2>
+                    <span class="text-xs text-neutral-500 font-mono" id="form-quote-number">#COT-1001</span>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Nombre / Empresa *</label>
+                        <input type="text" id="cust-name" oninput="updateQuotationPreview()" placeholder="Ej. Altos de Montearroyo" class="w-full text-sm border-neutral-300 focus:border-teal-500 focus:ring-teal-500 bg-neutral-50">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">NIT / Cédula</label>
+                            <input type="text" id="cust-id" oninput="updateQuotationPreview()" placeholder="901.234.567-8" class="w-full text-sm border-neutral-300 focus:border-teal-500 focus:ring-teal-500 bg-neutral-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Teléfono</label>
+                            <input type="text" id="cust-phone" oninput="updateQuotationPreview()" placeholder="317 4190562" class="w-full text-sm border-neutral-300 focus:border-teal-500 focus:ring-teal-500 bg-neutral-50">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Ciudad / Dirección</label>
+                            <input type="text" id="cust-city" oninput="updateQuotationPreview()" placeholder="Barbosa, Santander" class="w-full text-sm border-neutral-300 focus:border-teal-500 focus:ring-teal-500 bg-neutral-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Validez (Días)</label>
+                            <input type="number" id="quote-validity" value="15" oninput="updateQuotationPreview()" class="w-full text-sm border-neutral-300 focus:border-teal-500 focus:ring-teal-500 bg-neutral-50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGREGAR PRODUCTOS DE CATÁLOGO O MANUAL -->
+            <div class="bg-white p-5 shadow-sm border border-neutral-200 space-y-4">
+                <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-neutral-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-teal-600">add_shopping_cart</span>
+                        Agregar Ítems a la Cotización
+                    </h2>
+                </div>
+
+                <!-- Selector de productos existentes offline -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-bold text-neutral-600 uppercase">Seleccionar del Catálogo Codexis (Offline)</label>
+                    <div class="flex gap-2">
+                        <select id="catalog-select" class="w-full text-sm border-neutral-300 focus:border-teal-500 focus:ring-teal-500 bg-neutral-50">
+                            <option value="">-- Seleccionar producto --</option>
+                        </select>
+                        <button onclick="addSelectedCatalogProduct()" class="bg-neutral-900 hover:bg-black text-white px-4 py-2 text-xs font-bold uppercase transition flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">add</span>
+                            <span>Agregar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-neutral-200"></div>
+                    <span class="flex-shrink mx-3 text-[10px] text-neutral-400 uppercase font-bold">O Crear Personalizado Con Imagen</span>
+                    <div class="flex-grow border-t border-neutral-200"></div>
+                </div>
+
+                <!-- Formulario Ítem Personalizado u Offline Image Upload -->
+                <div class="space-y-3 bg-neutral-50 p-3 border border-neutral-200">
+                    <div>
+                        <label class="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Nombre / Título del Producto o Servicio</label>
+                        <input type="text" id="custom-item-name" placeholder="Ej. Cámara PTZ 4MP Híbrida / Instalación" class="w-full text-xs border-neutral-300 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Descripción / Especificaciones</label>
+                        <textarea id="custom-item-desc" rows="2" placeholder="Detalles técnicos, garantía, etc." class="w-full text-xs border-neutral-300 bg-white"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Precio Unitario ($)</label>
+                            <input type="number" id="custom-item-price" placeholder="528500" class="w-full text-xs border-neutral-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Cantidad</label>
+                            <input type="number" id="custom-item-qty" value="1" min="1" class="w-full text-xs border-neutral-300 bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Cargar Imagen Offline (Opcional)</label>
+                        <input type="file" id="custom-item-image" accept="image/*" onchange="handleImageUpload(event)" class="w-full text-xs text-neutral-500 file:mr-2 file:py-1 file:px-3 file:border-0 file:text-xs file:font-semibold file:bg-neutral-200 file:text-neutral-800 hover:file:bg-neutral-300">
+                        <input type="hidden" id="custom-item-image-base64" value="">
+                        <div id="image-upload-preview" class="mt-2 hidden flex items-center gap-2">
+                            <img id="upload-preview-img" src="" class="w-12 h-12 object-contain border border-neutral-300 bg-white p-1">
+                            <span class="text-[10px] text-green-600 font-semibold flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">check_circle</span> Imagen cargada offline
+                            </span>
+                        </div>
+                    </div>
+                    <button onclick="addCustomProduct()" class="w-full bg-teal-500 hover:bg-teal-600 text-neutral-950 font-black text-xs uppercase py-2 transition flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-sm">add_circle</span>
+                        <span>Agregar Ítem Personalizado</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DESCUENTOS Y NOTAS -->
+            <div class="bg-white p-5 shadow-sm border border-neutral-200 space-y-4">
+                <h2 class="text-sm font-black uppercase tracking-wider text-neutral-800 flex items-center gap-2 border-b border-neutral-200 pb-3">
+                    <span class="material-symbols-outlined text-teal-600">settings</span>
+                    Condiciones y Descuento
+                </h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Descuento ($)</label>
+                        <input type="number" id="quote-discount" value="0" oninput="updateQuotationPreview()" class="w-full text-sm border-neutral-300 bg-neutral-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Forma de Pago</label>
+                        <input type="text" id="quote-payment-terms" value="50% Anticipo - 50% Contra Entrega" oninput="updateQuotationPreview()" class="w-full text-sm border-neutral-300 bg-neutral-50">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Observaciones / Notas Adicionales</label>
+                    <textarea id="quote-notes" rows="2" oninput="updateQuotationPreview()" placeholder="Incluye instalación, configuración de red y soporte técnico por 12 meses." class="w-full text-sm border-neutral-300 bg-neutral-50"></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- VISTA PREVIA DE LA COTIZACIÓN (LO QUE SE IMPRIME A PDF) -->
+        <div class="lg:col-span-7 flex justify-center">
+            <div id="quotation-document" class="print-page bg-white w-full max-w-[800px] p-6 sm:p-10 shadow-lg border border-neutral-200 flex flex-col justify-between min-h-[1050px] text-neutral-900 text-sm">
+                
+                <!-- ENCABEZADO DE LA COTIZACIÓN -->
+                <div>
+                    <div class="flex justify-between items-start border-b-2 border-neutral-900 pb-6 mb-6">
+                        <div class="space-y-1">
+                            <h1 class="text-3xl font-black tracking-tighter uppercase text-neutral-950 flex items-center gap-2">
+                                <span>CODEXIS</span>
+                            </h1>
+                            <p class="text-[11px] font-bold tracking-widest text-teal-600 uppercase">Soluciones Tecnológicas & Seguridad</p>
+                            <p class="text-xs text-neutral-500 pt-1">NIT: 901.458.923-1 | Cel: 317 4190562</p>
+                            <p class="text-xs text-neutral-500">Barbosa Santander CC Jorge Eliecer Gaitan Local 107</p>
+                        </div>
+                        <div class="text-right space-y-1">
+                            <div class="bg-neutral-900 text-white font-black text-sm uppercase px-3 py-1 inline-block tracking-wider">
+                                COTIZACIÓN
+                            </div>
+                            <p class="text-lg font-black text-neutral-900 font-mono pt-1" id="preview-quote-number">#COT-1001</p>
+                            <p class="text-xs text-neutral-500">Fecha: <span id="preview-quote-date" class="font-semibold text-neutral-800">--/--/----</span></p>
+                            <p class="text-xs text-neutral-500">Válido por: <span id="preview-quote-validity" class="font-semibold text-neutral-800">15 días</span></p>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE DATOS DEL CLIENTE EN PREVIEW -->
+                    <div class="grid grid-cols-2 gap-4 bg-neutral-50 p-4 border border-neutral-200 mb-6">
+                        <div>
+                            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-0.5">CLIENTE</span>
+                            <h3 id="preview-cust-name" class="font-bold text-base text-neutral-900 uppercase">CLIENTE DE EJEMPLO</h3>
+                            <p id="preview-cust-id" class="text-xs text-neutral-600">NIT/CC: 123456789</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-0.5">CONTACTO Y UBICACIÓN</span>
+                            <p id="preview-cust-phone" class="text-xs text-neutral-700">Tel: 317 4190562</p>
+                            <p id="preview-cust-city" class="text-xs text-neutral-700">Bucaramanga, Santander</p>
+                        </div>
+                    </div>
+
+                    <!-- TABLA DE PRODUCTOS CON IMÁGENES OFFLINE -->
+                    <div class="overflow-x-auto mb-6">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-neutral-900 text-white text-[11px] font-bold uppercase tracking-wider">
+                                    <th class="py-2.5 px-3 w-16 text-center">Imagen</th>
+                                    <th class="py-2.5 px-3">Descripción del Producto / Servicio</th>
+                                    <th class="py-2.5 px-3 text-center w-16">Cant.</th>
+                                    <th class="py-2.5 px-3 text-right w-28">Precio Unit.</th>
+                                    <th class="py-2.5 px-3 text-right w-28">Subtotal</th>
+                                    <th class="py-2.5 px-2 text-center w-10 no-print">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-items-tbody" class="divide-y divide-neutral-200 text-xs">
+                                <!-- Los ítems se insertan dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TOTALES Y CONDICIONES EN PIE -->
+                <div class="space-y-6 pt-4 border-t border-neutral-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+                        
+                        <!-- CONDICIONES COMERCIALES -->
+                        <div class="sm:col-span-7 space-y-3">
+                            <div class="bg-neutral-50 p-3 border border-neutral-200">
+                                <h4 class="text-[11px] font-bold text-neutral-800 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm text-teal-600">verified</span>
+                                    Condiciones Comerciales
+                                </h4>
+                                <p class="text-xs text-neutral-600"><strong>Forma de pago:</strong> <span id="preview-payment-terms">50% Anticipo - 50% Contra Entrega</span></p>
+                                <p class="text-xs text-neutral-600 mt-1"><strong>Garantía:</strong> 12 meses directamente con CODEXIS en equipos por defectos de fábrica.</p>
+                            </div>
+
+                            <div id="preview-notes-container" class="text-xs text-neutral-600 space-y-1">
+                                <p class="font-bold text-neutral-800 uppercase text-[10px]">Observaciones:</p>
+                                <p id="preview-notes" class="bg-white p-2 border border-neutral-200 text-neutral-700 italic leading-relaxed">
+                                    --
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- RESUMEN DE TOTALES -->
+                        <div class="sm:col-span-5 bg-neutral-900 text-white p-4 space-y-2">
+                            <div class="flex justify-between text-xs text-neutral-300">
+                                <span>Subtotal:</span>
+                                <span id="preview-subtotal-val" class="font-mono">$0</span>
+                            </div>
+                            <div id="preview-discount-row" class="flex justify-between text-xs text-teal-400">
+                                <span>Descuento:</span>
+                                <span id="preview-discount-val" class="font-mono">-$0</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-neutral-300">
+                                <span>IVA / Impuestos (0%):</span>
+                                <span class="font-mono">$0</span>
+                            </div>
+                            <div class="border-t border-neutral-700 pt-2 flex justify-between items-center font-bold text-base">
+                                <span class="uppercase tracking-wider text-xs">Total General:</span>
+                                <span id="preview-total-val" class="font-mono text-teal-300 text-lg font-black">$0</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- FIRMAS Y PIE DE PÁGINA -->
+                    <div class="pt-8 border-t border-neutral-200 grid grid-cols-2 gap-8 text-center text-xs text-neutral-500">
+                        <div>
+                            <div class="border-b border-neutral-400 w-48 mx-auto mb-2"></div>
+                            <p class="font-bold text-neutral-800 uppercase">CODEXIS - Área Comercial</p>
+                            <p class="text-[10px]">Soporte Técnico & Cotizaciones</p>
+                        </div>
+                        <div>
+                            <div class="border-b border-neutral-400 w-48 mx-auto mb-2"></div>
+                            <p class="font-bold text-neutral-800 uppercase">Aceptado por el Cliente</p>
+                            <p class="text-[10px]">Firma / Sello de Conformidad</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL DE COTIZACIONES GUARDADAS LOCALMENTE (OFFLINE) -->
+    <div id="quotations-modal" class="no-print fixed inset-0 bg-neutral-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl border border-neutral-200 shadow-2xl p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-neutral-200 pb-3">
+                <h3 class="font-black text-base uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-teal-600">folder</span>
+                    Cotizaciones Guardadas en el Dispositivo
+                </h3>
+                <button onclick="closeSavedQuotationsModal()" class="text-neutral-500 hover:text-black">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div id="saved-quotations-list" class="max-h-96 overflow-y-auto divide-y divide-neutral-200">
+                <!-- Lista dinámica de cotizaciones -->
+            </div>
+
+            <div class="flex justify-end pt-3">
+                <button onclick="closeSavedQuotationsModal()" class="bg-neutral-900 text-white px-4 py-2 text-xs font-bold uppercase">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGICA JAVASCRIPT OFFLINE -->
+    <script>
+        // Estado local de la cotización actual
+        let currentQuotation = {
+            id: 'COT-' + Math.floor(1000 + Math.random() * 9000),
+            date: new Date().toLocaleDateString('es-CO'),
+            customer: {
+                name: '',
+                id: '',
+                phone: '',
+                city: ''
+            },
+            validityDays: 15,
+            items: [],
+            discount: 0,
+            paymentTerms: '50% Anticipo - 50% Contra Entrega',
+            notes: ''
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            initCatalogSelect();
+            // Si viene un item por defecto de productsData.js lo cargamos
+            if (typeof INITIAL_PRODUCTS_DATA !== 'undefined' && INITIAL_PRODUCTS_DATA.length > 0) {
+                const p = INITIAL_PRODUCTS_DATA[0];
+                currentQuotation.items.push({
+                    name: p.name,
+                    description: p.description || '',
+                    price: p.price || 0,
+                    qty: 1,
+                    image: p.image || ''
+                });
+            }
+            document.getElementById('form-quote-number').innerText = '#' + currentQuotation.id;
+            document.getElementById('preview-quote-number').innerText = '#' + currentQuotation.id;
+            document.getElementById('preview-quote-date').innerText = currentQuotation.date;
+            
+            updateQuotationPreview();
+        });
+
+        // Cargar catálogo en el <select>
+        function initCatalogSelect() {
+            const select = document.getElementById('catalog-select');
+            select.innerHTML = '<option value="">-- Seleccionar producto del catálogo --</option>';
+            if (typeof INITIAL_PRODUCTS_DATA !== 'undefined') {
+                INITIAL_PRODUCTS_DATA.forEach((prod, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.textContent = `${prod.name} - $${(prod.price || 0).toLocaleString('es-CO')}`;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        // Agregar producto del catálogo
+        function addSelectedCatalogProduct() {
+            const select = document.getElementById('catalog-select');
+            const idx = select.value;
+            if (idx === '' || !INITIAL_PRODUCTS_DATA[idx]) {
+                alert('Por favor selecciona un producto válido.');
+                return;
+            }
+            const p = INITIAL_PRODUCTS_DATA[idx];
+            currentQuotation.items.push({
+                name: p.name,
+                description: p.description || '',
+                price: p.price || 0,
+                qty: 1,
+                image: p.image || ''
+            });
+            select.value = '';
+            updateQuotationPreview();
+        }
+
+        // Convertir imagen offline cargada a Base64
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Str = e.target.result;
+                document.getElementById('custom-item-image-base64').value = base64Str;
+                document.getElementById('upload-preview-img').src = base64Str;
+                document.getElementById('image-upload-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Agregar producto personalizado
+        function addCustomProduct() {
+            const name = document.getElementById('custom-item-name').value.trim();
+            const desc = document.getElementById('custom-item-desc').value.trim();
+            const price = parseFloat(document.getElementById('custom-item-price').value) || 0;
+            const qty = parseInt(document.getElementById('custom-item-qty').value) || 1;
+            const image = document.getElementById('custom-item-image-base64').value;
+
+            if (!name) {
+                alert('Ingresa el nombre o título del ítem.');
+                return;
+            }
+
+            currentQuotation.items.push({
+                name: name,
+                description: desc,
+                price: price,
+                qty: qty,
+                image: image
+            });
+
+            // Limpiar inputs
+            document.getElementById('custom-item-name').value = '';
+            document.getElementById('custom-item-desc').value = '';
+            document.getElementById('custom-item-price').value = '';
+            document.getElementById('custom-item-qty').value = '1';
+            document.getElementById('custom-item-image').value = '';
+            document.getElementById('custom-item-image-base64').value = '';
+            document.getElementById('image-upload-preview').classList.add('hidden');
+
+            updateQuotationPreview();
+        }
+
+        // Eliminar ítem
+        function removeItem(index) {
+            currentQuotation.items.splice(index, 1);
+            updateQuotationPreview();
+        }
+
+        // Actualizar Cantidad de ítem directamente
+        function updateItemQty(index, newQty) {
+            const val = parseInt(newQty);
+            if (val > 0) {
+                currentQuotation.items[index].qty = val;
+                updateQuotationPreview();
+            }
+        }
+
+        // Renderizar vista previa y recalcular totales
+        function updateQuotationPreview() {
+            // Datos del cliente
+            const name = document.getElementById('cust-name').value.trim() || 'CLIENTE DE EJEMPLO';
+            const id = document.getElementById('cust-id').value.trim() || 'NIT/CC: --';
+            const phone = document.getElementById('cust-phone').value.trim() || 'Tel: --';
+            const city = document.getElementById('cust-city').value.trim() || 'Barbosa, Santander';
+            const validity = document.getElementById('quote-validity').value || 15;
+            const discount = parseFloat(document.getElementById('quote-discount').value) || 0;
+            const terms = document.getElementById('quote-payment-terms').value || '50% Anticipo - 50% Contra Entrega';
+            const notes = document.getElementById('quote-notes').value.trim() || 'Sin observaciones adicionales.';
+
+            document.getElementById('preview-cust-name').innerText = name;
+            document.getElementById('preview-cust-id').innerText = id.startsWith('NIT') || id.startsWith('CC') ? id : `NIT/CC: ${id}`;
+            document.getElementById('preview-cust-phone').innerText = `Tel: ${phone}`;
+            document.getElementById('preview-cust-city').innerText = city;
+            document.getElementById('preview-quote-validity').innerText = `${validity} días`;
+            document.getElementById('preview-payment-terms').innerText = terms;
+            document.getElementById('preview-notes').innerText = notes;
+
+            // Renderizar tabla
+            const tbody = document.getElementById('preview-items-tbody');
+            tbody.innerHTML = '';
+
+            let subtotal = 0;
+
+            if (currentQuotation.items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-6 text-center text-neutral-400 italic">No hay ítems agregados a la cotización</td>
+                    </tr>
+                `;
+            } else {
+                currentQuotation.items.forEach((item, idx) => {
+                    const itemSubtotal = (item.price || 0) * (item.qty || 1);
+                    subtotal += itemSubtotal;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-neutral-50 transition";
+                    
+                    // Imagen por defecto o en Base64
+                    const imgHtml = item.image 
+                        ? `<img src="${item.image}" class="w-12 h-12 object-contain border border-neutral-200 bg-white p-0.5 mx-auto">`
+                        : `<div class="w-10 h-10 bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-400 mx-auto"><span class="material-symbols-outlined text-base">image</span></div>`;
+
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 text-center align-middle">${imgHtml}</td>
+                        <td class="py-2.5 px-3 align-middle">
+                            <p class="font-bold text-neutral-900">${escapeHtml(item.name)}</p>
+                            ${item.description ? `<p class="text-[11px] text-neutral-500 whitespace-pre-line leading-tight mt-0.5">${escapeHtml(item.description)}</p>` : ''}
+                        </td>
+                        <td class="py-2.5 px-3 text-center align-middle font-mono font-semibold">
+                            <input type="number" min="1" value="${item.qty}" onchange="updateItemQty(${idx}, this.value)" class="no-print w-12 text-center text-xs border-neutral-300 py-0.5 px-1 inline-block">
+                            <span class="hidden print:inline">${item.qty}</span>
+                        </td>
+                        <td class="py-2.5 px-3 text-right align-middle font-mono">$${(item.price || 0).toLocaleString('es-CO')}</td>
+                        <td class="py-2.5 px-3 text-right align-middle font-mono font-bold">$${itemSubtotal.toLocaleString('es-CO')}</td>
+                        <td class="py-2.5 px-2 text-center align-middle no-print">
+                            <button onclick="removeItem(${idx})" class="text-red-500 hover:text-red-700 transition" title="Eliminar ítem">
+                                <span class="material-symbols-outlined text-base">delete</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const total = Math.max(0, subtotal - discount);
+
+            document.getElementById('preview-subtotal-val').innerText = `$${subtotal.toLocaleString('es-CO')}`;
+            document.getElementById('preview-discount-val').innerText = `-$${discount.toLocaleString('es-CO')}`;
+            document.getElementById('preview-total-val').innerText = `$${total.toLocaleString('es-CO')}`;
+        }
+
+        // Función nativa para Generar e Imprimir PDF Offline de alta fidelidad
+        function generatePDF() {
+            if (currentQuotation.items.length === 0) {
+                alert('Agrega al menos un ítem a la cotización antes de generar el PDF.');
+                return;
+            }
+            window.print();
+        }
+
+        // Guardar en localStorage para disponibilidad 100% offline
+        function saveQuotationLocal() {
+            const name = document.getElementById('cust-name').value.trim();
+            if (!name) {
+                alert('Ingresa el nombre del cliente para guardar la cotización.');
+                return;
+            }
+            
+            const savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            const record = {
+                id: currentQuotation.id,
+                date: currentQuotation.date,
+                customer: name,
+                total: document.getElementById('preview-total-val').innerText,
+                data: {
+                    name,
+                    id: document.getElementById('cust-id').value,
+                    phone: document.getElementById('cust-phone').value,
+                    city: document.getElementById('cust-city').value,
+                    validity: document.getElementById('quote-validity').value,
+                    discount: document.getElementById('quote-discount').value,
+                    terms: document.getElementById('quote-payment-terms').value,
+                    notes: document.getElementById('quote-notes').value,
+                    items: [...currentQuotation.items]
+                }
+            };
+
+            savedList.unshift(record);
+            localStorage.setItem('codexis_quotations', JSON.stringify(savedList));
+            alert(`Cotización ${currentQuotation.id} guardada con éxito en este dispositivo (offline).`);
+        }
+
+        // Redirección e integración para generar contrato
+        function goToContractFromActiveQuote() {
+            if (!currentQuotation.items || currentQuotation.items.length === 0) {
+                alert('Agrega al menos un ítem a la cotización antes de generar el contrato.');
+                return;
+            }
+            const name = document.getElementById('cust-name').value.trim() || 'CLIENTE';
+            const quotePayload = {
+                id: currentQuotation.id,
+                date: currentQuotation.date,
+                customer: {
+                    name: name,
+                    id: document.getElementById('cust-id').value.trim(),
+                    phone: document.getElementById('cust-phone').value.trim(),
+                    city: document.getElementById('cust-city').value.trim()
+                },
+                validityDays: document.getElementById('quote-validity').value || 15,
+                discount: parseFloat(document.getElementById('quote-discount').value) || 0,
+                paymentTerms: document.getElementById('quote-payment-terms').value || '50% Anticipo - 50% Contra Entrega',
+                notes: document.getElementById('quote-notes').value.trim() || '',
+                items: [...currentQuotation.items],
+                subtotal: document.getElementById('preview-subtotal-val').innerText,
+                total: document.getElementById('preview-total-val').innerText
+            };
+            localStorage.setItem('codexis_active_quote_for_contract', JSON.stringify(quotePayload));
+            window.location.href = 'contrato.html';
+        }
+
+        function goToContractFromSavedQuote(index) {
+            const savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            const q = savedList[index];
+            if (!q) return;
+
+            let subtotalVal = 0;
+            if (q.data && q.data.items) {
+                subtotalVal = q.data.items.reduce((acc, item) => acc + ((item.price || 0) * (item.qty || 1)), 0);
+            }
+            const quotePayload = {
+                id: q.id,
+                date: q.date,
+                customer: {
+                    name: q.data.name || q.customer,
+                    id: q.data.id || '',
+                    phone: q.data.phone || '',
+                    city: q.data.city || ''
+                },
+                validityDays: q.data.validity || 15,
+                discount: parseFloat(q.data.discount) || 0,
+                paymentTerms: q.data.terms || '50% Anticipo - 50% Contra Entrega',
+                notes: q.data.notes || '',
+                items: q.data.items || [],
+                subtotal: `$${subtotalVal.toLocaleString('es-CO')}`,
+                total: q.total || `$${subtotalVal.toLocaleString('es-CO')}`
+            };
+            localStorage.setItem('codexis_active_quote_for_contract', JSON.stringify(quotePayload));
+            window.location.href = 'contrato.html';
+        }
+
+        // Abrir modal de cotizaciones guardadas
+        function openSavedQuotationsModal() {
+            const listContainer = document.getElementById('saved-quotations-list');
+            listContainer.innerHTML = '';
+
+            const savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            if (savedList.length === 0) {
+                listContainer.innerHTML = '<p class="py-6 text-center text-neutral-400 text-xs italic">No hay cotizaciones guardadas localmente.</p>';
+            } else {
+                savedList.forEach((q, index) => {
+                    const div = document.createElement('div');
+                    div.className = "py-3 flex justify-between items-center hover:bg-neutral-50 px-2 transition";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-sm text-neutral-900">${escapeHtml(q.customer)} <span class="text-xs font-mono text-neutral-500">#${q.id}</span></p>
+                            <p class="text-xs text-neutral-500">Fecha: ${q.date} | Total: <strong class="text-teal-600">${q.total}</strong></p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadSavedQuotation(${index})" class="bg-neutral-900 text-white px-3 py-1 text-xs font-bold uppercase hover:bg-black transition">Cargar</button>
+                            <button onclick="goToContractFromSavedQuote(${index})" class="bg-amber-400 hover:bg-amber-300 text-neutral-950 px-3 py-1 text-xs font-bold uppercase transition flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">description</span>
+                                <span>Contrato</span>
+                            </button>
+                            <button onclick="deleteSavedQuotation(${index})" class="text-red-600 hover:text-red-800 text-xs px-2 py-1 transition">Eliminar</button>
+                        </div>
+                    `;
+                    listContainer.appendChild(div);
+                });
+            }
+
+            document.getElementById('quotations-modal').classList.remove('hidden');
+            document.getElementById('quotations-modal').classList.add('flex');
+        }
+
+        function closeSavedQuotationsModal() {
+            document.getElementById('quotations-modal').classList.add('hidden');
+            document.getElementById('quotations-modal').classList.remove('flex');
+        }
+
+        function loadSavedQuotation(index) {
+            const savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            const q = savedList[index];
+            if (!q) return;
+
+            currentQuotation.id = q.id;
+            currentQuotation.items = q.data.items || [];
+            
+            document.getElementById('cust-name').value = q.data.name || '';
+            document.getElementById('cust-id').value = q.data.id || '';
+            document.getElementById('cust-phone').value = q.data.phone || '';
+            document.getElementById('cust-city').value = q.data.city || '';
+            document.getElementById('quote-validity').value = q.data.validity || 15;
+            document.getElementById('quote-discount').value = q.data.discount || 0;
+            document.getElementById('quote-payment-terms').value = q.data.terms || '';
+            document.getElementById('quote-notes').value = q.data.notes || '';
+
+            document.getElementById('form-quote-number').innerText = '#' + currentQuotation.id;
+            document.getElementById('preview-quote-number').innerText = '#' + currentQuotation.id;
+
+            updateQuotationPreview();
+            closeSavedQuotationsModal();
+        }
+
+        function deleteSavedQuotation(index) {
+            if (!confirm('¿Seguro que deseas eliminar esta cotización guardada?')) return;
+            let savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            savedList.splice(index, 1);
+            localStorage.setItem('codexis_quotations', JSON.stringify(savedList));
+            openSavedQuotationsModal();
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>

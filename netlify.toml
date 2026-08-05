@@ -37,37 +37,6 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Redirects para páginas HTML específicas
-[[redirects]]
-  from = "/link"
-  to = "/link.html"
-  status = 200
-
-[[redirects]]
-  from = "/catalogo"
-  to = "/catalogo.html"
-  status = 200
-
-[[redirects]]
-  from = "/equipo"
-  to = "/equipo.html"
-  status = 200
-
-[[redirects]]
-  from = "/orden"
-  to = "/orden.html"
-  status = 200
-
-[[redirects]]
-  from = "/order"
-  to = "/order.html"
-  status = 200
-
-[[redirects]]
-  from = "/pago"
-  to = "/pago.html"
-  status = 200
-
 # Redirects para SPA (mantener URLs)
 [[redirects]]
   from = "/*"

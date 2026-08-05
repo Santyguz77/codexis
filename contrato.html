@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador de Contratos - CODEXIS</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#b2dfdb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#b2dfdb",
+                        "on-primary": "#1b1b1b",
+                        "surface": "#f9f9f9",
+                        "on-surface": "#1b1b1b",
+                    },
+                    fontFamily: {
+                        headline: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #1b1b1b;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Estilos de impresión legal para PDF sin depender de internet */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .print-page {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 24px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+            @page {
+                size: letter;
+                margin: 1.2cm;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-neutral-100 text-neutral-900 flex flex-col">
+
+    <!-- NAVBAR Y NAVEGACIÓN (no-print) -->
+    <header class="no-print bg-neutral-900 text-white sticky top-0 z-50 border-b border-neutral-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <a href="cotizacion.html" class="flex items-center space-x-2 text-white hover:text-amber-400 transition" title="Volver a Cotizaciones">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </a>
+                <div class="flex flex-col">
+                    <h1 class="text-lg font-black tracking-widest uppercase flex items-center gap-2">
+                        <span>CODEXIS</span>
+                        <span class="bg-amber-400 text-neutral-950 text-[10px] font-black px-1.5 py-0.5 uppercase tracking-normal">Contratos</span>
+                    </h1>
+                    <span class="text-[10px] text-amber-300 font-semibold tracking-wider uppercase">Generador Legal de Contratos</span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Global -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="openQuotationsPickerModal()" class="bg-neutral-800 hover:bg-neutral-700 text-amber-300 px-3 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1 border border-neutral-700 transition">
+                    <span class="material-symbols-outlined text-sm">folder_open</span>
+                    <span class="hidden sm:inline">Cargar Cotización</span>
+                </button>
+                <button onclick="saveContractLocal()" class="bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1 border border-neutral-700 transition">
+                    <span class="material-symbols-outlined text-sm">save</span>
+                    <span class="hidden sm:inline">Guardar Contrato</span>
+                </button>
+                <button onclick="printContractPDF()" class="bg-amber-400 hover:bg-amber-300 text-neutral-950 px-4 py-2 text-xs sm:text-sm font-black uppercase tracking-wider flex items-center gap-1 transition shadow-lg">
+                    <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+                    <span>Descargar PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PANEL PRINCIPAL (DOS COLUMNAS: EDITOR Y VISTA PREVIA DEL CONTRATO) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- FORMULARIO EDITOR DE CLÁUSULAS Y DATOS DEL CONTRATO (no-print) -->
+        <div class="no-print lg:col-span-5 space-y-6">
+            
+            <!-- DATOS GENERALES DEL CONTRATO -->
+            <div class="bg-white p-5 shadow-sm border border-neutral-200 space-y-4">
+                <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-neutral-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-amber-600">gavel</span>
+                        Datos del Contrato
+                    </h2>
+                    <span class="text-xs text-neutral-500 font-mono" id="form-contract-number">#CTR-1001</span>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">N° de Contrato</label>
+                            <input type="text" id="ctr-number" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 focus:border-amber-500 focus:ring-amber-500 bg-neutral-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Cotización Ref.</label>
+                            <input type="text" id="ctr-ref-quote" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 focus:border-amber-500 focus:ring-amber-500 bg-neutral-50">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Ciudad de Firma</label>
+                            <input type="text" id="ctr-city" value="Barbosa, Santander" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 focus:border-amber-500 focus:ring-amber-500 bg-neutral-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Fecha de Firma</label>
+                            <input type="text" id="ctr-date" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 focus:border-amber-500 focus:ring-amber-500 bg-neutral-50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATOS DE LAS PARTES -->
+            <div class="bg-white p-5 shadow-sm border border-neutral-200 space-y-4">
+                <h2 class="text-sm font-black uppercase tracking-wider text-neutral-800 flex items-center gap-2 border-b border-neutral-200 pb-3">
+                    <span class="material-symbols-outlined text-amber-600">groups</span>
+                    Partes Contratantes
+                </h2>
+                
+                <div class="space-y-3">
+                    <div class="bg-neutral-50 p-3 border border-neutral-200 space-y-2">
+                        <label class="block text-[11px] font-black text-amber-700 uppercase">El Contratista (Proveedor)</label>
+                        <input type="text" id="ctr-provider-name" value="CODEXIS - Soluciones Tecnológicas & Seguridad" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white font-semibold">
+                        <input type="text" id="ctr-provider-id" value="NIT: 901.458.923-1" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white">
+                        <input type="text" id="ctr-provider-rep" value="Representante Legal / Área Comercial CODEXIS" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white">
+                    </div>
+
+                    <div class="bg-neutral-50 p-3 border border-neutral-200 space-y-2">
+                        <label class="block text-[11px] font-black text-amber-700 uppercase">El Contratante (Cliente)</label>
+                        <input type="text" id="ctr-client-name" placeholder="Nombre completo o Razón Social" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white font-semibold">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="ctr-client-id" placeholder="NIT o Cédula" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white">
+                            <input type="text" id="ctr-client-phone" placeholder="Teléfono" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white">
+                        </div>
+                        <input type="text" id="ctr-client-address" placeholder="Dirección / Ciudad" oninput="updateContractPreview()" class="w-full text-xs border-neutral-300 bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TÉRMINOS Y CLÁUSULAS EDITABLES -->
+            <div class="bg-white p-5 shadow-sm border border-neutral-200 space-y-4">
+                <h2 class="text-sm font-black uppercase tracking-wider text-neutral-800 flex items-center gap-2 border-b border-neutral-200 pb-3">
+                    <span class="material-symbols-outlined text-amber-600">article</span>
+                    Términos y Cláusulas
+                </h2>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Plazo de Entrega</label>
+                        <input type="text" id="ctr-term-days" value="5 a 8 días hábiles" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 bg-neutral-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Meses de Garantía</label>
+                        <input type="number" id="ctr-warranty-months" value="12" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 bg-neutral-50">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Forma y Condiciones de Pago</label>
+                    <input type="text" id="ctr-payment-terms" oninput="updateContractPreview()" class="w-full text-sm border-neutral-300 bg-neutral-50">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-600 uppercase mb-1">Cláusulas o Notas Adicionales</label>
+                    <textarea id="ctr-custom-clauses" rows="3" oninput="updateContractPreview()" placeholder="Ej. El contratante proporcionará puntos de energía eléctrica de 110V a menos de 2 metros de los equipos." class="w-full text-sm border-neutral-300 bg-neutral-50"></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- VISTA PREVIA DEL DOCUMENTO DE CONTRATO (IMPRESIÓN / PDF) -->
+        <div class="lg:col-span-7 flex justify-center">
+            <div id="contract-document" class="print-page bg-white w-full max-w-[800px] p-8 sm:p-12 shadow-lg border border-neutral-200 flex flex-col justify-between min-h-[1100px] text-neutral-900 text-xs sm:text-sm leading-relaxed">
+                
+                <div class="space-y-6">
+                    <!-- ENCABEZADO -->
+                    <div class="flex justify-between items-start border-b-2 border-neutral-900 pb-5">
+                        <div class="space-y-1">
+                            <h1 class="text-2xl font-black tracking-tighter uppercase text-neutral-950">CODEXIS</h1>
+                            <p class="text-[10px] font-bold tracking-widest text-amber-600 uppercase">Soluciones Tecnológicas & Seguridad</p>
+                            <p class="text-[11px] text-neutral-500">NIT: 901.458.923-1 | Cel: 317 4190562</p>
+                            <p class="text-[11px] text-neutral-500">Barbosa, Santander CC Jorge Eliecer Gaitán Local 107</p>
+                        </div>
+                        <div class="text-right space-y-1">
+                            <div class="bg-neutral-900 text-white font-black text-xs uppercase px-3 py-1 inline-block tracking-wider">
+                                CONTRATO LEGAL
+                            </div>
+                            <p class="text-base font-black text-neutral-900 font-mono pt-1" id="preview-ctr-number">#CTR-1001</p>
+                            <p class="text-[11px] text-neutral-500">Cotización Ref: <span id="preview-ctr-ref-quote" class="font-bold text-neutral-800">#COT-1001</span></p>
+                            <p class="text-[11px] text-neutral-500">Fecha: <span id="preview-ctr-date" class="font-semibold text-neutral-800">--/--/----</span></p>
+                        </div>
+                    </div>
+
+                    <!-- TÍTULO DEL CONTRATO -->
+                    <div class="text-center py-2 bg-neutral-50 border border-neutral-200">
+                        <h2 class="text-xs sm:text-sm font-black uppercase tracking-wider text-neutral-900">
+                            CONTRATO DE PRESTACIÓN DE SERVICIOS Y SUMINISTRO DE EQUIPOS TECNOLÓGICOS
+                        </h2>
+                    </div>
+
+                    <!-- INTRODUCCIÓN Y PARTES -->
+                    <div class="space-y-2 text-justify text-neutral-800 text-xs">
+                        <p>
+                            En la ciudad de <strong id="preview-ctr-city" class="uppercase">Barbosa, Santander</strong>, a los <span id="preview-ctr-full-date" class="font-semibold">--</span>, entre los suscritos a saber: 
+                            por una parte <strong id="preview-ctr-provider-name">CODEXIS - SOLUCIONES TECNOLÓGICAS & SEGURIDAD</strong> identificada con <span id="preview-ctr-provider-id">NIT 901.458.923-1</span>, en adelante denominada <strong>EL CONTRATISTA</strong>; y por la otra parte <strong id="preview-ctr-client-name" class="uppercase">CLIENTE DE EJEMPLO</strong> identificada(o) con <span id="preview-ctr-client-id">NIT/CC 123456789</span>, con teléfono <span id="preview-ctr-client-phone">--</span> y domicilio en <span id="preview-ctr-client-address">--</span>, en adelante denominada(o) <strong>EL CONTRATANTE</strong>, se ha convenido celebrar el presente contrato sujeto a las siguientes cláusulas:
+                        </p>
+                    </div>
+
+                    <!-- CLÁUSULAS -->
+                    <div class="space-y-4 text-xs text-neutral-800">
+                        
+                        <!-- CLÁUSULA PRIMERA: OBJETO -->
+                        <div>
+                            <h3 class="font-black uppercase text-neutral-900 border-b border-neutral-300 pb-1 mb-2 text-[12px]">
+                                CLÁUSULA PRIMERA. OBJETO DEL CONTRATO
+                            </h3>
+                            <p class="mb-2 text-justify">
+                                <strong>EL CONTRATISTA</strong> se obliga para con <strong>EL CONTRATANTE</strong> a realizar el suministro, transporte, configuración e instalación de los equipos y/o servicios tecnológicos especificados en la Cotización de Referencia <span id="preview-ctr-ref-quote-inline" class="font-bold text-neutral-900">#COT-1001</span>, los cuales se relacionan a continuación:
+                            </p>
+
+                            <!-- TABLA DE ÍTEMS -->
+                            <div class="overflow-x-auto my-3 border border-neutral-300">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-neutral-900 text-white font-bold uppercase text-[10px] tracking-wider">
+                                            <th class="py-2 px-3">Ítem / Descripción de Equipos y Servicios</th>
+                                            <th class="py-2 px-2 text-center w-16">Cant.</th>
+                                            <th class="py-2 px-3 text-right w-28">Precio Unit.</th>
+                                            <th class="py-2 px-3 text-right w-28">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="preview-ctr-items-tbody" class="divide-y divide-neutral-200">
+                                        <!-- Ítems dinámicos -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- CLÁUSULA SEGUNDA: VALOR Y PAGO -->
+                        <div>
+                            <h3 class="font-black uppercase text-neutral-900 border-b border-neutral-300 pb-1 mb-2 text-[12px]">
+                                CLÁUSULA SEGUNDA. VALOR Y FORMA DE PAGO
+                            </h3>
+                            <p class="text-justify">
+                                El valor total del presente contrato asciende a la suma de <strong id="preview-ctr-total-val" class="text-neutral-950 font-mono text-sm font-black">$0</strong> M/CTE. 
+                                La forma de pago acordada por las partes es: <strong id="preview-ctr-payment-terms" class="text-neutral-900">50% Anticipo - 50% Contra Entrega</strong>.
+                            </p>
+                        </div>
+
+                        <!-- CLÁUSULA TERCERA: PLAZO DE EJECUCIÓN -->
+                        <div>
+                            <h3 class="font-black uppercase text-neutral-900 border-b border-neutral-300 pb-1 mb-2 text-[12px]">
+                                CLÁUSULA TERCERA. PLAZO DE EJECUCIÓN Y ENTREGABLES
+                            </h3>
+                            <p class="text-justify">
+                                <strong>EL CONTRATISTA</strong> ejecutará y entregará la totalidad de los trabajos e instalaciones contratadas en un plazo estimado de <strong id="preview-ctr-term-days">5 a 8 días hábiles</strong>, contados a partir del desembolso del anticipo pactado y la confirmación de disponibilidad del sitio por parte de <strong>EL CONTRATANTE</strong>.
+                            </p>
+                        </div>
+
+                        <!-- CLÁUSULA CUARTA: GARANTÍA Y SOPORTE -->
+                        <div>
+                            <h3 class="font-black uppercase text-neutral-900 border-b border-neutral-300 pb-1 mb-2 text-[12px]">
+                                CLÁUSULA CUARTA. GARANTÍA Y SOPORTE TÉCNICO
+                            </h3>
+                            <p class="text-justify">
+                                Los equipos suministrados cuentan con una garantía de <strong id="preview-ctr-warranty-months">12</strong> meses directamente con <strong>CODEXIS</strong> por defectos de fabricación. La garantía no cubre daños causados por mal uso, negligencia, descargas eléctricas o variaciones de voltaje sin protección de regulador u UPS.
+                            </p>
+                        </div>
+
+                        <!-- CLÁUSULA QUINTA: OBLIGACIONES -->
+                        <div>
+                            <h3 class="font-black uppercase text-neutral-900 border-b border-neutral-300 pb-1 mb-2 text-[12px]">
+                                CLÁUSULA QUINTA. OBLIGACIONES Y CONDICIONES ADICIONALES
+                            </h3>
+                            <p id="preview-ctr-custom-clauses" class="text-justify italic bg-neutral-50 p-2.5 border border-neutral-200 leading-relaxed text-neutral-700">
+                                Sin condiciones adicionales.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- FIRMAS LEGALES -->
+                    <div class="pt-12 avoid-break">
+                        <p class="text-xs text-neutral-600 text-center mb-10">
+                            En fe de conformidad, las partes firman el presente contrato en dos ejemplares del mismo tenor:
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-10 text-center text-xs">
+                            <div class="space-y-1">
+                                <div class="border-b border-neutral-900 w-56 mx-auto mb-3"></div>
+                                <p class="font-bold text-neutral-900 uppercase">EL CONTRATISTA</p>
+                                <p class="font-semibold text-neutral-800 text-[11px]" id="preview-sig-provider-name">CODEXIS - Soluciones Tecnológicas</p>
+                                <p class="text-[10px] text-neutral-500" id="preview-sig-provider-id">NIT: 901.458.923-1</p>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="border-b border-neutral-900 w-56 mx-auto mb-3"></div>
+                                <p class="font-bold text-neutral-900 uppercase">EL CONTRATANTE</p>
+                                <p class="font-semibold text-neutral-800 text-[11px]" id="preview-sig-client-name">CLIENTE DE EJEMPLO</p>
+                                <p class="text-[10px] text-neutral-500" id="preview-sig-client-id">NIT/CC: --</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL PARA SELECCIONAR OTRA COTIZACIÓN -->
+    <div id="quotations-picker-modal" class="no-print fixed inset-0 bg-neutral-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl border border-neutral-200 shadow-2xl p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-neutral-200 pb-3">
+                <h3 class="font-black text-base uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-amber-600">folder</span>
+                    Seleccionar Cotización para Generar Contrato
+                </h3>
+                <button onclick="closeQuotationsPickerModal()" class="text-neutral-500 hover:text-black">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div id="picker-quotations-list" class="max-h-96 overflow-y-auto divide-y divide-neutral-200">
+                <!-- Cotizaciones disponibles -->
+            </div>
+
+            <div class="flex justify-end pt-3">
+                <button onclick="closeQuotationsPickerModal()" class="bg-neutral-900 text-white px-4 py-2 text-xs font-bold uppercase">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC JAVASCRIPT -->
+    <script>
+        // Estado del Contrato Actual
+        let currentContract = {
+            contractNumber: 'CTR-' + Math.floor(1000 + Math.random() * 9000),
+            quoteRef: 'COT-1001',
+            city: 'Barbosa, Santander',
+            date: new Date().toLocaleDateString('es-CO'),
+            provider: {
+                name: 'CODEXIS - Soluciones Tecnológicas & Seguridad',
+                id: 'NIT: 901.458.923-1',
+                rep: 'Representante Legal CODEXIS'
+            },
+            client: {
+                name: '',
+                id: '',
+                phone: '',
+                address: ''
+            },
+            termDays: '5 a 8 días hábiles',
+            warrantyMonths: 12,
+            paymentTerms: '50% Anticipo - 50% Contra Entrega',
+            customClauses: 'El contratante garantizará el acceso a las instalaciones y suministro de energía eléctrica constante.',
+            items: [],
+            subtotal: '$0',
+            total: '$0'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuotationDataForContract();
+        });
+
+        // Cargar datos provenientes de cotizacion.html o localStorage
+        function loadQuotationDataForContract() {
+            const activeQuoteStr = localStorage.getItem('codexis_active_quote_for_contract');
+            if (activeQuoteStr) {
+                try {
+                    const q = JSON.parse(activeQuoteStr);
+                    currentContract.quoteRef = q.id || 'COT-1001';
+                    currentContract.contractNumber = 'CTR-' + (q.id ? q.id.replace('COT-', '') : Math.floor(1000 + Math.random() * 9000));
+                    if (q.customer) {
+                        currentContract.client.name = q.customer.name || '';
+                        currentContract.client.id = q.customer.id || '';
+                        currentContract.client.phone = q.customer.phone || '';
+                        currentContract.client.address = q.customer.city || '';
+                    }
+                    currentContract.paymentTerms = q.paymentTerms || '50% Anticipo - 50% Contra Entrega';
+                    currentContract.items = q.items || [];
+                    currentContract.subtotal = q.subtotal || '$0';
+                    currentContract.total = q.total || '$0';
+
+                    if (q.notes) {
+                        currentContract.customClauses += '\n' + q.notes;
+                    }
+                } catch(e) {
+                    console.error('Error parseando la cotización activa:', e);
+                }
+            }
+
+            // Poblar inputs del formulario
+            document.getElementById('ctr-number').value = currentContract.contractNumber;
+            document.getElementById('ctr-ref-quote').value = currentContract.quoteRef;
+            document.getElementById('ctr-city').value = currentContract.city;
+            document.getElementById('ctr-date').value = currentContract.date;
+            
+            document.getElementById('ctr-provider-name').value = currentContract.provider.name;
+            document.getElementById('ctr-provider-id').value = currentContract.provider.id;
+            document.getElementById('ctr-provider-rep').value = currentContract.provider.rep;
+
+            document.getElementById('ctr-client-name').value = currentContract.client.name;
+            document.getElementById('ctr-client-id').value = currentContract.client.id;
+            document.getElementById('ctr-client-phone').value = currentContract.client.phone;
+            document.getElementById('ctr-client-address').value = currentContract.client.address;
+
+            document.getElementById('ctr-term-days').value = currentContract.termDays;
+            document.getElementById('ctr-warranty-months').value = currentContract.warrantyMonths;
+            document.getElementById('ctr-payment-terms').value = currentContract.paymentTerms;
+            document.getElementById('ctr-custom-clauses').value = currentContract.customClauses;
+
+            document.getElementById('form-contract-number').innerText = '#' + currentContract.contractNumber;
+
+            updateContractPreview();
+        }
+
+        // Sincronizar vista previa en tiempo real
+        function updateContractPreview() {
+            const number = document.getElementById('ctr-number').value.trim() || 'CTR-1001';
+            const quoteRef = document.getElementById('ctr-ref-quote').value.trim() || 'COT-1001';
+            const city = document.getElementById('ctr-city').value.trim() || 'Barbosa, Santander';
+            const date = document.getElementById('ctr-date').value.trim() || new Date().toLocaleDateString('es-CO');
+
+            const provName = document.getElementById('ctr-provider-name').value.trim() || 'CODEXIS';
+            const provId = document.getElementById('ctr-provider-id').value.trim() || 'NIT 901.458.923-1';
+            const provRep = document.getElementById('ctr-provider-rep').value.trim() || 'Representante Legal';
+
+            const clientName = document.getElementById('ctr-client-name').value.trim() || 'CLIENTE DE EJEMPLO';
+            const clientId = document.getElementById('ctr-client-id').value.trim() || 'NIT/CC: --';
+            const clientPhone = document.getElementById('ctr-client-phone').value.trim() || '--';
+            const clientAddress = document.getElementById('ctr-client-address').value.trim() || '--';
+
+            const termDays = document.getElementById('ctr-term-days').value.trim() || '5 a 8 días hábiles';
+            const warranty = document.getElementById('ctr-warranty-months').value || '12';
+            const paymentTerms = document.getElementById('ctr-payment-terms').value.trim() || '50% Anticipo - 50% Contra Entrega';
+            const clauses = document.getElementById('ctr-custom-clauses').value.trim() || 'Sin condiciones adicionales.';
+
+            // Actualizar vista previa
+            document.getElementById('preview-ctr-number').innerText = '#' + number;
+            document.getElementById('preview-ctr-ref-quote').innerText = '#' + quoteRef;
+            document.getElementById('preview-ctr-ref-quote-inline').innerText = '#' + quoteRef;
+            document.getElementById('preview-ctr-date').innerText = date;
+            document.getElementById('preview-ctr-full-date').innerText = date;
+            document.getElementById('preview-ctr-city').innerText = city;
+
+            document.getElementById('preview-ctr-provider-name').innerText = provName;
+            document.getElementById('preview-ctr-provider-id').innerText = provId;
+
+            document.getElementById('preview-ctr-client-name').innerText = clientName;
+            document.getElementById('preview-ctr-client-id').innerText = clientId.startsWith('NIT') || clientId.startsWith('CC') ? clientId : `NIT/CC: ${clientId}`;
+            document.getElementById('preview-ctr-client-phone').innerText = clientPhone;
+            document.getElementById('preview-ctr-client-address').innerText = clientAddress;
+
+            document.getElementById('preview-ctr-term-days').innerText = termDays;
+            document.getElementById('preview-ctr-warranty-months').innerText = warranty;
+            document.getElementById('preview-ctr-payment-terms').innerText = paymentTerms;
+            document.getElementById('preview-ctr-custom-clauses').innerText = clauses;
+
+            // Firmas
+            document.getElementById('preview-sig-provider-name').innerText = provName;
+            document.getElementById('preview-sig-provider-id').innerText = provId;
+            document.getElementById('preview-sig-client-name').innerText = clientName;
+            document.getElementById('preview-sig-client-id').innerText = clientId.startsWith('NIT') || clientId.startsWith('CC') ? clientId : `NIT/CC: ${clientId}`;
+
+            // Renderizar tabla de ítems de la cotización
+            const tbody = document.getElementById('preview-ctr-items-tbody');
+            tbody.innerHTML = '';
+
+            let calculatedSubtotal = 0;
+
+            if (!currentContract.items || currentContract.items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-4 text-center text-neutral-400 italic">No hay ítems cargados desde la cotización</td>
+                    </tr>
+                `;
+            } else {
+                currentContract.items.forEach((item) => {
+                    const itemSub = (item.price || 0) * (item.qty || 1);
+                    calculatedSubtotal += itemSub;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-neutral-50";
+                    tr.innerHTML = `
+                        <td class="py-2 px-3 align-top">
+                            <p class="font-bold text-neutral-900">${escapeHtml(item.name)}</p>
+                            ${item.description ? `<p class="text-[10px] text-neutral-500 whitespace-pre-line leading-tight mt-0.5">${escapeHtml(item.description)}</p>` : ''}
+                        </td>
+                        <td class="py-2 px-2 text-center align-top font-mono font-semibold">${item.qty || 1}</td>
+                        <td class="py-2 px-3 text-right align-top font-mono">$${(item.price || 0).toLocaleString('es-CO')}</td>
+                        <td class="py-2 px-3 text-right align-top font-mono font-bold">$${itemSub.toLocaleString('es-CO')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('preview-ctr-total-val').innerText = currentContract.total !== '$0' ? currentContract.total : `$${calculatedSubtotal.toLocaleString('es-CO')}`;
+        }
+
+        // Descargar PDF / Imprimir contrato nativamente
+        function printContractPDF() {
+            window.print();
+        }
+
+        // Guardar Contrato Localmente
+        function saveContractLocal() {
+            const clientName = document.getElementById('ctr-client-name').value.trim();
+            if (!clientName) {
+                alert('Ingresa el nombre del cliente para guardar el contrato.');
+                return;
+            }
+
+            const savedContracts = JSON.parse(localStorage.getItem('codexis_contracts') || '[]');
+            const record = {
+                id: document.getElementById('ctr-number').value.trim(),
+                quoteRef: document.getElementById('ctr-ref-quote').value.trim(),
+                date: document.getElementById('ctr-date').value.trim(),
+                client: clientName,
+                total: document.getElementById('preview-ctr-total-val').innerText,
+                data: {
+                    contractNumber: document.getElementById('ctr-number').value.trim(),
+                    quoteRef: document.getElementById('ctr-ref-quote').value.trim(),
+                    city: document.getElementById('ctr-city').value.trim(),
+                    date: document.getElementById('ctr-date').value.trim(),
+                    provider: {
+                        name: document.getElementById('ctr-provider-name').value.trim(),
+                        id: document.getElementById('ctr-provider-id').value.trim(),
+                        rep: document.getElementById('ctr-provider-rep').value.trim()
+                    },
+                    client: {
+                        name: clientName,
+                        id: document.getElementById('ctr-client-id').value.trim(),
+                        phone: document.getElementById('ctr-client-phone').value.trim(),
+                        address: document.getElementById('ctr-client-address').value.trim()
+                    },
+                    termDays: document.getElementById('ctr-term-days').value.trim(),
+                    warrantyMonths: document.getElementById('ctr-warranty-months').value,
+                    paymentTerms: document.getElementById('ctr-payment-terms').value.trim(),
+                    customClauses: document.getElementById('ctr-custom-clauses').value.trim(),
+                    items: [...currentContract.items],
+                    total: document.getElementById('preview-ctr-total-val').innerText
+                }
+            };
+
+            savedContracts.unshift(record);
+            localStorage.setItem('codexis_contracts', JSON.stringify(savedContracts));
+            alert(`Contrato ${record.id} guardado localmente con éxito.`);
+        }
+
+        // Modal para seleccionar cotizaciones guardadas
+        function openQuotationsPickerModal() {
+            const listContainer = document.getElementById('picker-quotations-list');
+            listContainer.innerHTML = '';
+
+            const savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            if (savedList.length === 0) {
+                listContainer.innerHTML = '<p class="py-6 text-center text-neutral-400 text-xs italic">No hay cotizaciones guardadas localmente.</p>';
+            } else {
+                savedList.forEach((q, index) => {
+                    const div = document.createElement('div');
+                    div.className = "py-3 flex justify-between items-center hover:bg-neutral-50 px-2 transition";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-sm text-neutral-900">${escapeHtml(q.customer)} <span class="text-xs font-mono text-neutral-500">#${q.id}</span></p>
+                            <p class="text-xs text-neutral-500">Fecha: ${q.date} | Total: <strong class="text-amber-600">${q.total}</strong></p>
+                        </div>
+                        <button onclick="pickQuotationForContract(${index})" class="bg-amber-400 hover:bg-amber-300 text-neutral-950 px-3 py-1 text-xs font-bold uppercase transition">
+                            Cargar en Contrato
+                        </button>
+                    `;
+                    listContainer.appendChild(div);
+                });
+            }
+
+            document.getElementById('quotations-picker-modal').classList.remove('hidden');
+            document.getElementById('quotations-picker-modal').classList.add('flex');
+        }
+
+        function closeQuotationsPickerModal() {
+            document.getElementById('quotations-picker-modal').classList.add('hidden');
+            document.getElementById('quotations-picker-modal').classList.remove('flex');
+        }
+
+        function pickQuotationForContract(index) {
+            const savedList = JSON.parse(localStorage.getItem('codexis_quotations') || '[]');
+            const q = savedList[index];
+            if (!q) return;
+
+            let subtotalVal = 0;
+            if (q.data && q.data.items) {
+                subtotalVal = q.data.items.reduce((acc, item) => acc + ((item.price || 0) * (item.qty || 1)), 0);
+            }
+            const quotePayload = {
+                id: q.id,
+                date: q.date,
+                customer: {
+                    name: q.data.name || q.customer,
+                    id: q.data.id || '',
+                    phone: q.data.phone || '',
+                    city: q.data.city || ''
+                },
+                validityDays: q.data.validity || 15,
+                discount: parseFloat(q.data.discount) || 0,
+                paymentTerms: q.data.terms || '50% Anticipo - 50% Contra Entrega',
+                notes: q.data.notes || '',
+                items: q.data.items || [],
+                subtotal: `$${subtotalVal.toLocaleString('es-CO')}`,
+                total: q.total || `$${subtotalVal.toLocaleString('es-CO')}`
+            };
+            localStorage.setItem('codexis_active_quote_for_contract', JSON.stringify(quotePayload));
+            closeQuotationsPickerModal();
+            loadQuotationDataForContract();
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
