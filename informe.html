@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador de Informes Técnicos con IA - CODEXIS</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#b2dfdb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Geist:wght@300..700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#b2dfdb",
+                        "on-primary": "#1b1b1b",
+                        surface: "#f9f9f9",
+                        "on-surface": "#1b1b1b",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c6c6",
+                        "on-surface-variant": "#474747",
+                    },
+                    fontFamily: {
+                        headline: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                        mono: ["Geist", "monospace"],
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #1b1b1b;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .custom-blur {
+            backdrop-filter: blur(12px);
+        }
+
+        /* Drawer Asistente IA */
+        .ai-drawer {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(100%);
+        }
+
+        .ai-drawer.open {
+            transform: translateX(0);
+        }
+
+        /* Pulse animación para voz e IA */
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        .ai-active {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .listening {
+            background-color: #ef4444 !important;
+            color: white !important;
+            animation: pulse-glow 1s infinite;
+        }
+
+        /* Estilos de impresión profesional para PDF */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .print-container {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 15px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+
+            .page-break {
+                page-break-after: always;
+            }
+
+            textarea {
+                border: none !important;
+                resize: none !important;
+                padding: 0 !important;
+                background: transparent !important;
+            }
+
+            select,
+            input {
+                border: none !important;
+                background: transparent !important;
+                appearance: none !important;
+                -webkit-appearance: none !important;
+            }
+
+            @page {
+                size: letter;
+                margin: 1.2cm;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen">
+
+    <!-- Top Bar Navigation (no-print) -->
+    <nav
+        class="fixed top-0 w-full z-40 bg-[#f9f9f9]/85 dark:bg-black/85 custom-blur border-b border-outline-variant/20 shadow-sm no-print">
+        <div class="flex flex-wrap justify-between items-center w-full px-4 md:px-8 h-16 max-w-7xl mx-auto gap-4">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="p-2 hover:bg-black/5 rounded-full transition-colors"
+                    title="Volver al Panel">
+                    <span class="material-symbols-outlined text-black dark:text-white">arrow_back</span>
+                </a>
+                <div class="flex flex-col">
+                    <div
+                        class="text-xl font-black tracking-tighter text-black dark:text-white uppercase flex items-center gap-2">
+                        CODEXIS <span
+                            class="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 font-bold rounded">INFORME
+                            TÉCNICO IA</span>
+                    </div>
+                    <span class="text-[0.65rem] tracking-widest text-zinc-500 uppercase font-mono">Documentación &
+                        Peritaje</span>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- Selector de Ordenes si hay API -->
+                <select id="select-order" onchange="onOrderSelected(this.value)"
+                    class="text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- Cargar desde Orden --</option>
+                </select>
+
+                <button onclick="triggerImageUpload()"
+                    class="flex items-center gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded transition-all shadow-sm"
+                    title="Agregar fotos o evidencia fotográfica">
+                    <span class="material-symbols-outlined text-sm">add_a_photo</span>
+                    + Fotos
+                </button>
+
+                <button onclick="openFullAiModal()"
+                    class="flex items-center gap-1.5 text-xs bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-3 py-1.5 rounded transition-all shadow-sm">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    Generar con IA
+                </button>
+
+                <button onclick="toggleAiDrawer()"
+                    class="flex items-center gap-1.5 text-xs bg-zinc-800 hover:bg-zinc-900 text-white dark:bg-zinc-700 dark:hover:bg-zinc-600 font-medium px-3 py-1.5 rounded transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-sm text-blue-400">smart_toy</span>
+                    Asistente IA
+                </button>
+
+                <button onclick="configureApiKey()"
+                    class="flex items-center gap-1 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 px-2.5 py-1.5 rounded font-medium transition-colors"
+                    title="Ver / Configurar API Key de Groq">
+                    <span class="material-symbols-outlined text-sm text-amber-500">key</span>
+                    Key IA
+                </button>
+
+                <button onclick="window.print()"
+                    class="flex items-center gap-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 font-medium px-3 py-1.5 rounded transition-colors">
+                    <span class="material-symbols-outlined text-sm">print</span>
+                    Imprimir / PDF
+                </button>
+
+                <button onclick="triggerJsonImport()"
+                    class="flex items-center gap-1 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 px-2.5 py-1.5 rounded"
+                    title="Cargar/Importar informe desde JSON">
+                    <span class="material-symbols-outlined text-sm">upload_file</span>
+                </button>
+
+                <button onclick="exportInformeJSON()"
+                    class="flex items-center gap-1 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 px-2.5 py-1.5 rounded"
+                    title="Guardar/Descargar informe en JSON">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                </button>
+
+                <!-- Inputs ocultos para archivos -->
+                <input type="file" id="image-file-input" accept="image/*" multiple class="hidden"
+                    onchange="handleImageUpload(event)">
+                <input type="file" id="json-file-input" accept=".json" class="hidden"
+                    onchange="importInformeJSON(event)">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="pt-24 pb-20 max-w-5xl mx-auto px-4 md:px-8">
+
+        <!-- Document Page Container -->
+        <div id="informe-document"
+            class="print-container bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-none md:rounded-lg p-6 md:p-10 text-black dark:text-zinc-100">
+
+            <!-- Document Header Banner -->
+            <div
+                class="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-black dark:border-white pb-6 mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight text-black dark:text-white uppercase">CODEXIS
+                        PRECISION</h1>
+                    <p class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mt-0.5">Servicios Técnicos
+                        Especializados & Peritaje Electrónico</p>
+                    <p class="text-[0.7rem] text-zinc-500 mt-1">Tel: +57 317 419 0562 | Email: soporte@codexis.co</p>
+                </div>
+
+                <div
+                    class="text-left md:text-right bg-zinc-50 dark:bg-zinc-800/60 p-3 border border-zinc-200 dark:border-zinc-700 rounded w-full md:w-auto">
+                    <div class="text-xs uppercase tracking-widest text-zinc-400 font-mono font-bold">Informe Técnico N°
+                    </div>
+                    <input type="text" id="report-number" value="INF-2026-001"
+                        class="text-lg font-black font-mono tracking-wider text-blue-600 dark:text-blue-400 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 text-left md:text-right w-full md:w-44 focus:outline-none" />
+
+                    <div class="flex items-center gap-2 mt-2 justify-start md:justify-end text-xs">
+                        <span class="text-zinc-500">Fecha:</span>
+                        <input type="date" id="report-date"
+                            class="bg-transparent border-0 font-medium p-0 focus:ring-0 text-xs text-right" />
+                    </div>
+
+                    <div class="flex items-center gap-2 mt-1 justify-start md:justify-end text-xs">
+                        <span class="text-zinc-500">Estado:</span>
+                        <select id="report-status"
+                            class="bg-transparent border-0 font-bold p-0 focus:ring-0 text-xs text-blue-600 dark:text-blue-400 cursor-pointer">
+                            <option value="DIAGNÓSTICO FINALIZADO">DIAGNÓSTICO FINALIZADO</option>
+                            <option value="REPARACIÓN EXITOSA">REPARACIÓN EXITOSA</option>
+                            <option value="EN PROCESO TÉCNICO">EN PROCESO TÉCNICO</option>
+                            <option value="SIN REPARACIÓN">SIN REPARACIÓN</option>
+                            <option value="GARANTÍA EJECUTADA">GARANTÍA EJECUTADA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client & Equipment Info Grid -->
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 pb-6 border-b border-zinc-200 dark:border-zinc-800 avoid-break">
+
+                <!-- Client Card -->
+                <div
+                    class="bg-zinc-50/70 dark:bg-zinc-800/30 p-4 border border-zinc-200 dark:border-zinc-700/60 rounded-md">
+                    <div
+                        class="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-zinc-500 border-b border-zinc-200 dark:border-zinc-700 pb-2 mb-3">
+                        <span class="material-symbols-outlined text-sm text-blue-600">person</span>
+                        Datos del Cliente
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Nombre:</span>
+                            <input type="text" id="client-name" placeholder="Nombre completo"
+                                class="col-span-2 font-semibold bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Cédula / NIT:</span>
+                            <input type="text" id="client-id" placeholder="C.C. o NIT"
+                                class="col-span-2 bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Teléfono:</span>
+                            <input type="text" id="client-phone" placeholder="Número de contacto"
+                                class="col-span-2 bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Email / Dir:</span>
+                            <input type="text" id="client-email" placeholder="Correo / Dirección"
+                                class="col-span-2 bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment Card -->
+                <div
+                    class="bg-zinc-50/70 dark:bg-zinc-800/30 p-4 border border-zinc-200 dark:border-zinc-700/60 rounded-md">
+                    <div
+                        class="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-zinc-500 border-b border-zinc-200 dark:border-zinc-700 pb-2 mb-3">
+                        <span class="material-symbols-outlined text-sm text-blue-600">devices</span>
+                        Especificaciones del Dispositivo
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Equipo / Marca:</span>
+                            <input type="text" id="eq-brand" placeholder="Ej: Laptop Asus / HP"
+                                class="col-span-2 font-semibold bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Modelo / Serie:</span>
+                            <input type="text" id="eq-model" placeholder="Modelo y N° Serie/IMEI"
+                                class="col-span-2 font-mono bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Especificaciones:</span>
+                            <input type="text" id="eq-specs" placeholder="CPU, RAM, SSD/HDD, GPU"
+                                class="col-span-2 bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                        <div class="grid grid-cols-3 items-center">
+                            <span class="text-zinc-500 font-medium">Accesorios:</span>
+                            <input type="text" id="eq-accessories" placeholder="Cargador, funda, etc."
+                                class="col-span-2 bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Sections -->
+            <div class="space-y-6">
+
+                <!-- Sección 1: Motivo de Ingreso -->
+                <div class="avoid-break border-l-4 border-blue-500 pl-4 py-1">
+                    <div class="flex justify-between items-center mb-2 gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <input type="text" id="title-section-1" value="1. Motivo de Ingreso y Falla Reportada"
+                                class="font-black text-sm uppercase tracking-wide text-zinc-900 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                                title="Haz clic para modificar este título de sección" />
+                        </div>
+                        <button onclick="improveSectionWithAi('section-reason')"
+                            class="no-print flex items-center gap-1 text-[0.7rem] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800 transition-colors shrink-0"
+                            title="Mejorar redacción con IA">
+                            <span class="material-symbols-outlined text-xs">auto_awesome</span> Mejorar
+                        </button>
+                    </div>
+                    <textarea id="section-reason" rows="3"
+                        placeholder="Descripción detallada de los síntomas expuestos por el cliente o motivo de ingreso al laboratorio..."
+                        class="w-full text-xs leading-relaxed bg-zinc-50/50 dark:bg-zinc-800/40 p-3 rounded border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Sección 2: Diagnóstico Técnico e Inspección Inicial -->
+                <div class="avoid-break border-l-4 border-indigo-500 pl-4 py-1">
+                    <div class="flex justify-between items-center mb-2 gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <input type="text" id="title-section-2" value="2. Diagnóstico Técnico & Inspección Inicial"
+                                class="font-black text-sm uppercase tracking-wide text-zinc-900 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                                title="Haz clic para modificar este título de sección" />
+                        </div>
+                        <button onclick="improveSectionWithAi('section-diagnosis')"
+                            class="no-print flex items-center gap-1 text-[0.7rem] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800 transition-colors shrink-0">
+                            <span class="material-symbols-outlined text-xs">auto_awesome</span> Mejorar
+                        </button>
+                    </div>
+                    <textarea id="section-diagnosis" rows="4"
+                        placeholder="Inspección visual inicial, estado térmico, mediciones de voltaje de entrada, líneas principales..."
+                        class="w-full text-xs leading-relaxed bg-zinc-50/50 dark:bg-zinc-800/40 p-3 rounded border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Sección 3: Hallazgos & Pruebas Electrónicas -->
+                <div class="avoid-break border-l-4 border-amber-500 pl-4 py-1">
+                    <div class="flex justify-between items-center mb-2 gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <input type="text" id="title-section-3" value="3. Hallazgos Electrónicos & Pruebas Físicas"
+                                class="font-black text-sm uppercase tracking-wide text-zinc-900 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                                title="Haz clic para modificar este título de sección" />
+                        </div>
+                        <button onclick="improveSectionWithAi('section-findings')"
+                            class="no-print flex items-center gap-1 text-[0.7rem] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800 transition-colors shrink-0">
+                            <span class="material-symbols-outlined text-xs">auto_awesome</span> Mejorar
+                        </button>
+                    </div>
+                    <textarea id="section-findings" rows="4"
+                        placeholder="Componentes defectuosos detectados (capacitores en corto, mosfets degradados, pistas dañadas, humedad...)"
+                        class="w-full text-xs leading-relaxed bg-zinc-50/50 dark:bg-zinc-800/40 p-3 rounded border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Sección 4: Procedimiento & Reparación Realizada -->
+                <div class="avoid-break border-l-4 border-emerald-500 pl-4 py-1">
+                    <div class="flex justify-between items-center mb-2 gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <input type="text" id="title-section-4"
+                                value="4. Procedimiento Técnico & Intervención Realizada"
+                                class="font-black text-sm uppercase tracking-wide text-zinc-900 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                                title="Haz clic para modificar este título de sección" />
+                        </div>
+                        <button onclick="improveSectionWithAi('section-procedure')"
+                            class="no-print flex items-center gap-1 text-[0.7rem] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800 transition-colors shrink-0">
+                            <span class="material-symbols-outlined text-xs">auto_awesome</span> Mejorar
+                        </button>
+                    </div>
+                    <textarea id="section-procedure" rows="4"
+                        placeholder="Micro-soldadura realizada, reemplazo de integrados, mantenimiento térmico con pasta de alto rendimiento, flasheo de BIOS, pruebas de estrés..."
+                        class="w-full text-xs leading-relaxed bg-zinc-50/50 dark:bg-zinc-800/40 p-3 rounded border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Sección 5: Conclusiones & Recomendaciones Preventivas -->
+                <div class="avoid-break border-l-4 border-teal-500 pl-4 py-1">
+                    <div class="flex justify-between items-center mb-2 gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <input type="text" id="title-section-5" value="5. Conclusiones Técnicas & Recomendaciones"
+                                class="font-black text-sm uppercase tracking-wide text-zinc-900 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                                title="Haz clic para modificar este título de sección" />
+                        </div>
+                        <div class="flex items-center gap-2 no-print shrink-0">
+                            <button onclick="suggestRecommendationsWithAi()"
+                                class="flex items-center gap-1 text-[0.7rem] bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 transition-colors">
+                                <span class="material-symbols-outlined text-xs">lightbulb</span> Sugerir Consejos IA
+                            </button>
+                            <button onclick="improveSectionWithAi('section-conclusions')"
+                                class="flex items-center gap-1 text-[0.7rem] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800 transition-colors">
+                                <span class="material-symbols-outlined text-xs">auto_awesome</span> Mejorar
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="section-conclusions" rows="4"
+                        placeholder="Veredicto final del estado del equipo y lista de recomendaciones de cuidado para el cliente..."
+                        class="w-full text-xs leading-relaxed bg-zinc-50/50 dark:bg-zinc-800/40 p-3 rounded border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+            </div>
+
+            <!-- Tabla de Costos / Repuestos (opcional) -->
+            <div class="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800 avoid-break">
+                <div class="flex justify-between items-center mb-3 gap-2">
+                    <div class="flex items-center gap-2 flex-1">
+                        <span class="material-symbols-outlined text-sm">receipt</span>
+                        <input type="text" id="title-cost-table" value="Desglose de Servicios y Repuestos"
+                            class="font-black text-xs uppercase tracking-wider text-zinc-500 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                            title="Haz clic para modificar este título" />
+                    </div>
+                    <button onclick="addCostRow()"
+                        class="no-print text-xs bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 px-2 py-1 rounded font-medium transition-colors shrink-0">
+                        + Agregar Fila
+                    </button>
+                </div>
+
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold uppercase text-[0.65rem]">
+                            <th class="p-2 border border-zinc-200 dark:border-zinc-700">Ítem / Servicio / Repuesto</th>
+                            <th class="p-2 border border-zinc-200 dark:border-zinc-700 w-20 text-center">Cant.</th>
+                            <th class="p-2 border border-zinc-200 dark:border-zinc-700 w-32 text-right">Valor Unit.</th>
+                            <th class="p-2 border border-zinc-200 dark:border-zinc-700 w-32 text-right">Subtotal</th>
+                            <th class="p-2 border border-zinc-200 dark:border-zinc-700 w-10 text-center no-print"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cost-table-body">
+                        <!-- Filas de costo dinámicas -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-bold border-t-2 border-zinc-300 dark:border-zinc-700">
+                            <td colspan="3" class="p-2 text-right uppercase tracking-wide">Total Servicio (COP):</td>
+                            <td class="p-2 text-right font-mono text-sm text-blue-600 dark:text-blue-400"
+                                id="cost-total">$0</td>
+                            <td class="no-print"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <!-- Sección 6: Evidencia Fotográfica / Registro Fotográfico -->
+                <div class="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800 avoid-break">
+                    <div class="flex justify-between items-center mb-4 gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <span class="material-symbols-outlined text-sm text-emerald-600">photo_library</span>
+                            <input type="text" id="title-section-6"
+                                value="6. Evidencia Fotográfica & Registro del Servicio"
+                                class="font-black text-xs uppercase tracking-wider text-zinc-500 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none w-full"
+                                title="Haz clic para modificar este título" />
+                        </div>
+                        <button onclick="triggerImageUpload()"
+                            class="no-print flex items-center gap-1 text-xs bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded font-medium transition-colors border border-emerald-200 dark:border-emerald-800 shrink-0">
+                            <span class="material-symbols-outlined text-xs">add_a_photo</span>
+                            + Adjuntar Fotos
+                        </button>
+                    </div>
+                    <button onclick="triggerImageUpload()"
+                        class="no-print flex items-center gap-1 text-xs bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded font-medium transition-colors border border-emerald-200 dark:border-emerald-800">
+                        <span class="material-symbols-outlined text-xs">add_a_photo</span>
+                        + Adjuntar Fotos
+                    </button>
+                </div>
+
+                <!-- Grid de Galería de Imágenes -->
+                <div id="image-gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Filas dinámicas de imágenes -->
+                </div>
+            </div>
+
+            <!-- Signatures Section -->
+            <div class="mt-14 pt-8 border-t border-zinc-300 dark:border-zinc-700 grid grid-cols-2 gap-12 avoid-break">
+                <div class="text-center">
+                    <div class="h-16 flex items-end justify-center pb-2">
+                        <input type="text" id="tech-name-sig" value="Ing. Técnico Codexis"
+                            class="text-center font-bold text-xs bg-transparent border-b border-zinc-400 focus:outline-none w-3/4" />
+                    </div>
+                    <div
+                        class="border-t border-zinc-400 pt-1 text-[0.7rem] uppercase tracking-wider text-zinc-500 font-semibold">
+                        Firma Técnico Responsable
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <div class="h-16 flex items-end justify-center pb-2">
+                        <span class="text-zinc-300 text-xs italic">Firma / Aceptación</span>
+                    </div>
+                    <div
+                        class="border-t border-zinc-400 pt-1 text-[0.7rem] uppercase tracking-wider text-zinc-500 font-semibold">
+                        Conformidad y Recibido Cliente
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Footer -->
+            <div
+                class="mt-12 text-center text-[0.65rem] text-zinc-400 border-t border-zinc-100 dark:border-zinc-800 pt-4 font-mono">
+                CODEXIS PRECISION · Documento Técnico Generado · Bogotá, Colombia · www.codexis.co
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Drawer Asistente IA (Panel Lateral) -->
+    <aside id="ai-drawer"
+        class="ai-drawer fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-zinc-900 shadow-2xl z-50 border-l border-zinc-200 dark:border-zinc-800 flex flex-col no-print">
+
+        <!-- Drawer Header -->
+        <div class="p-4 bg-zinc-900 text-white flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">smart_toy</span>
+                <div>
+                    <h3 class="font-bold text-sm">Asistente IA CODEXIS</h3>
+                    <p class="text-[0.65rem] text-zinc-400">Potenciado con Groq Llama-3.3 70B</p>
+                </div>
+            </div>
+            <button onclick="toggleAiDrawer()" class="text-zinc-400 hover:text-white p-1 rounded">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Chat History Container -->
+        <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+            <div
+                class="bg-blue-50 dark:bg-blue-950/40 p-3 rounded-lg border border-blue-100 dark:border-blue-900 text-zinc-800 dark:text-zinc-200">
+                <p class="font-semibold text-blue-700 dark:text-blue-300 mb-1">¡Hola! Soy tu asistente de ingeniería.
+                </p>
+                <p>Puedo ayudarte a redactar el informe técnico completo, diagnosticar fallas en tarjetas madre,
+                    calcular valores de componentes o estructurar hallazgos.</p>
+            </div>
+        </div>
+
+        <!-- Sugerencias Rápidas -->
+        <div
+            class="p-2 border-t border-zinc-200 dark:border-zinc-800 flex gap-2 overflow-x-auto text-[0.7rem] bg-zinc-50 dark:bg-zinc-800/40">
+            <button onclick="sendQuickPrompt('¿Cómo redactar un diagnóstico de corto en línea principal de 19V?')"
+                class="whitespace-nowrap bg-white dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-600 px-2 py-1 rounded hover:bg-blue-50 transition-colors">
+                ⚡ Corto en 19V
+            </button>
+            <button onclick="sendQuickPrompt('Dame 4 recomendaciones preventivas para mantenimiento de laptop gamer.')"
+                class="whitespace-nowrap bg-white dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-600 px-2 py-1 rounded hover:bg-blue-50 transition-colors">
+                💡 Consejos Laptop Gamer
+            </button>
+            <button onclick="sendQuickPrompt('Explicación técnica de falla por condensador de tántalo desvalorizado')"
+                class="whitespace-nowrap bg-white dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-600 px-2 py-1 rounded hover:bg-blue-50 transition-colors">
+                🔬 Condensador Tántalo
+            </button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <form onsubmit="handleAiChatSubmit(event)" class="flex gap-2 items-center">
+                <input type="text" id="ai-chat-input" placeholder="Pregunta o dicta tu consulta técnica..."
+                    class="flex-1 text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+
+                <button type="button" id="btn-voice-input" onclick="toggleVoiceInput()"
+                    class="p-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-700 dark:text-zinc-300 rounded-lg transition-colors"
+                    title="Dictar por voz">
+                    <span class="material-symbols-outlined text-sm">mic</span>
+                </button>
+
+                <button type="submit" id="btn-send-ai"
+                    class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">send</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Modal: Generación Completa de Informe con IA -->
+    <div id="full-ai-modal"
+        class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+        <div
+            class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl max-w-lg w-full p-6 text-black dark:text-white">
+
+            <div class="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-600">auto_awesome</span>
+                    <h3 class="font-black text-base">Generar Informe Completo con IA</h3>
+                </div>
+                <button onclick="closeFullAiModal()" class="text-zinc-400 hover:text-zinc-600">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <p class="text-xs text-zinc-600 dark:text-zinc-400 mb-3">
+                Escribe o dicta las notas informales de tu servicio (síntomas, mediciones, componentes cambiados). La IA
+                redactará automáticamente todas las secciones técnicas.
+            </p>
+
+            <textarea id="ai-full-notes" rows="6"
+                placeholder="Ejemplo: Laptop HP Pavilion no encendía ni cargaba. Al destapar se detectó corto en capacitores de tántalo de la línea principal de 19V. Se reemplazó capacitor PC102 y mosfet de entrada AP4407. Se aplicó pasta térmica MX-4 y se realizó prueba de estrés de 2 horas en FurMark a 65°C sin fallas..."
+                class="w-full text-xs p-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"></textarea>
+
+            <div id="ai-full-status" class="hidden text-xs text-blue-600 font-semibold mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
+                Redactando informe profesional con IA...
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="closeFullAiModal()"
+                    class="text-xs px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    Cancelar
+                </button>
+                <button onclick="runFullAiGeneration()"
+                    class="text-xs px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow">
+                    ✨ Redactar Informe
+                </button>
+            </div>
+        </div>
+        <!-- Modal: Zoom de Imagen Ampliada -->
+        <div id="image-zoom-modal"
+            class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 no-print"
+            onclick="closeImageZoom()">
+            <button onclick="closeImageZoom()" class="absolute top-6 right-6 text-white hover:text-zinc-300 p-2">
+                <span class="material-symbols-outlined text-3xl">close</span>
+            </button>
+            <img id="modal-zoom-img" src="" alt="Vista ampliada"
+                class="max-w-[90vw] max-h-[80vh] object-contain rounded shadow-2xl" onclick="event.stopPropagation()" />
+            <p id="modal-zoom-caption"
+                class="text-white text-xs mt-3 font-medium bg-black/60 px-4 py-1.5 rounded-full border border-white/10 max-w-xl text-center">
+            </p>
+        </div>
+
+        <!-- Scripts Logic -->
+        <script>
+            // Configuración de API Directa Groq
+            let DIRECT_GROQ_KEY = localStorage.getItem("codexis_groq_key") || "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";
+            let availableGroqModelsCache = null;
+
+            async function getAvailableGroqModels(apiKey) {
+                if (availableGroqModelsCache && availableGroqModelsCache.length > 0) {
+                    return availableGroqModelsCache;
+                }
+                try {
+                    const res = await fetch("https://api.groq.com/openai/v1/models", {
+                        method: "GET",
+                        headers: { "Authorization": `Bearer ${apiKey}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.data && Array.isArray(data.data)) {
+                            const models = data.data
+                                .map(m => m.id)
+                                .filter(id => !id.includes("whisper") && !id.includes("guard") && !id.includes("vision") && !id.includes("safetensors"));
+                            if (models.length > 0) {
+                                console.log("Modelos activos de Groq detectados automáticamente:", models);
+                                availableGroqModelsCache = models;
+                                return models;
+                            }
+                        }
+                    } else {
+                        const errText = await res.text();
+                        console.warn("No se pudo obtener lista de modelos de Groq:", errText);
+                    }
+                } catch (e) {
+                    console.warn("Error al consultar /v1/models de Groq:", e.message);
+                }
+                return [
+                    "llama-3.3-70b-versatile",
+                    "llama-3.1-8b-instant",
+                    "llama3-8b-8192",
+                    "llama3-70b-8192",
+                    "mixtral-8x7b-32768"
+                ];
+            }
+
+            function configureApiKey() {
+                const currentKey = localStorage.getItem("codexis_groq_key") || DIRECT_GROQ_KEY;
+                const newKey = prompt("Ingresa o modifica la API Key de Groq:", currentKey);
+                if (newKey !== null && newKey.trim() !== "") {
+                    DIRECT_GROQ_KEY = newKey.trim();
+                    localStorage.setItem("codexis_groq_key", DIRECT_GROQ_KEY);
+                    availableGroqModelsCache = null; // Reset cache
+                    alert("API Key de Groq guardada correctamente en tu navegador.");
+                }
+            }
+
+            // Estado inicial
+            let cachedOrders = [];
+            let reportImages = []; // Array de { id, dataUrl, caption }
+            let itemsCost = [
+                { description: "Mantenimiento Preventivo & Limpieza de Placa", qty: 1, price: 80000 }
+            ];
+
+            document.addEventListener("DOMContentLoaded", () => {
+                // Inicializar Fecha actual
+                const today = new Date().toISOString().split("T")[0];
+                document.getElementById("report-date").value = today;
+
+                // Cargar ordenes si el backend está activo
+                loadOrdersList();
+
+                // Renderizar filas de costo por defecto
+                renderCostRows();
+
+                // Renderizar galería de imágenes inicial
+                renderImageGallery();
+
+                // Configurar soporte para arrastrar y soltar fotos (Drag & Drop)
+                setupDragAndDrop();
+
+                // Revisar parámetros de URL (?orderId=... o ?token=...)
+                const urlParams = new URLSearchParams(window.location.search);
+                const orderId = urlParams.get("orderId") || urlParams.get("id");
+                if (orderId) {
+                    loadOrderById(orderId);
+                }
+            });
+
+            // ============================================
+            // FUNCIONES DE INTEGRACIÓN CON BACKEND / ORDENES
+            // ============================================
+            async function loadOrdersList() {
+                try {
+                    const res = await fetch(`${API_URL}/orders`, { cache: 'no-store' });
+                    if (!res.ok) return;
+                    const orders = await res.json();
+                    if (Array.isArray(orders)) {
+                        cachedOrders = orders;
+                        const select = document.getElementById("select-order");
+                        select.innerHTML = '<option value="">-- Cargar desde Orden --</option>';
+                        orders.forEach(o => {
+                            const opt = document.createElement("option");
+                            opt.value = o.id;
+                            opt.textContent = `Orden #${o.id || o.number || 'S/N'} - ${o.client_name || o.clientName || 'Cliente'} (${o.equipment || o.device || 'Equipo'})`;
+                            select.appendChild(opt);
+                        });
+                    }
+                } catch (e) {
+                    console.log("No se pudieron cargar ordenes remotas:", e.message);
+                }
+            }
+
+            function onOrderSelected(orderId) {
+                if (!orderId) return;
+                loadOrderById(orderId);
+            }
+
+            function loadOrderById(id) {
+                const order = cachedOrders.find(o => String(o.id) === String(id));
+                if (!order) return;
+
+                document.getElementById("report-number").value = `INF-2026-ORD${order.id}`;
+                document.getElementById("client-name").value = order.client_name || order.clientName || "";
+                document.getElementById("client-phone").value = order.client_phone || order.phone || "";
+                document.getElementById("client-email").value = order.client_email || order.email || "";
+
+                const brand = order.brand || order.device_brand || "";
+                const device = order.equipment || order.device || "";
+                document.getElementById("eq-brand").value = `${device} ${brand}`.trim();
+                document.getElementById("eq-model").value = order.model || order.serial || "";
+                document.getElementById("eq-specs").value = order.specs || order.components || "";
+                document.getElementById("eq-accessories").value = order.accessories || "";
+
+                // Llenar motivo de ingreso
+                if (order.fault || order.issue || order.problem) {
+                    document.getElementById("section-reason").value = order.fault || order.issue || order.problem;
+                }
+            }
+
+            // ============================================
+            // SERVICIO DE LLAMADA DIRECTA A GROQ AI (DINÁMICO)
+            // ============================================
+            async function callGroqAi(systemPrompt, userPrompt) {
+                const apiKey = (localStorage.getItem("codexis_groq_key") || DIRECT_GROQ_KEY).trim();
+                const modelsToTry = await getAvailableGroqModels(apiKey);
+                let firstError = null;
+
+                for (const modelCandidate of modelsToTry) {
+                    try {
+                        console.log(`Probando modelo Groq: ${modelCandidate}...`);
+                        const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                            method: "POST",
+                            headers: {
+                                "Authorization": `Bearer ${apiKey}`,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                model: modelCandidate,
+                                messages: [
+                                    { role: "system", content: systemPrompt },
+                                    { role: "user", content: userPrompt }
+                                ],
+                                temperature: 0.3,
+                                max_tokens: 1500
+                            })
+                        });
+
+                        if (groqRes.ok) {
+                            const data = await groqRes.json();
+                            const result = data.choices?.[0]?.message?.content;
+                            if (result) {
+                                console.log(`✅ Conexión exitosa usando el modelo: ${modelCandidate}`);
+                                return result;
+                            }
+                        } else {
+                            const errText = await groqRes.text();
+                            console.warn(`Modelo ${modelCandidate} falló (${groqRes.status}):`, errText);
+                            if (!firstError) firstError = `[${modelCandidate}]: ${errText}`;
+                        }
+                    } catch (e) {
+                        console.warn(`Error de red con modelo ${modelCandidate}:`, e.message);
+                        if (!firstError) firstError = e.message;
+                    }
+                }
+
+                throw new Error(`Error en API de Groq: ${firstError || "No se pudo conectar con los modelos de Groq."}`);
+            }
+
+            // ============================================
+            // MEJORAR SECCIÓN ESPECÍFICA CON IA
+            // ============================================
+            async function improveSectionWithAi(fieldId) {
+                const textarea = document.getElementById(fieldId);
+                const currentText = textarea.value.trim();
+                if (!currentText) {
+                    alert("Escribe primero algunas notas breves en esta sección para que la IA las mejore.");
+                    return;
+                }
+
+                const originalBtnText = event.currentTarget.innerHTML;
+                event.currentTarget.innerHTML = `<span class="material-symbols-outlined text-xs animate-spin">refresh</span> Procesando...`;
+
+                try {
+                    const systemPrompt = `Eres un ingeniero sénior en diagnóstico electrónico de CODEXIS. 
+Tu tarea es redactar y pulir la sección del informe técnico provista. Haz la redacción formal, técnica, limpia y profesional en español. Retorna ÚNICAMENTE el texto redactado mejorado sin comillas ni intros adicionales.`;
+
+                    const result = await callGroqAi(systemPrompt, `Texto a mejorar:\n${currentText}`);
+                    textarea.value = result.trim();
+                } catch (err) {
+                    alert("Error al comunicarse con la IA: " + err.message);
+                } finally {
+                    event.currentTarget.innerHTML = originalBtnText;
+                }
+            }
+
+            // ============================================
+            // SUGERIR RECOMENDACIONES PREVENTIVAS CON IA
+            // ============================================
+            async function suggestRecommendationsWithAi() {
+                const eqBrand = document.getElementById("eq-brand").value;
+                const reason = document.getElementById("section-reason").value;
+                const diagnosis = document.getElementById("section-diagnosis").value;
+
+                const promptInfo = `Equipo: ${eqBrand}\nMotivo: ${reason}\nDiagnóstico: ${diagnosis}`;
+
+                try {
+                    const systemPrompt = `Eres un especialista técnico de CODEXIS. Genera entre 3 a 5 recomendaciones técnicas preventivas muy claras y profesionales para el cliente final para proteger su equipo y prevenir fallas futuras. Retorna una lista numerada.`;
+                    const result = await callGroqAi(systemPrompt, promptInfo);
+
+                    const conclusionsEl = document.getElementById("section-conclusions");
+                    conclusionsEl.value = (conclusionsEl.value.trim() + "\n\nRECOMENDACIONES PREVENTIVAS DE CUIDADO:\n" + result).trim();
+                } catch (err) {
+                    alert("Error al generar sugerencias: " + err.message);
+                }
+            }
+
+            // ============================================
+            // GENERAR INFORME COMPLETO DESDE MODAL CON IA
+            // ============================================
+            function openFullAiModal() {
+                document.getElementById("full-ai-modal").classList.remove("hidden");
+            }
+
+            function closeFullAiModal() {
+                document.getElementById("full-ai-modal").classList.add("hidden");
+            }
+
+            async function runFullAiGeneration() {
+                const notes = document.getElementById("ai-full-notes").value.trim();
+                if (!notes) {
+                    alert("Por favor escribe algunas notas sobre el servicio realizado.");
+                    return;
+                }
+
+                const statusEl = document.getElementById("ai-full-status");
+                statusEl.classList.remove("hidden");
+
+                try {
+                    const systemPrompt = `Eres el especialista principal en diagnóstico electrónico e ingeniería de soporte técnico de CODEXIS.
+Tu trabajo es tomar las notas del técnico y generar un informe completo respondiendo ÚNICAMENTE con un objeto JSON válido con este esquema exacto:
+{
+  "reason": "Redacción formal del motivo de ingreso y fallas reportadas",
+  "diagnosis": "Diagnóstico técnico e inspección inicial detallada con terminología precisa",
+  "findings": "Hallazgos electrónicos, mediciones de componentes y pruebas físicas encontradas",
+  "procedure": "Procedimiento técnico realizado, reparaciones, soldadura, mantenimiento térmico o repuestos",
+  "conclusions": "Conclusiones finales del estado del equipo y recomendaciones de cuidado para el cliente"
+}
+Responde SOLAMENTE con el código JSON sin texto antes ni después.`;
+
+                    const rawJsonStr = await callGroqAi(systemPrompt, notes);
+
+                    // Extraer bloque JSON usando expresión regular para evitar fallos por texto circundante
+                    let parsed = null;
+                    const jsonMatch = rawJsonStr.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        parsed = JSON.parse(jsonMatch[0]);
+                    } else {
+                        parsed = JSON.parse(rawJsonStr.replace(/```json/g, "").replace(/```/g, "").trim());
+                    }
+
+                    if (parsed.reason) document.getElementById("section-reason").value = parsed.reason;
+                    if (parsed.diagnosis) document.getElementById("section-diagnosis").value = parsed.diagnosis;
+                    if (parsed.findings) document.getElementById("section-findings").value = parsed.findings;
+                    if (parsed.procedure) document.getElementById("section-procedure").value = parsed.procedure;
+                    if (parsed.conclusions) document.getElementById("section-conclusions").value = parsed.conclusions;
+
+                    closeFullAiModal();
+                } catch (err) {
+                    alert("No se pudo estructurar el informe automáticamente: " + err.message);
+                } finally {
+                    statusEl.classList.add("hidden");
+                }
+            }
+
+            // ============================================
+            // DRAWER Y CHAT LATERAL CON IA
+            // ============================================
+            function toggleAiDrawer() {
+                const drawer = document.getElementById("ai-drawer");
+                drawer.classList.toggle("open");
+            }
+
+            function sendQuickPrompt(promptText) {
+                document.getElementById("ai-chat-input").value = promptText;
+                handleAiChatSubmit(new Event("submit"));
+            }
+
+            async function handleAiChatSubmit(e) {
+                e.preventDefault();
+                const input = document.getElementById("ai-chat-input");
+                const userMsg = input.value.trim();
+                if (!userMsg) return;
+
+                input.value = "";
+                appendChatMessage("user", userMsg);
+
+                const typingId = appendChatMessage("assistant", "pensando...", true);
+
+                try {
+                    const systemPrompt = `Eres Codexis IA, el asistente técnico de ingeniería en computadores y microelectrónica. Responde de forma muy concisa, profesional y útil en español.`;
+                    const reply = await callGroqAi(systemPrompt, userMsg);
+
+                    removeChatMessage(typingId);
+                    appendChatMessage("assistant", reply);
+                } catch (err) {
+                    removeChatMessage(typingId);
+                    appendChatMessage("assistant", "⚠️ Error de conexión: " + err.message);
+                }
+            }
+
+            function appendChatMessage(role, text, isTyping = false) {
+                const container = document.getElementById("ai-chat-messages");
+                const msgId = "msg-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4);
+
+                const isUser = role === "user";
+                const div = document.createElement("div");
+                div.id = msgId;
+                div.className = `p-3 rounded-lg text-xs leading-relaxed max-w-[85%] ${isUser
+                        ? "bg-blue-600 text-white ml-auto font-medium"
+                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
+                    }`;
+
+                if (isTyping) {
+                    div.innerHTML = `<span class="animate-pulse flex items-center gap-1"><span class="material-symbols-outlined text-sm">auto_awesome</span> Procesando consulta...</span>`;
+                } else {
+                    div.textContent = text;
+                }
+
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+                return msgId;
+            }
+
+            function removeChatMessage(id) {
+                const el = document.getElementById(id);
+                if (el) el.remove();
+            }
+
+            // ============================================
+            // RECONOCIMIENTO DE VOZ PARA CHAT
+            // ============================================
+            let speechRecognition = null;
+            let isListeningVoice = false;
+
+            function toggleVoiceInput() {
+                if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                    alert("Tu navegador no soporta entrada por voz.");
+                    return;
+                }
+
+                const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!speechRecognition) {
+                    speechRecognition = new SpeechRec();
+                    speechRecognition.lang = 'es-CO';
+                    speechRecognition.continuous = false;
+
+                    speechRecognition.onstart = () => {
+                        isListeningVoice = true;
+                        document.getElementById("btn-voice-input").classList.add("listening");
+                    };
+
+                    speechRecognition.onend = () => {
+                        isListeningVoice = false;
+                        document.getElementById("btn-voice-input").classList.remove("listening");
+                    };
+
+                    speechRecognition.onresult = (e) => {
+                        const transcript = e.results[0][0].transcript;
+                        document.getElementById("ai-chat-input").value = transcript;
+                    };
+                }
+
+                if (isListeningVoice) {
+                    speechRecognition.stop();
+                } else {
+                    speechRecognition.start();
+                }
+            }
+
+            // ============================================
+            // MANEJO DE TABLA DE COSTOS & EXPORTACIÓN
+            // ============================================
+            function renderCostRows() {
+                const tbody = document.getElementById("cost-table-body");
+                tbody.innerHTML = "";
+                let total = 0;
+
+                itemsCost.forEach((item, idx) => {
+                    const subtotal = (item.qty || 0) * (item.price || 0);
+                    total += subtotal;
+
+                    const tr = document.createElement("tr");
+                    tr.className = "border-b border-zinc-200 dark:border-zinc-800";
+                    tr.innerHTML = `
+                    <td class="p-2 border border-zinc-200 dark:border-zinc-700">
+                        <input type="text" value="${escapeHtml(item.description)}" onchange="updateCostItem(${idx}, 'description', this.value)" class="w-full bg-transparent focus:outline-none" />
+                    </td>
+                    <td class="p-2 border border-zinc-200 dark:border-zinc-700 text-center">
+                        <input type="number" value="${item.qty}" onchange="updateCostItem(${idx}, 'qty', this.value)" class="w-full text-center bg-transparent focus:outline-none" />
+                    </td>
+                    <td class="p-2 border border-zinc-200 dark:border-zinc-700 text-right font-mono">
+                        <input type="number" value="${item.price}" onchange="updateCostItem(${idx}, 'price', this.value)" class="w-full text-right bg-transparent focus:outline-none" />
+                    </td>
+                    <td class="p-2 border border-zinc-200 dark:border-zinc-700 text-right font-mono font-semibold">
+                        $${subtotal.toLocaleString('es-CO')}
+                    </td>
+                    <td class="p-2 border border-zinc-200 dark:border-zinc-700 text-center no-print">
+                        <button onclick="removeCostRow(${idx})" class="text-red-500 hover:text-red-700">
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                        </button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById("cost-total").textContent = `$${total.toLocaleString('es-CO')}`;
+            }
+
+            function addCostRow() {
+                itemsCost.push({ description: "Nuevo Repuesto / Servicio", qty: 1, price: 0 });
+                renderCostRows();
+            }
+
+            function removeCostRow(idx) {
+                itemsCost.splice(idx, 1);
+                renderCostRows();
+            }
+
+            function updateCostItem(idx, key, val) {
+                if (key === 'qty' || key === 'price') {
+                    itemsCost[idx][key] = parseFloat(val) || 0;
+                } else {
+                    itemsCost[idx][key] = val;
+                }
+                renderCostRows();
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+            }
+
+            // ============================================
+            // GESTIÓN DE EVIDENCIA FOTOGRÁFICA (IMÁGENES)
+            // ============================================
+            function triggerImageUpload() {
+                document.getElementById("image-file-input").click();
+            }
+
+            function handleImageUpload(e) {
+                const files = Array.from(e.target.files || []);
+                processImageFiles(files);
+                e.target.value = ""; // Reset
+            }
+
+            function processImageFiles(files) {
+                files.forEach(file => {
+                    if (!file.type.startsWith("image/")) return;
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        reportImages.push({
+                            id: "img-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4),
+                            dataUrl: evt.target.result,
+                            caption: file.name.replace(/\.[^/.]+$/, "") // Nombre de archivo por defecto
+                        });
+                        renderImageGallery();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function removeReportImage(id) {
+                reportImages = reportImages.filter(img => img.id !== id);
+                renderImageGallery();
+            }
+
+            function updateImageCaption(id, newCaption) {
+                const img = reportImages.find(i => i.id === id);
+                if (img) img.caption = newCaption;
+            }
+
+            function openImageZoom(dataUrl, caption) {
+                document.getElementById("modal-zoom-img").src = dataUrl;
+                document.getElementById("modal-zoom-caption").textContent = caption || "";
+                document.getElementById("image-zoom-modal").classList.remove("hidden");
+            }
+
+            function closeImageZoom() {
+                document.getElementById("image-zoom-modal").classList.add("hidden");
+            }
+
+            function renderImageGallery() {
+                const container = document.getElementById("image-gallery-container");
+                if (!container) return;
+
+                if (reportImages.length === 0) {
+                    container.innerHTML = `
+                    <div class="col-span-full py-8 text-center border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg no-print cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" onclick="triggerImageUpload()">
+                        <span class="material-symbols-outlined text-3xl text-emerald-600 mb-1">add_a_photo</span>
+                        <p class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Haz clic aquí o arrastra fotos para agregar evidencia fotográfica</p>
+                        <p class="text-[0.68rem] text-zinc-500 mt-1">Soporta JPG, PNG, WEBP (se incrustarán en el documento y se imprimirán en el PDF)</p>
+                    </div>
+                `;
+                    return;
+                }
+
+                container.innerHTML = reportImages.map((img, idx) => `
+                <div class="avoid-break bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700 rounded-lg p-2 flex flex-col justify-between group shadow-sm">
+                    <div class="relative overflow-hidden rounded bg-black/5 aspect-video flex items-center justify-center cursor-pointer" onclick="openImageZoom('${img.dataUrl}', '${escapeHtml(img.caption)}')">
+                        <img src="${img.dataUrl}" alt="${escapeHtml(img.caption)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white no-print">
+                            <span class="material-symbols-outlined">zoom_in</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex items-center gap-1">
+                        <span class="text-[0.65rem] font-bold text-zinc-400 font-mono">${idx + 1}.</span>
+                        <input type="text" value="${escapeHtml(img.caption)}" placeholder="Pie de foto / descripción..." onchange="updateImageCaption('${img.id}', this.value)" class="flex-1 text-xs bg-transparent border-b border-dashed border-zinc-300 dark:border-zinc-700 focus:border-blue-500 focus:outline-none px-1 py-0.5" />
+                        <button onclick="removeReportImage('${img.id}')" class="no-print text-red-500 hover:text-red-700 p-1" title="Eliminar foto">
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                        </button>
+                    </div>
+                </div>
+            `).join("");
+            }
+
+            function setupDragAndDrop() {
+                const doc = document.getElementById("informe-document");
+                if (!doc) return;
+
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    doc.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }, false);
+                });
+
+                doc.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files && files.length > 0) {
+                        processImageFiles(Array.from(files));
+                    }
+                }, false);
+            }
+
+            // ============================================
+            // IMPORTAR Y EXPORTAR JSON CON IMÁGENES
+            // ============================================
+            function triggerJsonImport() {
+                document.getElementById("json-file-input").click();
+            }
+
+            function importInformeJSON(e) {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        if (data.number) document.getElementById("report-number").value = data.number;
+                        if (data.date) document.getElementById("report-date").value = data.date;
+                        if (data.status) document.getElementById("report-status").value = data.status;
+
+                        if (data.client) {
+                            document.getElementById("client-name").value = data.client.name || "";
+                            document.getElementById("client-id").value = data.client.id || "";
+                            document.getElementById("client-phone").value = data.client.phone || "";
+                            document.getElementById("client-email").value = data.client.email || "";
+                        }
+
+                        if (data.equipment) {
+                            document.getElementById("eq-brand").value = data.equipment.brand || "";
+                            document.getElementById("eq-model").value = data.equipment.model || "";
+                            document.getElementById("eq-specs").value = data.equipment.specs || "";
+                            document.getElementById("eq-accessories").value = data.equipment.accessories || "";
+                        }
+
+                        if (data.titles) {
+                            if (data.titles.title1) document.getElementById("title-section-1").value = data.titles.title1;
+                            if (data.titles.title2) document.getElementById("title-section-2").value = data.titles.title2;
+                            if (data.titles.title3) document.getElementById("title-section-3").value = data.titles.title3;
+                            if (data.titles.title4) document.getElementById("title-section-4").value = data.titles.title4;
+                            if (data.titles.title5) document.getElementById("title-section-5").value = data.titles.title5;
+                            if (data.titles.title6) document.getElementById("title-section-6").value = data.titles.title6;
+                            if (data.titles.costTable) document.getElementById("title-cost-table").value = data.titles.costTable;
+                        }
+
+                        if (data.sections) {
+                            document.getElementById("section-reason").value = data.sections.reason || "";
+                            document.getElementById("section-diagnosis").value = data.sections.diagnosis || "";
+                            document.getElementById("section-findings").value = data.sections.findings || "";
+                            document.getElementById("section-procedure").value = data.sections.procedure || "";
+                            document.getElementById("section-conclusions").value = data.sections.conclusions || "";
+                        }
+
+                        if (Array.isArray(data.costs)) {
+                            itemsCost = data.costs;
+                            renderCostRows();
+                        }
+
+                        if (Array.isArray(data.images)) {
+                            reportImages = data.images;
+                            renderImageGallery();
+                        }
+
+                        alert("Informe cargado exitosamente.");
+                    } catch (err) {
+                        alert("Error al leer el archivo JSON: " + err.message);
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = "";
+            }
+
+            function exportInformeJSON() {
+                const data = {
+                    number: document.getElementById("report-number").value,
+                    date: document.getElementById("report-date").value,
+                    status: document.getElementById("report-status").value,
+                    titles: {
+                        title1: document.getElementById("title-section-1")?.value || "",
+                        title2: document.getElementById("title-section-2")?.value || "",
+                        title3: document.getElementById("title-section-3")?.value || "",
+                        title4: document.getElementById("title-section-4")?.value || "",
+                        title5: document.getElementById("title-section-5")?.value || "",
+                        title6: document.getElementById("title-section-6")?.value || "",
+                        costTable: document.getElementById("title-cost-table")?.value || "",
+                    },
+                    client: {
+                        name: document.getElementById("client-name").value,
+                        id: document.getElementById("client-id").value,
+                        phone: document.getElementById("client-phone").value,
+                        email: document.getElementById("client-email").value,
+                    },
+                    equipment: {
+                        brand: document.getElementById("eq-brand").value,
+                        model: document.getElementById("eq-model").value,
+                        specs: document.getElementById("eq-specs").value,
+                        accessories: document.getElementById("eq-accessories").value,
+                    },
+                    sections: {
+                        reason: document.getElementById("section-reason").value,
+                        diagnosis: document.getElementById("section-diagnosis").value,
+                        findings: document.getElementById("section-findings").value,
+                        procedure: document.getElementById("section-procedure").value,
+                        conclusions: document.getElementById("section-conclusions").value,
+                    },
+                    costs: itemsCost,
+                    images: reportImages
+                };
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `Informe_${data.number || 'Codexis'}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        </script>
+</body>
+
+</html>
